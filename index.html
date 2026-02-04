@@ -3,18 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budget Mensile - Gestione Familiare</title>
+    <title>Budget Mensile + Spese</title>
     <style>
-        :root {
-            --color-primary: #2196F3;
-            --color-success: #4CAF50;
-            --color-danger: #F44336;
-            --color-warning: #FF9800;
-            --color-light: #f5f5f5;
-            --color-dark: #333;
-            --color-border: #ddd;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -25,27 +15,19 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 0;
-            margin: 0;
-            color: var(--color-dark);
             display: flex;
             justify-content: center;
-            align-items: center;
-            width: 100%;
+            align-items: flex-start;
+            padding: 20px 10px;
         }
 
         .container {
-            width: 100vw;
-            max-width: 100vw;
+            max-width: 430px;
+            width: 100%;
             background: white;
-            border-radius: 0;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-            margin: 0;
-            height: 100vh;
-            max-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         header {
@@ -53,306 +35,145 @@
             color: white;
             padding: 25px 20px;
             text-align: center;
-            flex-shrink: 0;
         }
 
         header h1 {
             font-size: 1.8em;
-            margin-bottom: 5px;
-            font-weight: 700;
+            margin-bottom: 10px;
         }
 
-        header p {
-            font-size: 0.85em;
-            opacity: 0.95;
-            font-weight: 300;
+        .month-selector {
+            background: white;
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
         }
 
         .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
+            padding: 25px;
         }
 
         .section {
-            background: var(--color-light);
+            background: #f8f9fa;
             padding: 20px;
-            border-radius: 15px;
-            border-left: 5px solid var(--color-primary);
-        }
-
-        .section.entrate {
-            border-left-color: var(--color-success);
-        }
-
-        .section.spese {
-            border-left-color: var(--color-danger);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
         }
 
         .section h2 {
-            color: var(--color-dark);
+            color: #333;
             margin-bottom: 15px;
-            font-size: 1.25em;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .entry-items {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 12px;
+            font-size: 1.3em;
         }
 
         .entry-item {
             background: white;
             padding: 12px;
-            border-radius: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
             display: flex;
             gap: 8px;
             align-items: center;
-            border: 1px solid var(--color-border);
-            transition: all 0.2s ease;
         }
 
-        .entry-item:active {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .item-label-input,
-        .item-amount-input {
-            padding: 8px;
-            border: 1px solid;
-            border-radius: 8px;
-            font-size: 0.95em;
-            font-family: inherit;
-        }
-
-        .item-label-input {
+        .entry-item input {
             flex: 1;
-            font-weight: 600;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95em;
         }
 
-        .item-amount-input {
-            width: 90px;
-            text-align: right;
-            font-weight: 600;
-        }
-
-        .item-label-input:focus,
-        .item-amount-input:focus {
+        .entry-item input:focus {
             outline: none;
-            border-width: 2px;
+            border-color: #667eea;
         }
 
-        .entrata-input {
-            border-color: var(--color-success);
-        }
-
-        .entrata-input:focus {
-            border-color: var(--color-success);
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
-        }
-
-        .spesa-input {
-            border-color: var(--color-danger);
-        }
-
-        .spesa-input:focus {
-            border-color: var(--color-danger);
-            box-shadow: 0 0 8px rgba(244, 67, 54, 0.2);
-        }
-
-        .btn-remove {
-            background: var(--color-danger);
+        .remove-btn {
+            background: #F44336;
             color: white;
             border: none;
-            padding: 8px 10px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 0.9em;
-            min-width: 35px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
         }
 
-        .btn-remove:active {
-            opacity: 0.8;
-            transform: scale(0.95);
-        }
-
-        .btn-add {
+        .add-btn {
             width: 100%;
             padding: 12px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95em;
-            margin-bottom: 12px;
-            transition: all 0.2s ease;
+            background: #4CAF50;
             color: white;
-        }
-
-        .btn-add:active {
-            transform: scale(0.98);
-        }
-
-        .btn-add-entrate {
-            background: var(--color-success);
-        }
-
-        .btn-add-entrate:active {
-            background: #45a049;
-        }
-
-        .btn-add-spese {
-            background: var(--color-danger);
-        }
-
-        .btn-add-spese:active {
-            background: #da190b;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
         .total-row {
             background: white;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            border: 2px solid var(--color-primary);
-            font-size: 1.15em;
-            font-weight: 700;
-            margin-top: 8px;
-        }
-
-        .total-label {
-            color: var(--color-dark);
-        }
-
-        .total-amount {
-            color: var(--color-primary);
-        }
-
-        .total-amount.entrata {
-            color: var(--color-success);
-        }
-
-        .total-amount.spesa {
-            color: var(--color-danger);
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 10px;
+            border: 2px solid #667eea;
         }
 
         .summary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
-            border-radius: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
+            border-radius: 10px;
             text-align: center;
+            margin-top: 20px;
         }
 
-        .summary-card {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 15px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-        }
-
-        .summary-label {
-            font-size: 0.8em;
-            opacity: 0.9;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
+        .summary h3 {
+            margin-bottom: 10px;
         }
 
         .summary-value {
-            font-size: 1.5em;
-            font-weight: 700;
+            font-size: 2em;
+            font-weight: bold;
         }
 
-        .balance-positive {
-            color: #4CAF50;
-        }
-
-        .balance-negative {
-            color: #FF6B6B;
-        }
-
-        .section.collapsible-closed {
+        .week-section {
+            background: #f8f9fa;
             padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
 
-        .section.collapsible-closed .entry-items,
-        .section.collapsible-closed .btn-add,
-        .section.collapsible-closed .total-row {
-            display: none;
+        .week-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #667eea;
         }
 
-        @media (max-height: 700px) {
-            .container {
-                height: auto;
-                max-height: none;
-            }
-
-            .content {
-                overflow-y: visible;
-                padding: 15px;
-                gap: 15px;
-            }
-
-            header {
-                padding: 20px 15px;
-            }
-
-            header h1 {
-                font-size: 1.5em;
-            }
-
-            .section {
-                padding: 18px;
-            }
-
-            .summary {
-                gap: 10px;
-                padding: 18px;
-            }
+        .food-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
         }
 
-        @media (orientation: landscape) {
-            .container {
-                height: auto;
-                max-height: none;
-            }
+        .food-input input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
 
-            .content {
-                overflow-y: visible;
-                gap: 12px;
-            }
-
-            header {
-                padding: 15px 20px;
-            }
-
-            header h1 {
-                font-size: 1.5em;
-                margin-bottom: 0;
-            }
-
-            header p {
-                font-size: 0.8em;
-            }
+        .food-input input[type="number"] {
+            width: 80px;
         }
     </style>
 </head>
@@ -360,579 +181,238 @@
     <div class="container">
         <header>
             <h1>💰 Budget Mensile</h1>
-            <p>Gestione entrate e spese familiari</p>
-            <div style="margin-top: 15px;">
-                <select id="month-selector" style="padding: 10px 20px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.95); color: #333; font-size: 1.05em; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" onchange="changeMonth()">
-                    <option value="2026-02">Febbraio 2026</option>
-                    <option value="2026-03">Marzo 2026</option>
-                    <option value="2026-04">Aprile 2026</option>
-                    <option value="2026-05">Maggio 2026</option>
-                    <option value="2026-06">Giugno 2026</option>
-                    <option value="2026-07">Luglio 2026</option>
-                    <option value="2026-08">Agosto 2026</option>
-                    <option value="2026-09">Settembre 2026</option>
-                    <option value="2026-10">Ottobre 2026</option>
-                    <option value="2026-11">Novembre 2026</option>
-                    <option value="2026-12">Dicembre 2026</option>
-                    <option value="2027-01">Gennaio 2027</option>
-                </select>
-            </div>
+            <select class="month-selector" id="monthSelector">
+                <option value="2026-02">Febbraio 2026</option>
+                <option value="2026-03">Marzo 2026</option>
+                <option value="2026-04">Aprile 2026</option>
+                <option value="2026-05">Maggio 2026</option>
+                <option value="2026-06">Giugno 2026</option>
+                <option value="2026-07">Luglio 2026</option>
+                <option value="2026-08">Agosto 2026</option>
+                <option value="2026-09">Settembre 2026</option>
+                <option value="2026-10">Ottobre 2026</option>
+                <option value="2026-11">Novembre 2026</option>
+                <option value="2026-12">Dicembre 2026</option>
+            </select>
         </header>
 
         <div class="content">
-            <!-- ENTRATE -->
-            <div class="section entrate">
+            <!-- Entrate -->
+            <div class="section">
                 <h2>📥 Entrate</h2>
-                
-                <div class="entry-items" id="entrate-items">
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="Stipendio Luca" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="1460" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="Stipendio Lisa" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="600" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="Gare Luca" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="400" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                </div>
-
-                <button class="btn-add btn-add-entrate" onclick="addEntryItem('entrate')">+ Aggiungi Entrata</button>
-
+                <div id="entrate-items"></div>
+                <button class="add-btn" onclick="addEntry('entrate')">+ Aggiungi Entrata</button>
                 <div class="total-row">
-                    <span class="total-label">Totale Entrate</span>
-                    <span class="total-amount entrata" id="total-entrate">€ 2.460</span>
+                    <span>Totale Entrate</span>
+                    <span id="total-entrate">€ 0</span>
                 </div>
             </div>
 
-            <!-- SPESE -->
-            <div class="section spese">
+            <!-- Spese -->
+            <div class="section">
                 <h2>📤 Spese</h2>
-                
-                <div class="entry-items" id="spese-items">
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Affitto" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="600" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Alimenti" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="500" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Trasporti" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="400" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Rate Svago" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="160" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Ricariche + Abbonamento" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="70" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Rata Carta di Credito" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="100" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Animali" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="180" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Cena Fuori" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="60" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Regali" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="60" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                </div>
-
-                <button class="btn-add btn-add-spese" onclick="addSpesaRow()">+ Aggiungi Spesa</button>
-
+                <div id="spese-items"></div>
+                <button class="add-btn" onclick="addEntry('spese')">+ Aggiungi Spesa</button>
                 <div class="total-row">
-                    <span class="total-label">Totale Spese</span>
-                    <span class="total-amount spesa" id="total-spese">€ 2.130</span>
+                    <span>Totale Spese</span>
+                    <span id="total-spese">€ 0</span>
                 </div>
             </div>
 
-            <!-- RIEPILOGO -->
+            <!-- Spese Alimentari -->
+            <div class="section">
+                <h2>🛒 Spese Alimentari</h2>
+                <div id="food-weeks"></div>
+                <div class="total-row">
+                    <span>Totale Mese</span>
+                    <span id="total-food">€ 0 / 500</span>
+                </div>
+            </div>
+
+            <!-- Riepilogo -->
             <div class="summary">
-                <div class="summary-card">
-                    <div class="summary-label">📥 Entrate</div>
-                    <div class="summary-value" style="color: #4CAF50;" id="summary-entrate">€ 2.460</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-label">📤 Spese</div>
-                    <div class="summary-value" style="color: #F44336;" id="summary-spese">€ 2.130</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-label">💾 Risparmio</div>
-                    <div class="summary-value balance-positive" id="summary-balance">€ 330</div>
-                </div>
-            </div>
-
-            <!-- LISTA DELLA SPESA SETTIMANALE -->
-            <div class="section" style="border-left-color: #FF9800;">
-                <h2>🛒 Spese Alimentari Settimanali</h2>
-                <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">Budget: <strong>€500/mese (€125/settimana)</strong></p>
-                
-                <div id="weeks-container" style="display: flex; flex-direction: column; gap: 15px;">
-                    <!-- Settimana 1 -->
-                    <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
-                        <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 1</div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                                <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                                <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                                <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                                <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                        </div>
-                        
-                        <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
-                            <span>Totale Settimana:</span>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <span id="total-week1" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
-                                <span class="budget-status ok" id="status-week1" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Settimana 2 -->
-                    <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
-                        <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 2</div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                                <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                                <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                                <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                                <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                        </div>
-                        
-                        <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
-                            <span>Totale Settimana:</span>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <span id="total-week2" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
-                                <span class="budget-status ok" id="status-week2" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Settimana 3 -->
-                    <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
-                        <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 3</div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                                <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                                <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                                <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                                <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                        </div>
-                        
-                        <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
-                            <span>Totale Settimana:</span>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <span id="total-week3" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
-                                <span class="budget-status ok" id="status-week3" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Settimana 4 -->
-                    <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
-                        <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 4</div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                                <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                                <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                                <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                            <div>
-                                <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                                <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals()" oninput="updateFoodTotals()">
-                            </div>
-                        </div>
-                        
-                        <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
-                            <span>Totale Settimana:</span>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <span id="total-week4" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
-                                <span class="budget-status ok" id="status-week4" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RIEPILOGO MENSILE ALIMENTARE -->
-                <div class="summary" style="margin-top: 20px;">
-                    <div class="summary-card">
-                        <div class="summary-label">Budget</div>
-                        <div class="summary-value">€ 500</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-label">Speso</div>
-                        <div class="summary-value" id="total-food-spent">€ 0,00</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-label">Rimasto</div>
-                        <div class="summary-value balance-positive" id="total-food-remaining">€ 500,00</div>
-                    </div>
-                </div>
+                <h3>Risparmio</h3>
+                <div class="summary-value" id="risparmio">€ 0</div>
             </div>
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwfZDY",
+            authDomain: "budget-luca.firebaseapp.com",
+            projectId: "budget-luca",
+            storageBucket: "budget-luca.firebasestorage.app",
+            messagingSenderId: "67496424698",
+            appId: "1:67496424698:web:6e0537f76fa1286840B543",
+            measurementId: "G-TLR0RQ40M9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.doc = doc;
+        window.getDoc = getDoc;
+        window.setDoc = setDoc;
+
+        // Inizializza app
+        initApp();
+    </script>
+
     <script>
         let currentMonth = '2026-02';
+        let data = {
+            entrate: [],
+            spese: [],
+            food: [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+        };
 
-        function changeMonth() {
-            const selector = document.getElementById('month-selector');
-            currentMonth = selector.value;
-            loadMonthData();
+        function initApp() {
+            document.getElementById('monthSelector').value = currentMonth;
+            document.getElementById('monthSelector').addEventListener('change', changeMonth);
+            loadMonth();
         }
 
-        function saveMonthData() {
-            const data = {
-                month: currentMonth,
-                entrate: [],
-                spese: [],
-                spesaAlimentare: {
-                    week1: [],
-                    week2: [],
-                    week3: [],
-                    week4: []
-                }
-            };
-
-            // Salva anche l'ultima modifica
-            data.lastModified = new Date().toISOString();
-
-            document.querySelectorAll('#entrate-items .entry-item').forEach(item => {
-                const label = item.querySelector('.item-label-input').value;
-                const amount = item.querySelector('.item-amount-input').value;
-                if (label || amount) {
-                    data.entrate.push({ label, amount });
-                }
-            });
-
-            document.querySelectorAll('#spese-items .entry-item').forEach(item => {
-                const label = item.querySelector('.item-label-input').value;
-                const amount = item.querySelector('.item-amount-input').value;
-                if (label || amount) {
-                    data.spese.push({ label, amount });
-                }
-            });
-
-            for (let week = 1; week <= 4; week++) {
-                document.querySelectorAll(`.week${week}-shopping`).forEach(input => {
-                    data.spesaAlimentare[`week${week}`].push(input.value || '0');
-                });
-            }
-
-            localStorage.setItem(`budget-${currentMonth}`, JSON.stringify(data));
-        }
-
-        function loadMonthData() {
-            const savedData = localStorage.getItem(`budget-${currentMonth}`);
-            
-            if (savedData) {
-                const data = JSON.parse(savedData);
+        async function loadMonth() {
+            try {
+                const docRef = window.doc(window.db, "budgets", currentMonth);
+                const docSnap = await window.getDoc(docRef);
                 
-                document.getElementById('entrate-items').innerHTML = '';
-                data.entrate.forEach(item => {
-                    const container = document.getElementById('entrate-items');
-                    const newItem = document.createElement('div');
-                    newItem.className = 'entry-item';
-                    newItem.innerHTML = `
-                        <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="${item.label}" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="${item.amount}" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    `;
-                    container.appendChild(newItem);
-                });
-
-                document.getElementById('spese-items').innerHTML = '';
-                data.spese.forEach(item => {
-                    const container = document.getElementById('spese-items');
-                    const newItem = document.createElement('div');
-                    newItem.className = 'entry-item';
-                    newItem.innerHTML = `
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="${item.label}" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="${item.amount}" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    `;
-                    container.appendChild(newItem);
-                });
-
-                for (let week = 1; week <= 4; week++) {
-                    const inputs = document.querySelectorAll(`.week${week}-shopping`);
-                    const weekData = data.spesaAlimentare[`week${week}`];
-                    inputs.forEach((input, index) => {
-                        if (weekData[index]) {
-                            input.value = weekData[index];
-                        }
-                    });
-                }
-
-                updateBudgetTotals();
-                updateFoodTotals();
-            } else {
-                document.getElementById('entrate-items').innerHTML = `
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="Stipendio Luca" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="1460" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="Stipendio Lisa" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="600" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="Gare Luca" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="400" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                `;
-
-                document.getElementById('spese-items').innerHTML = `
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Affitto" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="600" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Alimenti" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="500" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Trasporti" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="400" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Rate Svago" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="160" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Ricariche + Abbonamento" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="70" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Rata Carta di Credito" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="100" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Animali" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="180" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Cena Fuori" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="60" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                    <div class="entry-item">
-                        <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="Regali" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="60" step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-                        <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-                    </div>
-                `;
-
-                updateBudgetTotals();
-                updateFoodTotals();
-            }
-        }
-
-        function addEntryItem(type) {
-            const container = document.getElementById(type + '-items');
-            const newItem = document.createElement('div');
-            newItem.className = 'entry-item';
-            
-            const inputClass = type === 'entrate' ? 'entrata-input' : 'spesa-input';
-            
-            newItem.innerHTML = `
-                <input type="text" class="item-label-input ${inputClass}" placeholder="Nome" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                <input type="number" class="item-amount-input ${inputClass}" placeholder="€" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-            `;
-            
-            container.appendChild(newItem);
-            updateBudgetTotals();
-            saveMonthData();
-        }
-
-        function addSpesaRow() {
-            const container = document.getElementById('spese-items');
-            const newItem = document.createElement('div');
-            newItem.className = 'entry-item';
-            
-            newItem.innerHTML = `
-                <input type="text" class="item-label-input spesa-input" placeholder="Nome" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                <input type="number" class="item-amount-input spesa-input" placeholder="€" step="0.01" min="0" onchange="updateBudgetTotals()" oninput="updateBudgetTotals()">
-                <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-            `;
-            
-            container.appendChild(newItem);
-            updateBudgetTotals();
-            saveMonthData();
-            newItem.querySelector('.item-label-input').focus();
-        }
-
-        function removeEntry(btn) {
-            btn.parentElement.remove();
-            updateBudgetTotals();
-            saveMonthData();
-        }
-
-        function calculateWeekTotal(week) {
-            const inputs = document.querySelectorAll(`.week${week}-shopping`);
-            let total = 0;
-            inputs.forEach(input => {
-                total += parseFloat(input.value) || 0;
-            });
-            return total;
-        }
-
-        function updateFoodTotals() {
-            const budgetPerWeek = 125;
-            let monthTotal = 0;
-
-            for (let week = 1; week <= 4; week++) {
-                const weekTotal = calculateWeekTotal(week);
-                monthTotal += weekTotal;
-
-                const totalElement = document.getElementById(`total-week${week}`);
-                const statusElement = document.getElementById(`status-week${week}`);
-                
-                totalElement.textContent = '€ ' + weekTotal.toFixed(2).replace('.', ',');
-
-                if (weekTotal > budgetPerWeek) {
-                    statusElement.className = 'budget-status warning';
-                    statusElement.style.cssText = 'background: rgba(244, 67, 54, 0.2); color: #F44336; padding: 4px 8px; border-radius: 5px; font-size: 0.8em;';
-                    statusElement.textContent = '⚠ Superato';
+                if (docSnap.exists()) {
+                    data = docSnap.data();
                 } else {
-                    statusElement.className = 'budget-status ok';
-                    statusElement.style.cssText = 'background: rgba(76, 175, 80, 0.2); color: #4CAF50; padding: 4px 8px; border-radius: 5px; font-size: 0.8em;';
-                    statusElement.textContent = '✓ OK';
+                    // Dati default
+                    data = {
+                        entrate: [
+                            {label: 'Stipendio Luca', amount: 1460},
+                            {label: 'Stipendio Lisa', amount: 600},
+                            {label: 'Gare Luca', amount: 400}
+                        ],
+                        spese: [
+                            {label: 'Affitto', amount: 600},
+                            {label: 'Alimenti', amount: 500},
+                            {label: 'Trasporti', amount: 400},
+                            {label: 'Rate Svago', amount: 160},
+                            {label: 'Ricariche', amount: 70},
+                            {label: 'Rata Carta', amount: 100},
+                            {label: 'Animali', amount: 180},
+                            {label: 'Cena Fuori', amount: 60},
+                            {label: 'Regali', amount: 60}
+                        ],
+                        food: [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+                    };
                 }
-            }
-
-            // Aggiorna il riepilogo mensile
-            const monthElement = document.getElementById('total-food-spent');
-            const remainingElement = document.getElementById('total-food-remaining');
-
-            monthElement.textContent = '€ ' + monthTotal.toFixed(2).replace('.', ',');
-            const remaining = 500 - monthTotal;
-            remainingElement.textContent = '€ ' + remaining.toFixed(2).replace('.', ',');
-            
-            if (remaining < 0) {
-                remainingElement.style.color = '#FF6B6B';
-            } else {
-                remainingElement.style.color = '#4CAF50';
+                
+                renderAll();
+            } catch (error) {
+                console.error("Errore caricamento:", error);
+                renderAll();
             }
         }
 
-        function updateBudgetTotals() {
-            // Calcola entrate
-            const entrateInputs = document.querySelectorAll('#entrate-items .item-amount-input');
-            let totalEntrate = 0;
-            entrateInputs.forEach(input => {
-                totalEntrate += parseFloat(input.value) || 0;
-            });
-
-            // Calcola spese
-            const speseInputs = document.querySelectorAll('#spese-items .item-amount-input');
-            let totalSpese = 0;
-            speseInputs.forEach(input => {
-                totalSpese += parseFloat(input.value) || 0;
-            });
-
-            // Calcola risparmio
-            const balance = totalEntrate - totalSpese;
-
-            // Aggiorna display
-            document.getElementById('total-entrate').textContent = '€ ' + totalEntrate.toFixed(2).replace('.', ',');
-            document.getElementById('total-spese').textContent = '€ ' + totalSpese.toFixed(2).replace('.', ',');
-            
-            document.getElementById('summary-entrate').textContent = '€ ' + totalEntrate.toFixed(2).replace('.', ',');
-            document.getElementById('summary-spese').textContent = '€ ' + totalSpese.toFixed(2).replace('.', ',');
-            
-            const summaryBalance = document.getElementById('summary-balance');
-            summaryBalance.textContent = '€ ' + balance.toFixed(2).replace('.', ',');
-            
-            if (balance >= 0) {
-                summaryBalance.className = 'summary-value balance-positive';
-            } else {
-                summaryBalance.className = 'summary-value balance-negative';
+        async function saveData() {
+            try {
+                const docRef = window.doc(window.db, "budgets", currentMonth);
+                await window.setDoc(docRef, data);
+                console.log("Dati salvati con successo!");
+            } catch (error) {
+                console.error("Errore salvataggio:", error);
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadMonthData();
-        });
-    </script>
-</body>
-</html>
+        function changeMonth(e) {
+            currentMonth = e.target.value;
+            loadMonth();
+        }
+
+        function renderAll() {
+            renderEntries('entrate');
+            renderEntries('spese');
+            renderFood();
+            updateTotals();
+        }
+
+        function renderEntries(type) {
+            const container = document.getElementById(`${type}-items`);
+            container.innerHTML = '';
+            
+            data[type].forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'entry-item';
+                div.innerHTML = `
+                    <input type="text" value="${item.label}" onchange="updateEntry('${type}', ${index}, 'label', this.value)">
+                    <input type="number" value="${item.amount}" onchange="updateEntry('${type}', ${index}, 'amount', this.value)">
+                    <button class="remove-btn" onclick="removeEntry('${type}', ${index})">✕</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderFood() {
+            const container = document.getElementById('food-weeks');
+            container.innerHTML = '';
+            
+            for (let week = 0; week < 4; week++) {
+                const weekDiv = document.createElement('div');
+                weekDiv.className = 'week-section';
+                weekDiv.innerHTML = `<div class="week-title">Settimana ${week + 1} (Budget: €125)</div>`;
+                
+                for (let day = 0; day < 4; day++) {
+                    const foodDiv = document.createElement('div');
+                    foodDiv.className = 'food-input';
+                    foodDiv.innerHTML = `
+                        <input type="text" placeholder="Spesa ${day + 1}" readonly style="flex:1">
+                        <input type="number" value="${data.food[week][day]}" onchange="updateFood(${week}, ${day}, this.value)" placeholder="€">
+                    `;
+                    weekDiv.appendChild(foodDiv);
+                }
+                
+                const weekTotal = data.food[week].reduce((a,b) => a + parseFloat(b || 0), 0);
+                const weekTotalDiv = document.createElement('div');
+                weekTotalDiv.style.marginTop = '10px';
+                weekTotalDiv.style.fontWeight = 'bold';
+                weekTotalDiv.innerHTML = `Totale: €${weekTotal.toFixed(2)} ${weekTotal > 125 ? '⚠️' : '✅'}`;
+                weekDiv.appendChild(weekTotalDiv);
+                
+                container.appendChild(weekDiv);
+            }
+        }
+
+        function addEntry(type) {
+            data[type].push({label: '', amount: 0});
+            renderEntries(type);
+            updateTotals();
+            saveData();
+        }
+
+        function removeEntry(type, index) {
+            data[type].splice(index, 1);
+            renderEntries(type);
+            updateTotals();
+            saveData();
+        }
+
+        function updateEntry(type, index, field, value) {
+            if (field === 'amount') {
+                data[type][index][field] = parseFloat(value) || 0;
+            } else {
+                data[type][index][field] = value;
+            }
+            updateTotals();
+            saveData();
+        }
+
+        function updateFood(week, day, value) {
+            data.food[week][day] = parseFloat(value) || 0;
+            renderFood();
+            updateTotals();
+            saveData();
+        }
+
+        function updateTotals() {
+            const totalEntrate = data.entrate.reduce((sum, item) => sum + item.amount,
