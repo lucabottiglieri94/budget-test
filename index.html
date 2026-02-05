@@ -1120,8 +1120,8 @@
         const goalAmount = 250; // Obiettivo di 250 euro
         
         // Calcola il risparmio come: Totale Entrate - Totale Spese
-        const incomeElement = document.getElementById('summary-income');
-        const expenseElement = document.getElementById('summary-expense');
+                const incomeElement = document.getElementById('summary-entrate');
+        const expenseElement = document.getElementById('total-spese');
         
         const totalIncome = incomeElement ? parseFloat(incomeElement.textContent.replace('€', '').replace('.', '').replace(',', '.').trim()) : 0;
         const totalExpense = expenseElement ? parseFloat(expenseElement.textContent.replace('€', '').replace('.', '').replace(',', '.').trim()) : 0;
