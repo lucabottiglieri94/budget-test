@@ -1201,16 +1201,21 @@ if (contentEl && headerEl) {
         const currentScroll = contentEl.scrollTop;
 
         if (window.innerWidth <= 768) {
-            if (currentScroll > lastScrollTop && currentScroll > 60) {
+
+            // Se NON sei in cima → header nascosto
+            if (currentScroll > 10) {
                 headerEl.classList.add('header-hidden');
-            } else {
+            }
+
+            // Riappare SOLO quando torni in cima
+            if (currentScroll <= 5) {
                 headerEl.classList.remove('header-hidden');
             }
-        }
 
-        lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+        }
     });
 }
+
         
     </script>
 </body>
