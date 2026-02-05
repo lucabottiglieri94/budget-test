@@ -1257,393 +1257,420 @@ if (contentEl) {
 
         
     </script>
- <!-- ================= MONETA AI + CHAT (SOLO DATI HTML) ================= -->
-<style>
-    /* Contenitore generale della moneta/AI */
-    #ai-coin-assistant {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 10px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    /* Fumetto dei suggerimenti */
-    #ai-coin-tooltip {
-        max-width: 260px;
-        background: rgba(0, 0, 0, 0.85);
-        color: #fff;
-        padding: 10px 12px;
-        border-radius: 10px;
-        font-size: 0.85em;
-        line-height: 1.4;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        opacity: 0;
-        transform: translateY(10px);
-        pointer-events: none;
-        transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    #ai-coin-tooltip.visible {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-    }
-
-    #ai-coin-tooltip strong {
-        color: #FFEB3B;
-    }
-
-    /* Bottone moneta: solo PNG, niente palla gialla */
-    #ai-coin-button {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        background: transparent;
-        box-shadow: 0 12px 20px rgba(0,0,0,0.35);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: visible;
-        position: relative;
-        animation: coin-bounce 2s ease-in-out infinite;
-    }
-
-    /* Immagine della moneta */
-    #ai-coin-button img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        pointer-events: none;
-    }
-
-    /* Effetto “pulse” al click */
-    #ai-coin-button::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        border: 2px solid rgba(255, 255, 255, 0.6);
-        opacity: 0;
-        transform: scale(0.5);
-        transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    #ai-coin-button.clicked::after {
-        opacity: 1;
-        transform: scale(1.15);
-    }
-
-    /* Animazione rimbalzo moneta */
-    @keyframes coin-bounce {
-        0%, 100% { transform: translateY(0); }
-        20%      { transform: translateY(-8px); }
-        40%      { transform: translateY(0); }
-        60%      { transform: translateY(-4px); }
-        80%      { transform: translateY(0); }
-    }
-
-    /* Piccola notifica di “typing” AI */
-    #ai-coin-typing {
-        font-size: 0.75em;
-        color: #ddd;
-        display: none;
-        margin-top: 2px;
-    }
-
-    /* CHAT BOX */
-    #ai-chat-box {
-        width: 320px;
-        max-height: 420px;
-        background: #ffffff;
-        border-radius: 14px;
-        box-shadow: 0 12px 28px rgba(0,0,0,0.35);
-        overflow: hidden;
-        display: none; /* nascosta di default, si apre al click */
-        flex-direction: column;
-        border: 1px solid rgba(0,0,0,0.1);
-    }
-
-    #ai-chat-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #fff;
-        padding: 10px 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 0.9em;
-    }
-
-    #ai-chat-header-title {
-        display: flex;
-        flex-direction: column;
-    }
-
-    #ai-chat-header-title span:first-child {
-        font-weight: 600;
-    }
-
-    #ai-chat-header-title span:last-child {
-        font-size: 0.75em;
-        opacity: 0.85;
-    }
-
-    #ai-chat-close {
-        cursor: pointer;
-        font-size: 1.1em;
-        opacity: 0.9;
-    }
-
-    #ai-chat-messages {
-        padding: 10px;
-        background: #f5f5f5;
-        flex: 1;
-        overflow-y: auto;
-        font-size: 0.85em;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .ai-chat-msg {
-        max-width: 85%;
-        padding: 8px 10px;
-        border-radius: 10px;
-        line-height: 1.4;
-    }
-
-    .ai-chat-msg.ai {
-        background: #ffffff;
-        align-self: flex-start;
-        border-bottom-left-radius: 2px;
-    }
-
-    .ai-chat-msg.user {
-        background: #667eea;
-        color: #fff;
-        align-self: flex-end;
-        border-bottom-right-radius: 2px;
-    }
-
-    #ai-chat-input-area {
-        border-top: 1px solid #ddd;
-        padding: 8px;
-        background: #fff;
-        display: flex;
-        gap: 6px;
-        align-items: center;
-    }
-
-    #ai-chat-input {
-        flex: 1;
-        border-radius: 999px;
-        border: 1px solid #ccc;
-        padding: 6px 10px;
-        font-size: 0.85em;
-        font-family: inherit;
-        outline: none;
-    }
-
-    #ai-chat-send {
-        border-radius: 999px;
-        border: none;
-        background: #667eea;
-        color: #fff;
-        padding: 6px 12px;
-        font-size: 0.85em;
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-    #ai-chat-send:active {
-        transform: scale(0.98);
-    }
-</style>
-
-<div id="ai-coin-assistant">
-    <div id="ai-coin-tooltip"></div>
-
-    <div id="ai-chat-box">
-        <div id="ai-chat-header">
-            <div id="ai-chat-header-title">
-                <span>AI Budget Coach</span>
-                <span>Usa solo i dati della pagina</span>
-            </div>
-            <div id="ai-chat-close">&times;</div>
-        </div>
-        <div id="ai-chat-messages">
-            <div class="ai-chat-msg ai">
-                Ciao! Sono la tua assistente del budget. Fai una domanda su entrate, spese o saldo e userò i dati di questa pagina per aiutarti.
-            </div>
-        </div>
-        <div id="ai-chat-input-area">
-            <input id="ai-chat-input" type="text" placeholder="Scrivi una domanda..." />
-            <button id="ai-chat-send">Invia</button>
-        </div>
-    </div>
-
-    <button id="ai-coin-button" aria-label="Assistente AI budget">
-        <img src="https://image2url.com/r2/default/images/1770325569777-148ee72e-c1cc-4e77-87b8-041b2d9969f4.png" alt="AI Coin">
-    </button>
-
-    <div id="ai-coin-typing">Sto analizzando il tuo budget…</div>
-</div>
-
 <script>
-    (function () {
-        const tooltip = document.getElementById('ai-coin-tooltip');
-        const button = document.getElementById('ai-coin-button');
-        const typing = document.getElementById('ai-coin-typing');
-        const chatBox = document.getElementById('ai-chat-box');
-        const chatClose = document.getElementById('ai-chat-close');
-        const chatMessages = document.getElementById('ai-chat-messages');
-        const chatInput = document.getElementById('ai-chat-input');
-        const chatSend = document.getElementById('ai-chat-send');
+(function () {
+    const tooltip = document.getElementById('ai-coin-tooltip');
+    const button = document.getElementById('ai-coin-button');
+    const typing = document.getElementById('ai-coin-typing');
+    const chatBox = document.getElementById('ai-chat-box');
+    const chatClose = document.getElementById('ai-chat-close');
+    const chatMessages = document.getElementById('ai-chat-messages');
+    const chatInput = document.getElementById('ai-chat-input');
+    const chatSend = document.getElementById('ai-chat-send');
 
-        let tooltipTimeoutId = null;
+    let tooltipTimeoutId = null;
 
-        function generaSuggerimentiDallaPagina() {
-            const suggestions = [];
+    /* ================== LETTURA COMPLETA DEL TEMPLATE ================== */
 
-            const totalEntrate = document.getElementById('total-entrate');
-            const totalSpese = document.getElementById('total-spese');
-            const balanceEl = document.getElementById('balance-value');
+    function parseEuro(text) {
+        if (!text) return 0;
+        const cleaned = text
+            .replace(/€/g, '')
+            .replace(/\s/g, '')
+            .replace(/\./g, '')
+            .replace(',', '.');
+        const n = parseFloat(cleaned);
+        return isNaN(n) ? 0 : n;
+    }
 
-            let balanceVal = 0;
-            if (balanceEl) {
-                const text = balanceEl.textContent.replace(/[€\s\.]/g, '').replace(',', '.');
-                const n = parseFloat(text);
-                if (!isNaN(n)) balanceVal = n;
+    function formatEuro(value) {
+        return '€ ' + value.toFixed(2).replace('.', ',');
+    }
+
+    function readSummaryBudget() {
+        const entrateEl = document.getElementById('summary-entrate') || document.getElementById('total-entrate');
+        const speseEl   = document.getElementById('summary-spese')   || document.getElementById('total-spese');
+        const balanceEl = document.getElementById('summary-balance');
+
+        const entrate = entrateEl ? parseEuro(entrateEl.textContent) : 0;
+        const spese   = speseEl   ? parseEuro(speseEl.textContent)   : 0;
+        const saldo   = balanceEl ? parseEuro(balanceEl.textContent) : (entrate - spese);
+
+        return {
+            entrate, spese, saldo,
+            entrateText: entrateEl ? entrateEl.textContent.trim() : formatEuro(entrate),
+            speseText:   speseEl   ? speseEl.textContent.trim()   : formatEuro(spese),
+            saldoText:   balanceEl ? balanceEl.textContent.trim() : formatEuro(saldo)
+        };
+    }
+
+    function readEntries() {
+        const entrate = [];
+        const spese = [];
+
+        document.querySelectorAll('#entrate-items .entry-item').forEach(item => {
+            const label = item.querySelector('.item-label-input')?.value?.trim() || '';
+            const amount = item.querySelector('.item-amount-input')?.value || '';
+            if (label || amount) {
+                entrate.push({
+                    label,
+                    amountNum: parseEuro(amount),
+                    amountText: amount ? formatEuro(parseEuro(amount)) : '€ 0,00'
+                });
             }
+        });
 
-            if (balanceVal > 0) {
-                suggestions.push("Il tuo saldo è positivo: valuta se destinare una parte a risparmio o fondo emergenze.");
-            } else if (balanceVal < 0) {
-                suggestions.push("Il saldo è negativo: prova a ridurre le spese variabili (es. tempo libero, extra, ristoranti) nella prossima settimana.");
+        document.querySelectorAll('#spese-items .entry-item').forEach(item => {
+            const label = item.querySelector('.item-label-input')?.value?.trim() || '';
+            const amount = item.querySelector('.item-amount-input')?.value || '';
+            if (label || amount) {
+                spese.push({
+                    label,
+                    amountNum: parseEuro(amount),
+                    amountText: amount ? formatEuro(parseEuro(amount)) : '€ 0,00'
+                });
             }
+        });
 
-            const foodBudgetSection = document.querySelector('.food-budget-section');
-            if (foodBudgetSection) {
-                suggestions.push("Hai una sezione spesa alimentare: confronta il budget settimanale con le spese reali per capire dove stai sforando.");
-            }
+        return { entrate, spese };
+    }
 
-            const fixedCostsLabels = Array.from(document.querySelectorAll('.entry-item .item-label-input'))
-                .map(i => i.value?.toLowerCase() || '');
+    function readFoodWeeks() {
+        const weeklyBudget = 125;
+        const monthlyBudget = 500;
+        const weeks = [];
+        let monthlyTotal = 0;
 
-            if (fixedCostsLabels.some(v => v.includes('mutuo') || v.includes('affitto'))) {
-                suggestions.push("Vedo spese fisse come mutuo/affitto: assicurati che non superino il 30–35% delle entrate totali.");
-            }
+        for (let week = 1; week <= 4; week++) {
+            let weekTotal = 0;
+            document.querySelectorAll(`.week${week}-shopping`).forEach(input => {
+                weekTotal += parseEuro(input.value || '');
+            });
 
-            if (fixedCostsLabels.some(v => v.includes('auto') || v.includes('assicurazione'))) {
-                suggestions.push("Controlla i costi auto/assicurazione: se sono alti, valuta preventivi alternativi o una rata più sostenibile.");
-            }
+            monthlyTotal += weekTotal;
 
-            if (suggestions.length === 0) {
-                suggestions.push("Compila entrate e spese: ti aiuterò a capire dove puoi ottimizzare il tuo bilancio.");
-            }
-
-            const intro = "Ciao, sono la tua AI del budget. ";
-            const body = suggestions.slice(0, 3).join(" ");
-            return intro + body;
+            const statusEl = document.getElementById(`status-week${week}`);
+            const statusText = statusEl ? statusEl.textContent.trim() : '';
+            weeks.push({
+                index: week,
+                total: weekTotal,
+                totalText: formatEuro(weekTotal),
+                statusText,
+                overBudget: weekTotal > weeklyBudget,
+                diff: weekTotal - weeklyBudget
+            });
         }
 
-        function mostraSuggerimento() {
-            typing.style.display = 'block';
-            tooltip.classList.remove('visible');
+        const remainingMonthly = monthlyBudget - monthlyTotal;
 
-            if (tooltipTimeoutId) {
-                clearTimeout(tooltipTimeoutId);
-                tooltipTimeoutId = null;
-            }
+        return {
+            weeklyBudget,
+            monthlyBudget,
+            monthlyTotal,
+            monthlyTotalText: formatEuro(monthlyTotal),
+            remainingMonthly,
+            remainingMonthlyText: formatEuro(remainingMonthly),
+            weeks
+        };
+    }
 
-            setTimeout(() => {
-                const testo = generaSuggerimentiDallaPagina();
-                tooltip.innerHTML = testo;
-                typing.style.display = 'none';
-                tooltip.classList.add('visible');
+    function readSavingsGoal() {
+        const goalAmount = 250;
+        const savedAmountEl = document.getElementById('saved-amount');
+        const remainingAmountEl = document.getElementById('remaining-amount');
+        const progressTextEl = document.getElementById('progress-percentage');
 
-                // Nasconde il tooltip dopo 6 secondi
-                tooltipTimeoutId = setTimeout(() => {
-                    tooltip.classList.remove('visible');
-                }, 6000);
-            }, 600);
+        const saved = savedAmountEl ? parseEuro(savedAmountEl.textContent) : 0;
+        const remaining = remainingAmountEl ? parseEuro(remainingAmountEl.textContent) : Math.max(0, goalAmount - saved);
+        const perc = progressTextEl ? parseFloat(progressTextEl.textContent.replace('%','')) || 0 : (saved / goalAmount) * 100;
+
+        return {
+            goal: goalAmount,
+            saved,
+            remaining,
+            perc: Math.max(0, Math.min(100, perc)),
+            savedText: formatEuro(saved),
+            remainingText: formatEuro(remaining)
+        };
+    }
+
+    function readGlobalContext() {
+        const monthSelector = document.getElementById('month-selector');
+        const currentMonthValue = monthSelector ? monthSelector.value : '';
+        const currentMonthLabel = monthSelector
+            ? (monthSelector.selectedOptions[0]?.textContent.trim() || '')
+            : '';
+
+        const syncLabel = document.getElementById('sync-label');
+        const syncText = syncLabel ? syncLabel.textContent.trim() : '';
+
+        const userInfo = document.getElementById('user-info');
+        const userEmail = userInfo ? userInfo.textContent.trim() : '';
+
+        return {
+            currentMonthValue,
+            currentMonthLabel,
+            syncText,
+            userEmail
+        };
+    }
+
+    function readPageData() {
+        const budget = readSummaryBudget();
+        const entries = readEntries();
+        const food = readFoodWeeks();
+        const goal = readSavingsGoal();
+        const global = readGlobalContext();
+
+        return { budget, entries, food, goal, global };
+    }
+
+    /* ================== TOOLTIP INTELLIGENTE ================== */
+
+    function generaSuggerimentiDallaPagina() {
+        const data = readPageData();
+
+        const suggestions = [];
+
+        if (data.global.currentMonthLabel) {
+            suggestions.push(`Stai lavorando sul mese di ${data.global.currentMonthLabel}.`);
         }
 
-        /* --- FUNZIONI CHAT --- */
-
-        function appendMessage(text, type) {
-            const div = document.createElement('div');
-            div.className = 'ai-chat-msg ' + type;
-            div.textContent = text;
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (data.budget.saldo > 0) {
+            suggestions.push(`Il tuo saldo è positivo (${data.budget.saldoText}): pensa a destinare una quota fissa a risparmio o fondo emergenze.`);
+        } else if (data.budget.saldo < 0) {
+            suggestions.push(`Il saldo è negativo (${data.budget.saldoText}): valuta di ridurre spese non essenziali nel prossimo mese.`);
         }
 
-        function leggiDatiPagina() {
-            const totalEntrate = document.getElementById('total-entrate');
-            const totalSpese = document.getElementById('total-spese');
-            const balanceEl = document.getElementById('balance-value');
-
-            let entrateText = totalEntrate ? totalEntrate.textContent.trim() : "non disponibili";
-            let speseText = totalSpese ? totalSpese.textContent.trim() : "non disponibili";
-            let saldoText = balanceEl ? balanceEl.textContent.trim() : "non disponibile";
-
-            const labels = Array.from(document.querySelectorAll('.entry-item .item-label-input'))
-                .map(i => i.value || '')
-                .filter(v => v.trim() !== '');
-
-            return { entrateText, speseText, saldoText, labels };
+        const food = data.food;
+        if (food.monthlyTotal > 0) {
+            suggestions.push(`Per la spesa alimentare hai speso ${food.monthlyTotalText} su un budget di ${formatEuro(food.monthlyBudget)}.`);
+            const sforate = food.weeks.filter(w => w.overBudget);
+            if (sforate.length > 0) {
+                const numeri = sforate.map(w => `Settimana ${w.index}`).join(', ');
+                suggestions.push(`Hai sforato il budget da €${food.weeklyBudget} in: ${numeri}.`);
+            }
         }
 
-        function rispostaAI(domanda) {
-            const lower = domanda.toLowerCase();
-            const dati = leggiDatiPagina();
-
-            if (lower.includes('entrate') || lower.includes('guadagno') || lower.includes('stipendio')) {
-                return "Le tue entrate totali attualmente risultano: " + dati.entrateText + ".";
-            }
-
-            if (lower.includes('spese') || lower.includes('uscite') || lower.includes('quanto spendo')) {
-                return "Le tue spese totali attualmente risultano: " + dati.speseText + ".";
-            }
-
-            if (lower.includes('saldo') || lower.includes('avanzo') || lower.includes('disavanzo')) {
-                return "Il tuo saldo attuale risulta: " + dati.saldoText + ". Se è negativo, prova a tagliare qualche voce variabile.";
-            }
-
-            if (lower.includes('categorie') || lower.includes('voci') || lower.includes('cosa ho')) {
-                if (dati.labels.length > 0) {
-                    return "Al momento vedo queste voci nel tuo budget: " + dati.labels.join(", ") + ".";
-                } else {
-                    return "Non vedo ancora nomi di voci compilati. Aggiungi le descrizioni alle tue spese/entrate per un’analisi più precisa.";
-                }
-            }
-
-            return "Ho analizzato i dati della pagina: entrate " + dati.entrateText +
-                ", spese " + dati.speseText + ", saldo " + dati.saldoText +
-                ". Fai domande usando parole come \"entrate\", \"spese\", \"saldo\" o \"categorie\" per risposte più specifiche.";
+        const labels = data.entries.spese.map(s => s.label.toLowerCase());
+        if (labels.some(v => v.includes('affitto') || v.includes('mutuo'))) {
+            suggestions.push('Vedo spese abitative (affitto/mutuo): idealmente dovrebbero stare entro il 30–35% delle entrate.');
+        }
+        if (labels.some(v => v.includes('auto') || v.includes('assicurazione') || v.includes('rc'))) {
+            suggestions.push('Hai costi legati all’auto: confrontare assicurazione e carburante può liberare margine ogni mese.');
         }
 
-        function inviaDomanda() {
-            const text = chatInput.value.trim();
-            if (!text) return;
-            appendMessage(text, 'user');
-            chatInput.value = '';
-
-            setTimeout(() => {
-                const reply = rispostaAI(text);
-                appendMessage(reply, 'ai');
-            }, 500);
+        if (suggestions.length === 0) {
+            suggestions.push('Compila entrate, spese e spesa alimentare: poi chiedimi come ottimizzare il tuo bilancio.');
         }
 
-        // Click sulla moneta: rimbalzo + toggle chat + suggerimento
+        const intro = 'Ciao, sono la tua AI del budget. ';
+        return intro + suggestions.slice(0, 3).join(' ');
+    }
+
+    function mostraSuggerimento() {
+        if (!tooltip || !typing) return;
+
+        typing.style.display = 'block';
+        tooltip.classList.remove('visible');
+
+        if (tooltipTimeoutId) {
+            clearTimeout(tooltipTimeoutId);
+            tooltipTimeoutId = null;
+        }
+
+        setTimeout(() => {
+            const testo = generaSuggerimentiDallaPagina();
+            tooltip.textContent = testo;
+            typing.style.display = 'none';
+            tooltip.classList.add('visible');
+
+            tooltipTimeoutId = setTimeout(() => {
+                tooltip.classList.remove('visible');
+            }, 6000);
+        }, 600);
+    }
+
+    /* ================== CHAT: MESSAGGI ================== */
+
+    function appendMessage(text, type) {
+        const div = document.createElement('div');
+        div.className = 'ai-chat-msg ' + type;
+        div.textContent = text;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    /* ================== MOTORE DI RISPOSTA “INTELLIGENTE” ================== */
+
+    function generaRisposta(domanda) {
+        const lower = domanda.toLowerCase();
+        const data = readPageData();
+
+        const { budget, entries, food, goal, global } = data;
+
+        // Domande su mese / sincronizzazione / utente
+        if (lower.includes('mese') || lower.includes('periodo')) {
+            let base = global.currentMonthLabel
+                ? `Stai lavorando su ${global.currentMonthLabel}.`
+                : 'Non riesco a capire il mese selezionato.';
+            if (global.syncText) {
+                base += ` Stato sincronizzazione: ${global.syncText}.`;
+            }
+            if (global.userEmail) {
+                base += ` Utente collegato: ${global.userEmail}.`;
+            }
+            return base;
+        }
+
+        if (lower.includes('sincronizz') || lower.includes('google') || lower.includes('login')) {
+            if (!global.userEmail) {
+                return 'Al momento non vedo un utente loggato: per sincronizzare il budget devi accedere con Google dal pulsante in alto.';
+            }
+            return `Risulti connesso come ${global.userEmail}. Stato: ${global.syncText || 'nessuna informazione aggiuntiva.'}`;
+        }
+
+        // Entrate
+        if (lower.includes('entrate') || lower.includes('guadagno') || lower.includes('stipendio')) {
+            if (entries.entrate.length === 0) {
+                return 'Non vedo entrate compilate: aggiungi almeno una voce nella sezione Entrate per poterle analizzare.';
+            }
+            const elenco = entries.entrate
+                .map(e => `- ${e.label || 'Senza nome'}: ${e.amountText}`)
+                .join('\n');
+            return `Le tue entrate totali risultano: ${budget.entrateText}.\nEcco il dettaglio:\n${elenco}`;
+        }
+
+        // Spese
+        if (lower.includes('spese') || lower.includes('uscite') || lower.includes('quanto spendo')) {
+            if (entries.spese.length === 0) {
+                return 'Non vedo spese compilate: inserisci le tue voci (affitto, auto, svago, ecc.) per un’analisi dettagliata.';
+            }
+            const elenco = entries.spese
+                .map(s => `- ${s.label || 'Senza nome'}: ${s.amountText}`)
+                .join('\n');
+            return `Le tue spese totali risultano: ${budget.speseText}.\nEcco il dettaglio:\n${elenco}`;
+        }
+
+        // Saldo / avanzo / disavanzo
+        if (lower.includes('saldo') || lower.includes('avanzo') || lower.includes('disavanzo')) {
+            let commento = '';
+            if (budget.saldo > 0) {
+                commento = 'Hai un avanzo: valuta di destinarne una parte al risparmio o al rimborso di debiti costosi.';
+            } else if (budget.saldo < 0) {
+                commento = 'Se il saldo resta negativo per più mesi, prova a rivedere spese non essenziali o aumentare le entrate.';
+            } else {
+                commento = 'Saldo esattamente a zero: è un equilibrio, ma non lascia margine per imprevisti.';
+            }
+            return `Il tuo saldo attuale è ${budget.saldoText}.\n${commento}`;
+        }
+
+        // Risparmio / obiettivo
+        if (lower.includes('risparmi') || lower.includes('obiettivo') || lower.includes('goal') || lower.includes('risparmio')) {
+            const g = goal;
+            if (!g.goal) {
+                return 'Non trovo un obiettivo di risparmio configurato nella pagina.';
+            }
+            let testo = `Il tuo obiettivo di risparmio mensile è ${formatEuro(g.goal)}.\n`;
+            testo += `Hai già risparmiato ${g.savedText} e ti mancano ${g.remainingText} (${g.perc.toFixed(0)}%).`;
+            if (g.perc < 50 && g.remaining > 0) {
+                testo += '\nSe vuoi accelerare, prova a destinare una parte delle entrate extra direttamente al risparmio appena le ricevi.';
+            } else if (g.perc >= 100) {
+                testo += '\nComplimenti, hai raggiunto l’obiettivo di questo mese: potresti alzare leggermente il target il prossimo mese.';
+            }
+            return testo;
+        }
+
+        // Spesa alimentare / settimane
+        if (lower.includes('spesa alimentare') || lower.includes('spesa settimanale') || lower.includes('spese alimentari') || lower.includes('supermercato') || lower.includes('lidl')) {
+            const f = food;
+            if (f.monthlyTotal === 0) {
+                return 'Nel riquadro Spese Alimentari Settimanali non trovo importi: inserisci le spese per ogni settimana così posso analizzarle.';
+            }
+
+            const riepilogoSettimane = f.weeks.map(w => {
+                const statoBase = w.overBudget
+                    ? `sforata di ${formatEuro(w.diff)}`
+                    : `entro budget (hai ancora ${formatEuro(-w.diff)})`;
+                return `Settimana ${w.index}: ${w.totalText}, ${statoBase}`;
+            }).join('\n');
+
+            let testo = `Per la spesa alimentare hai speso in totale ${f.monthlyTotalText} su un budget di ${formatEuro(f.monthlyBudget)}.\n`;
+            testo += riepilogoSettimane;
+
+            const sforate = f.weeks.filter(w => w.overBudget);
+            if (sforate.length > 0) {
+                testo += '\n\nSuggerimento: prova a pianificare un menu fisso per le settimane in cui sfori di più e usa una lista della spesa più rigida.';
+            }
+            return testo;
+        }
+
+        // Domande su categorie / voci
+        if (lower.includes('categorie') || lower.includes('voci') || lower.includes('cosa ho') || lower.includes('che spese') || lower.includes('quali spese')) {
+            const labels = [...entries.entrate, ...entries.spese]
+                .map(v => v.label)
+                .filter(v => v && v.trim() !== '');
+            if (labels.length === 0) {
+                return 'Non vedo nomi di voci compilati. Aggiungi le descrizioni alle tue entrate e spese per avere una panoramica delle categorie.';
+            }
+            return 'Nel tuo budget vedo queste voci:\n- ' + labels.join('\n- ');
+        }
+
+        // Domande “aiutami a migliorare”
+        if (lower.includes('come posso migliorare') ||
+            lower.includes('ottimizza') ||
+            lower.includes('consigli') ||
+            lower.includes('come risparmiare') ||
+            lower.includes('dove tagliare')) {
+
+            const fisse = entries.spese.filter(s =>
+                /affitto|mutuo|prestito|finanziamento|rata|noleggio/i.test(s.label || '')
+            );
+            const variabili = entries.spese.filter(s =>
+                /cena|ristorante|svago|extra|tempo libero|shopping|regali|viaggi|vacanze/i.test(s.label || '')
+            );
+
+            let testo = `Partiamo dai numeri: entrate ${budget.entrateText}, spese ${budget.speseText}, saldo ${budget.saldoText}.\n`;
+
+            if (fisse.length > 0) {
+                const sommaFisse = fisse.reduce((acc, s) => acc + s.amountNum, 0);
+                testo += `Le spese fisse (affitto, rate, ecc.) che vedo valgono circa ${formatEuro(sommaFisse)} al mese: sono più difficili da cambiare nel breve.\n`;
+            }
+
+            if (variabili.length > 0) {
+                const sommaVar = variabili.reduce((acc, s) => acc + s.amountNum, 0);
+                testo += `Le spese variabili (svago, cene, shopping…) che ho riconosciuto sono circa ${formatEuro(sommaVar)}: qui c’è di solito più margine di taglio.\n`;
+            }
+
+            testo += 'Un buon approccio è: definisci un tetto massimo per svago/shopping, pianifica in anticipo la spesa alimentare e, se possibile, aumenta il risparmio automatico appena ricevi lo stipendio.';
+            return testo;
+        }
+
+        // Risposta di fallback generica ma consapevole del template
+        return `Ho analizzato i dati di questa pagina.\n` +
+            `Entrate totali: ${budget.entrateText}.\n` +
+            `Spese totali: ${budget.speseText}.\n` +
+            `Saldo: ${budget.saldoText}.\n` +
+            `Spesa alimentare: ${food.monthlyTotalText} su ${formatEuro(food.monthlyBudget)} di budget.\n` +
+            `Obiettivo di risparmio: ${formatEuro(goal.goal)} (hai ${goal.savedText}, ti mancano ${goal.remainingText}).\n` +
+            'Per domande più specifiche usa parole chiave come "entrate", "spese", "saldo", "risparmio", "spesa alimentare", "come posso migliorare".';
+    }
+
+    function inviaDomanda() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        appendMessage(text, 'user');
+        chatInput.value = '';
+
+        setTimeout(() => {
+            const reply = generaRisposta(text);
+            appendMessage(reply, 'ai');
+        }, 400);
+    }
+
+    /* ================== EVENTI UI ================== */
+
+    if (button) {
         button.addEventListener('click', () => {
             button.classList.add('clicked');
             setTimeout(() => button.classList.remove('clicked'), 250);
@@ -1656,28 +1683,36 @@ if (contentEl) {
 
             mostraSuggerimento();
         });
+    }
 
+    if (chatClose) {
         chatClose.addEventListener('click', () => {
             chatBox.style.display = 'none';
         });
+    }
 
+    if (chatSend) {
         chatSend.addEventListener('click', inviaDomanda);
+    }
 
+    if (chatInput) {
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 inviaDomanda();
             }
         });
+    }
 
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                mostraSuggerimento();
-            }, 2000);
-        });
-    })();
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            mostraSuggerimento();
+        }, 2000);
+    });
+})();
 </script>
-<!-- =============== FINE MONETA AI + CHAT ================= -->
+<!-- =============== FINE MONETA AI + CHAT (NUOVA VERSIONE) ================= -->
+
 
 </body>
 </html>
