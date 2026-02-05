@@ -49,13 +49,18 @@
         }
 
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px 20px;
+    text-align: center;
+    flex-shrink: 0;
 
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
         header h1 {
             font-size: 1.8em;
             margin-bottom: 5px;
@@ -507,6 +512,11 @@
         .alert-close:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+        header.header-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
     </style>
 </head>
 <body>
@@ -1179,6 +1189,26 @@
         }
     }
     setTimeout(updateSavingsGoal, 500);
+        let lastScrollTop = 0;
+const headerEl = document.querySelector('header');
+const contentEl = document.querySelector('.content');
+
+if (contentEl && headerEl) {
+    contentEl.addEventListener('scroll', () => {
+        const currentScroll = contentEl.scrollTop;
+
+        if (window.innerWidth <= 768) {
+            if (currentScroll > lastScrollTop && currentScroll > 60) {
+                headerEl.classList.add('header-hidden');
+            } else {
+                headerEl.classList.remove('header-hidden');
+            }
+        }
+
+        lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+    });
+}
+        
     </script>
 </body>
 </html>
