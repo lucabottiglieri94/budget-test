@@ -14,155 +14,249 @@
     --color-dark: #333;
     --color-border: #ddd;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
+
+* {margin:0;padding:0;box-sizing:border-box;}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
     color: var(--color-dark);
-    display: flex;
-    justify-content: center;
-}
-.container {
     width: 100%;
-    max-width: 1200px;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    height: 100%;
+    margin:0;
 }
+
+.container {
+    max-width:100vw;
+    min-height:100vh;
+    background:white;
+    display:flex;
+    flex-direction:column;
+}
+
 header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    color:white;
     padding: 25px 20px;
-    text-align: center;
-    position: sticky;
-    top: 0;
+    text-align:center;
+    position: fixed;
+    top:0; left:0; right:0;
     z-index: 1000;
 }
-header h1 { font-size: 1.8em; margin-bottom: 5px; }
-header p { font-size: 0.85em; opacity: 0.95; }
-header button {
-    background: white; color: #764ba2; border: none; padding: 8px 12px;
-    border-radius: 10px; cursor: pointer; font-weight: 700; margin-top: 10px;
-}
+
+header h1 { font-size:1.8em; margin-bottom:5px; font-weight:700;}
+header p { font-size:0.85em; opacity:0.95; font-weight:300;}
+
 .content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+    flex:1;
+    margin-top:180px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    overflow-y:auto;
 }
+
 .section {
     background: var(--color-light);
-    padding: 20px;
-    border-radius: 15px;
-    border-left: 5px solid var(--color-primary);
+    padding:20px;
+    border-radius:15px;
+    border-left:5px solid var(--color-primary);
 }
-.section.entrate { border-left-color: var(--color-success); }
-.section.spese { border-left-color: var(--color-danger); }
-.section h2 { margin-bottom: 15px; display: flex; align-items: center; gap: 8px; font-size: 1.25em; }
-.entry-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+
+.section.entrate { border-left-color: var(--color-success);}
+.section.spese { border-left-color: var(--color-danger);}
+.section.budget { border-left-color: var(--color-warning);}
+
+.section h2 { font-size:1.25em; font-weight:600; margin-bottom:15px;}
+
+.entry-items { display:flex; flex-direction:column; gap:10px; margin-bottom:12px;}
 .entry-item {
-    background: white;
-    padding: 12px;
-    border-radius: 10px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    border: 1px solid var(--color-border);
+    background:white; padding:12px; border-radius:10px;
+    display:flex; gap:8px; align-items:center; border:1px solid var(--color-border);
 }
+
 .item-label-input, .item-amount-input {
-    padding: 8px; border-radius: 8px; font-size: 0.95em;
+    padding:8px;
+    border-radius:8px;
+    font-family:inherit;
 }
-.item-label-input { flex: 1; font-weight: 600; }
-.item-amount-input { width: 90px; text-align: right; font-weight: 600; }
-.btn-remove { background: var(--color-danger); color: white; border: none; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
-.btn-add { width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.95em; margin-bottom: 12px; color: white; }
-.btn-add-entrate { background: var(--color-success); }
-.btn-add-spese { background: var(--color-danger); }
-.total-row { background: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; border: 2px solid var(--color-primary); font-weight: 700; margin-top: 8px; }
+
+.item-label-input { flex:1; font-weight:600;}
+.item-amount-input { width:90px; text-align:right; font-weight:600;}
+
+.btn-remove { background: var(--color-danger); color:white; border:none;
+    padding:8px 10px; border-radius:8px; cursor:pointer; font-size:0.9em; min-width:35px;}
+
+.btn-add { width:100%; padding:12px; border:none; border-radius:10px; cursor:pointer; color:white; font-weight:600; margin-bottom:12px;}
+
+.btn-add-entrate { background: var(--color-success);}
+.btn-add-spese { background: var(--color-danger);}
+
+.total-row {
+    background:white; padding:15px; border-radius:10px;
+    display:flex; justify-content:space-between; align-items:center;
+    border:2px solid var(--color-primary); font-weight:700; margin-top:8px;
+}
+
 .summary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 15px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-    text-align: center;
+    background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+    color:white;
+    padding:20px;
+    border-radius:15px;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:12px;
+    text-align:center;
 }
-.summary-card {
-    background: rgba(255,255,255,0.15);
-    padding: 15px;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-}
-.summary-label { font-size: 0.8em; opacity: 0.9; margin-bottom: 6px; font-weight: 600; }
-.summary-value { font-size: 1.5em; font-weight: 700; }
-.balance-positive { color: #4CAF50; }
-.balance-negative { color: #FF6B6B; }
+
+.summary-card { background: rgba(255,255,255,0.15); padding:15px; border-radius:12px;}
+.summary-label { font-size:0.8em; opacity:0.9; margin-bottom:6px; font-weight:600;}
+.summary-value { font-size:1.5em; font-weight:700;}
+
+.balance-positive { color:#4CAF50; }
+.balance-negative { color:#FF6B6B; }
+
 #risparmi-btn, #comparatori-btn {
-    position: fixed; bottom: 20px; padding: 10px 18px; border-radius: 999px; border: none; font-weight: 700; cursor: pointer; z-index: 1500;
+    position:fixed; bottom:20px; padding:10px 18px; border-radius:999px;
+    border:none; color:white; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    z-index:1500;
 }
-#risparmi-btn { left: 20px; background: #ff9800; color: #fff; }
-#comparatori-btn { right: 20px; background: #4CAF50; color: #fff; }
-#ai-coin { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); width: 80px; cursor: pointer; z-index: 1600; animation: floatCoin 2s ease-in-out infinite alternate; }
-@keyframes floatCoin { 0% { transform: translateX(-50%) translateY(0px) rotate(0deg); } 100% { transform: translateX(-50%) translateY(-10px) rotate(15deg); } }
-#ai-bubble { position: fixed; bottom: 200px; left: 50%; transform: translateX(-50%); background: #fff; padding: 12px 18px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); max-width: 260px; text-align: center; font-size: 0.85em; color: #333; display: none; z-index: 1700; }
+
+#risparmi-btn { left:20px; background:#ff9800;}
+#comparatori-btn { right:20px; background:#4CAF50;}
+
+#risparmi-btn:active, #comparatori-btn:active { transform: scale(0.98);}
+
+/* Moneta AI */
+#coin-ai {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    z-index: 1600;
+}
+
+#coin-ai img { width:100%; animation: bounce 1.5s infinite; }
+
+@keyframes bounce {
+    0% { transform: translateY(0);}
+    50% { transform: translateY(-10px);}
+    100% { transform: translateY(0);}
+}
+
+#ai-tip {
+    position: fixed;
+    bottom: 190px;
+    right: 20px;
+    width: 250px;
+    background: white;
+    border-radius: 15px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    padding:15px;
+    display:none;
+    font-size:0.9em;
+    z-index:1600;
+}
 </style>
 </head>
 <body>
 <div class="container">
 <header>
-    <h1>💰 Budget Mensile</h1>
-    <p>Gestione entrate e spese familiari (sincronizzato)</p>
-    <button id="login-btn">🔑 Accedi con Google</button>
+<h1>💰 Budget Mensile</h1>
+<p>Gestione entrate e spese familiari (sincronizzato)</p>
+<div style="margin-top:15px;">
+    <select id="month-selector" onchange="changeMonth()">
+        <option value="2026-02">Febbraio 2026</option>
+        <option value="2026-03">Marzo 2026</option>
+        <option value="2026-04">Aprile 2026</option>
+    </select>
+</div>
+<div style="margin-top:10px;">
+    <button id="login-btn">Accedi con Google</button>
+    <span id="user-info" style="font-size:0.8em;margin-left:8px;"></span>
+</div>
+<div id="sync-status" style="margin-top:10px; font-size:0.8em;">
+    🔄 Stato sincronizzazione: <span id="sync-label">In attesa...</span>
+</div>
 </header>
 
 <div class="content">
-    <button id="risparmi-btn" onclick="location.href='risparmi.html'">📈 Grafico Risparmi</button>
-    <button id="comparatori-btn" onclick="location.href='comparatori.html'">📊 Comparatori</button>
 
-    <div class="section entrate">
-        <h2>📥 Entrate</h2>
-        <div class="entry-items" id="entrate-items"></div>
-        <button class="btn-add btn-add-entrate" onclick="addEntryItem('entrate')">+ Aggiungi Entrata</button>
-        <div class="total-row"><span>Totale Entrate</span><span id="total-entrate">€ 0,00</span></div>
-    </div>
+<button id="risparmi-btn" onclick="location.href='risparmi.html'">📈 Grafico Risparmi</button>
+<button id="comparatori-btn" onclick="location.href='comparatori.html'">📊 Comparatori</button>
 
-    <div class="section spese">
-        <h2>📤 Spese</h2>
-        <div class="entry-items" id="spese-items"></div>
-        <button class="btn-add btn-add-spese" onclick="addEntryItem('spese')">+ Aggiungi Spesa</button>
-        <div class="total-row"><span>Totale Spese</span><span id="total-spese">€ 0,00</span></div>
-    </div>
-
-    <div class="summary">
-        <div class="summary-card"><div class="summary-label">📥 Entrate</div><div class="summary-value" id="summary-entrate">€ 0,00</div></div>
-        <div class="summary-card"><div class="summary-label">📤 Spese</div><div class="summary-value" id="summary-spese">€ 0,00</div></div>
-        <div class="summary-card"><div class="summary-label">💾 Risparmio</div><div class="summary-value balance-positive" id="summary-balance">€ 0,00</div></div>
-    </div>
+<!-- ENTRATE -->
+<div class="section entrate">
+<h2>📥 Entrate</h2>
+<div class="entry-items" id="entrate-items"></div>
+<button class="btn-add btn-add-entrate" onclick="addEntryItem('entrate')">+ Aggiungi Entrata</button>
+<div class="total-row">
+<span class="total-label">Totale Entrate</span>
+<span class="total-amount entrata" id="total-entrate">€0,00</span>
 </div>
 </div>
 
-<img id="ai-coin" src="https://upload.wikimedia.org/wikipedia/commons/1/17/2_euro_coin.png" alt="Moneta AI">
-<div id="ai-bubble">💡 Consiglio AI: Puoi risparmiare ancora €100 questo mese! 💰</div>
+<!-- SPESE -->
+<div class="section spese">
+<h2>📤 Spese</h2>
+<div class="entry-items" id="spese-items"></div>
+<button class="btn-add btn-add-spese" onclick="addEntryItem('spese')">+ Aggiungi Spesa</button>
+<div class="total-row">
+<span class="total-label">Totale Spese</span>
+<span class="total-amount spesa" id="total-spese">€0,00</span>
+</div>
+</div>
+
+<!-- BUDGET SETTIMANALE -->
+<div class="section budget">
+<h2>📝 Budget Settimanale</h2>
+<div style="display:flex;gap:10px; align-items:center;">
+    <label>Limite Settimanale €</label>
+    <input type="number" id="weekly-budget" value="300" style="padding:6px;border-radius:6px;" oninput="checkWeeklyBudget()">
+</div>
+<div style="margin-top:10px;">Spesa Settimanale Attuale: €<span id="weekly-spesa">0</span></div>
+</div>
+
+<!-- RIEPILOGO -->
+<div class="summary">
+<div class="summary-card">
+<div class="summary-label">📥 Entrate</div>
+<div class="summary-value" style="color:#4CAF50;" id="summary-entrate">€0,00</div>
+</div>
+<div class="summary-card">
+<div class="summary-label">📤 Spese</div>
+<div class="summary-value" style="color:#F44336;" id="summary-spese">€0,00</div>
+</div>
+<div class="summary-card">
+<div class="summary-label">💾 Risparmio</div>
+<div class="summary-value balance-positive" id="summary-balance">€0,00</div>
+</div>
+</div>
+
+<!-- MONETA AI -->
+<div id="coin-ai">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Euro_coin_2_Euro.png/64px-Euro_coin_2_Euro.png" alt="Moneta AI">
+</div>
+<div id="ai-tip">💡 Consiglio AI: Controlla le spese superflue e risparmia fino a €50 questo mese!</div>
+
+</div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
-    authDomain: "budget-luca.firebaseapp.com",
-    projectId: "budget-luca",
-    storageBucket: "budget-luca.firebasestorage.app",
-    messagingSenderId: "67496424698",
-    appId: "1:67496424698:web:b1822e04ef4efc07408543",
-    measurementId: "G-7LEYRZE9QN"
+apiKey:"AIzaSyAdZBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+authDomain:"budget-luca.firebaseapp.com",
+projectId:"budget-luca",
+storageBucket:"budget-luca.firebasestorage.app",
+messagingSenderId:"67496424698",
+appId:"1:67496424698:web:b1822e04ef4efc07408543"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -171,30 +265,148 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 let currentUser = null;
-onAuthStateChanged(auth, user => { currentUser = user; loginBtn.textContent = user ? "✅ Loggato" : "🔑 Accedi con Google"; });
+let currentMonth = '2026-02';
+let unsubscribe = null;
+let isSaving = false;
 
-const loginBtn = document.getElementById("login-btn");
-loginBtn.onclick = () => { if(!currentUser) signInWithPopup(auth, provider); };
+const loginBtn = document.getElementById('login-btn');
+const userInfo = document.getElementById('user-info');
+const syncLabel = document.getElementById('sync-label');
 
-const aiCoin = document.getElementById('ai-coin');
-const aiBubble = document.getElementById('ai-bubble');
-aiCoin.addEventListener('click', async () => {
-    if(!currentUser) { alert("Accedi per ricevere i consigli AI!"); return; }
-    const ref = doc(db, "budgets", "2026-02");
-    const snap = await getDoc(ref);
-    let balance = 0;
-    if(snap.exists()) {
-        const data = snap.data();
-        const totalEntrate = data.entrate?.reduce((a,b)=>a+parseFloat(b.amount||0),0)||0;
-        const totalSpese = data.spese?.reduce((a,b)=>a+parseFloat(b.amount||0),0)||0;
-        balance = totalEntrate - totalSpese;
+loginBtn.addEventListener('click', async ()=>{
+    if(currentUser){
+        await signOut(auth);
+    } else {
+        await signInWithPopup(auth, provider);
     }
-    aiBubble.textContent = `💡 Consiglio AI: Puoi ancora risparmiare circa €${(balance*0.3).toFixed(2)} questo mese! 💰`;
-    aiBubble.style.display = 'block';
-    setTimeout(()=>{ aiBubble.style.display='none'; }, 5000);
 });
 
-// Funzioni aggiuntive addEntryItem, updateTotals ecc. da aggiungere qui
+onAuthStateChanged(auth, (user)=>{
+    currentUser = user;
+    if(user){
+        loginBtn.textContent = 'Esci';
+        userInfo.textContent = user.email;
+        attachRealtimeListener();
+    } else {
+        loginBtn.textContent = 'Accedi con Google';
+        userInfo.textContent = '';
+    }
+});
+
+function setSyncStatus(text,color="#fff"){ syncLabel.textContent=text; syncLabel.style.color=color; }
+
+function changeMonth(){ currentMonth = document.getElementById('month-selector').value; attachRealtimeListener(); }
+
+function collectCurrentData(){
+    const data={month:currentMonth,entrate:[],spese:[],weeklyBudget:parseFloat(document.getElementById('weekly-budget').value)||0, lastModified:new Date().toISOString()};
+    document.querySelectorAll('#entrate-items .entry-item').forEach(i=>{
+        const label=i.querySelector('.item-label-input').value;
+        const amount=i.querySelector('.item-amount-input').value;
+        if(label||amount)data.entrate.push({label,amount});
+    });
+    document.querySelectorAll('#spese-items .entry-item').forEach(i=>{
+        const label=i.querySelector('.item-label-input').value;
+        const amount=i.querySelector('.item-amount-input').value;
+        if(label||amount)data.spese.push({label,amount});
+    });
+    return data;
+}
+
+async function saveMonthData(){
+    if(!currentUser)return;
+    isSaving=true;
+    setSyncStatus("Salvataggio...", "#ffeb3b");
+    try{
+        const ref = doc(db,"budgets",currentMonth);
+        await setDoc(ref, collectCurrentData(),{merge:true});
+        setSyncStatus("Salvato ✅","#8bc34a");
+    }catch(e){ console.error(e); setSyncStatus("Errore ❌","#ff5252");}
+    finally{ setTimeout(()=>{isSaving=false},300); updateWeeklyBudgetTip(); }
+}
+
+function populateUIFromData(data){
+    document.getElementById('weekly-budget').value = data.weeklyBudget||300;
+
+    const entrateContainer=document.getElementById('entrate-items');
+    entrateContainer.innerHTML='';
+    const entrate=data.entrate.length?data.entrate:[{label:'Stipendio Luca',amount:'1460'}];
+    entrate.forEach(item=>{
+        const div=document.createElement('div');
+        div.className='entry-item';
+        div.innerHTML=`<input type="text" class="item-label-input entrata-input" placeholder="Nome" value="${item.label}" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
+        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="${item.amount}" step="0.01" min="0" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
+        <button class="btn-remove" onclick="removeEntry(this)">✕</button>`;
+        entrateContainer.appendChild(div);
+    });
+
+    const speseContainer=document.getElementById('spese-items');
+    speseContainer.innerHTML='';
+    const spese=data.spese.length?data.spese:[{label:'Affitto',amount:'600'}];
+    spese.forEach(item=>{
+        const div=document.createElement('div');
+        div.className='entry-item';
+        div.innerHTML=`<input type="text" class="item-label-input spesa-input" placeholder="Nome" value="${item.label}" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
+        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="${item.amount}" step="0.01" min="0" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
+        <button class="btn-remove" onclick="removeEntry(this)">✕</button>`;
+        speseContainer.appendChild(div);
+    });
+    updateTotals();
+}
+
+function attachRealtimeListener(){
+    if(!currentUser)return;
+    if(unsubscribe){ unsubscribe(); unsubscribe=null; }
+    const ref = doc(db,"budgets",currentMonth);
+    unsubscribe = onSnapshot(ref,(snap)=>{
+        if(isSaving) return;
+        if(snap.exists()){ populateUIFromData(snap.data()); setSyncStatus("Sincronizzato ✅","#8bc34a"); }
+        else populateUIFromData({entrate:[],spese:[],weeklyBudget:300});
+    });
+}
+
+function addEntryItem(type){
+    const container=document.getElementById(type==='entrate'?'entrate-items':'spese-items');
+    const cls=type==='entrate'?'entrata-input':'spesa-input';
+    const div=document.createElement('div');
+    div.className='entry-item';
+    div.innerHTML=`<input type="text" class="item-label-input ${cls}" placeholder="Nome" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
+    <input type="number" class="item-amount-input ${cls}" placeholder="€" step="0.01" min="0" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
+    <button class="btn-remove" onclick="removeEntry(this)">✕</button>`;
+    container.appendChild(div);
+}
+
+function removeEntry(btn){ btn.closest('.entry-item').remove(); updateTotals(); saveMonthData(); }
+
+function updateTotals(){
+    let totEntrate=0, totSpese=0;
+    document.querySelectorAll('#entrate-items .item-amount-input').forEach(i=>totEntrate+=parseFloat(i.value)||0);
+    document.querySelectorAll('#spese-items .item-amount-input').forEach(i=>totSpese+=parseFloat(i.value)||0);
+    const bal=totEntrate-totSpese;
+    document.getElementById('total-entrate').textContent='€'+totEntrate.toFixed(2);
+    document.getElementById('total-spese').textContent='€'+totSpese.toFixed(2);
+    document.getElementById('summary-entrate').textContent='€'+totEntrate.toFixed(2);
+    document.getElementById('summary-spese').textContent='€'+totSpese.toFixed(2);
+    const balEl=document.getElementById('summary-balance');
+    balEl.textContent='€'+bal.toFixed(2);
+    balEl.classList.toggle('balance-positive',bal>=0);
+    balEl.classList.toggle('balance-negative',bal<0);
+
+    checkWeeklyBudget();
+}
+
+function checkWeeklyBudget(){
+    const weeklyLimit=parseFloat(document.getElementById('weekly-budget').value)||0;
+    const spesaSettimanale = parseFloat(document.getElementById('total-spese').textContent.replace('€',''))/4;
+    document.getElementById('weekly-spesa').textContent=spesaSettimanale.toFixed(2);
+    if(spesaSettimanale>weeklyLimit){
+        alert("⚠️ Attenzione: hai superato il budget settimanale!");
+    }
+}
+
+document.getElementById('coin-ai').addEventListener('click',()=>{
+    const tip=document.getElementById('ai-tip');
+    tip.style.display = tip.style.display==='none'?'block':'none';
+});
 </script>
 </body>
 </html>
