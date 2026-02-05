@@ -11,8 +11,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #1f1c2c, #928dab);
-      color: #f5f5f5;
+      background: linear-gradient(135deg, #2b2a4b, #4c5c96); /* blu/viola Web3 più chiaro */
+      color: #ffffff;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -183,12 +183,24 @@
         type:"bar",
         data:{
           labels:mesi,
-          datasets:[{label:"Risparmio mese €",data:risparmi,backgroundColor:colori, borderRadius:10, barThickness:40}]
+          datasets:[{
+            label:"Risparmio mese €",
+            data:risparmi,
+            backgroundColor:colori,
+            borderRadius:10,
+            barThickness:40
+          }]
         },
         options:{
           responsive:true,
-          scales:{ y:{ beginAtZero:true, grid:{ color:'rgba(255,255,255,0.2)' } }, x:{ grid:{ display:false } } },
-          plugins:{ tooltip:{ callbacks:{ label:(c)=>`${c.dataset.label}: ${c.raw.toFixed(2)} €` } } },
+          scales:{ 
+            y:{ beginAtZero:true, ticks:{ color:"#ffffff" }, grid:{ color:'rgba(255,255,255,0.3)' } },
+            x:{ ticks:{ color:"#ffffff" }, grid:{ display:false } }
+          },
+          plugins:{ 
+            legend:{ labels:{ color:"#ffffff" } },
+            tooltip:{ callbacks:{ label:(c)=>`${c.dataset.label}: ${c.raw.toFixed(2)} €` } } 
+          },
           onClick:(evt,elements)=>{
             if(elements.length>0){
               const index = elements[0].index;
