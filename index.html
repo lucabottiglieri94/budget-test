@@ -29,7 +29,8 @@
             margin: 0;
             color: var(--color-dark);
             display: flex;
-    padding: 0;            align-items: center;
+            justify-content: center;
+            align-items: center;
             width: 100%;
         }
 
@@ -57,11 +58,11 @@
 
         header h1 {
             font-size: 1.8em;
-           margin-bottom: 5px;
+            margin-bottom: 5px;
             font-weight: 700;
         }
 
-                        header p {
+        header p {
             font-size: 0.85em;
             opacity: 0.95;
             font-weight: 300;
@@ -506,27 +507,6 @@
         .alert-close:hover {
             background: rgba(255, 255, 255, 0.3);
         }
-
-                /* Nascondi header su iPhone durante scroll */
-        @supports (-webkit-touch-callout: none) {
-            /* Rileva solo iOS */
-            header {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                z-index: 1000;
-                transition: transform 0.3s ease-in-out;
-            }
-            
-            header.hidden {
-                transform: translateY(-100%);
-            }
-            
-            .container {
-                padding-top: 120px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -538,7 +518,7 @@
         
         
                
-        <header id="main-header">
+        <header>
 
                 <!-- Notifica Budget Superato -->
     <div id="budget-alert" class="budget-alert hidden">
@@ -1201,25 +1181,4 @@
     setTimeout(updateSavingsGoal, 500);
     </script>
 </body>
-
 </html>
-
-        // Gestione scroll per nascondere header solo su iPhone
-        if (/iPhone|iPod/.test(navigator.userAgent)) {
-            let lastScrollTop = 0;
-            const header = document.getElementById('main-header');
-            
-            window.addEventListener('scroll', function() {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                
-                if (scrollTop > lastScrollTop && scrollTop > 100) {
-                    // Scroll down - nascondi header
-                    header.classList.add('hidden');
-                } else {
-                    // Scroll up - mostra header
-                    header.classList.remove('hidden');
-                }
-                
-                lastScrollTop = scrollTop;
-            });
-        }
