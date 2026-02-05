@@ -419,24 +419,6 @@
                     <div class="summary-value balance-positive" id="summary-balance">€ 0,00</div>
                 </div>
             </div>
-            <!-- OBIETTIVO DEL MESE -->
-<div class="section" style="margin-top: 10px;">
-    <h2>🎯 Obiettivo del mese</h2>
-    <div style="margin-bottom: 10px; font-size: 0.9em; color: #555;">
-        Obiettivo risparmio: 
-        <input id="monthly-goal-input" type="number" value="300" min="0" step="10"
-               style="width: 90px; padding:4px 6px; border-radius:6px; border:1px solid #ccc; text-align:right;"
-               onchange="updateGoalBar(); saveMonthData()" oninput="updateGoalBar()">
-        €
-    </div>
-    <div style="width:100%; height:16px; background:#eee; border-radius:8px; overflow:hidden;">
-        <div id="goal-progress-bar" style="height:100%; width:0%; background:#4CAF50;"></div>
-    </div>
-    <div id="goal-progress-text" style="margin-top:6px; font-size:0.85em; color:#333;">
-        Mancano € 300,00 per l’obiettivo.
-    </div>
-</div>
-
 
             <!-- LISTA DELLA SPESA SETTIMANALE -->
             <div class="section" style="border-left-color: #FF9800;">
@@ -639,23 +621,25 @@
             }
         }
 
-function collectCurrentData() {
-    const data = {
-        month: currentMonth,
-        entrate: [],
-        spese: [],
-        spesaAlimentare: {
-            week1: [],
-            week2: [],
-            week3: [],
-            week4: []
-        },
-        goal: {
-            monthlyTarget: parseFloat(document.getElementById('monthly-goal-input')?.value || '300')
-        },
-        lastModified: new Date().toISOString()
-    };
+        function changeMonth() {
+            const selector = document.getElementById('month-selector');
+            currentMonth = selector.value;
+            attachRealtimeListener();
+        }
 
+        function collectCurrentData() {
+            const data = {
+                month: currentMonth,
+                entrate: [],
+                spese: [],
+                spesaAlimentare: {
+                    week1: [],
+                    week2: [],
+                    week3: [],
+                    week4: []
+                },
+                lastModified: new Date().toISOString()
+            };
 
             document.querySelectorAll('#entrate-items .entry-item').forEach(item => {
                 const label = item.querySelector('.item-label-input').value;
@@ -742,78 +726,14 @@ function collectCurrentData() {
 
             for (let week = 1; week <= 4; week++) {
                 const inputs = document.querySelectorAll(`.week${week}-shopping`);
-                const weekData = data.spesaAlimentare && data.spesaAlimentare[`week${week}`]
-                    ? data.spesaAlimentare[`week${week}`]
-                    : [];
+                const weekData = data.spesaAlimentare && data.spesaAlimentare[`week${week}`] ? data.spesaAlimentare[`week${week}`] : [];
                 inputs.forEach((input, index) => {
                     input.value = weekData[index] || '';
                 });
             }
 
-            // Obiettivo del mese
-            const goalInput = document.getElementById('monthly-goal-input');
-            if (goalInput) {
-                const target = data.goal && typeof data.goal.monthlyTarget === 'number'
-                    ? data.goal.monthlyTarget
-                    : 300;
-                goalInput.value = target;
-            }
-
             updateBudgetTotals();
             updateFoodTotals();
-            updateGoalBar();
-        }
-
-            function updateGoalBar() {
-    const goalInput = document.getElementById('monthly-goal-input');
-    if (!goalInput) return;
-
-    const target = parseFloat(goalInput.value || '0') || 0;
-
-    // saldo attuale = entrate - spese
-    let totalEntrate = 0;
-    document.querySelectorAll('#entrate-items .item-amount-input').forEach(input => {
-        const val = parseFloat((input.value || "").replace(',', '.')) || 0;
-        totalEntrate += val;
-    });
-
-    let totalSpese = 0;
-    document.querySelectorAll('#spese-items .item-amount-input').forEach(input => {
-        const val = parseFloat((input.value || "").replace(',', '.')) || 0;
-        totalSpese += val;
-    });
-
-    const balance = totalEntrate - totalSpese;
-
-    const bar = document.getElementById('goal-progress-bar');
-    const text = document.getElementById('goal-progress-text');
-
-    if (!bar || !text) return;
-
-    if (target <= 0) {
-        bar.style.width = "0%";
-        bar.style.background = "#ccc";
-        text.textContent = "Nessun obiettivo impostato.";
-        return;
-    }
-
-    let percent = (balance / target) * 100;
-    if (percent < 0) percent = 0;
-    if (percent > 150) percent = 150;
-
-    bar.style.width = `${Math.min(percent,100)}%`;
-    bar.style.background = balance >= target ? "#4CAF50" : "#FF9800";
-
-    const diff = target - balance;
-    if (balance >= target) {
-        text.textContent = `Obiettivo raggiunto! Hai superato l'obiettivo di ${formatCurrency(balance - target)}.`;
-    } else {
-        text.textContent = `Mancano ${formatCurrency(diff)} per l’obiettivo.`;
-    }
-}
-
-        }
-
         }
 
         function attachRealtimeListener() {
@@ -891,13 +811,10 @@ function collectCurrentData() {
             document.getElementById('summary-spese').textContent = formatCurrency(totalSpese);
 
             const balanceEl = document.getElementById('summary-balance');
-                balanceEl.textContent = formatCurrency(balance);
-    balanceEl.classList.toggle('balance-positive', balance >= 0);
-    balanceEl.classList.toggle('balance-negative', balance < 0);
-
-    updateGoalBar();
-}
-
+            balanceEl.textContent = formatCurrency(balance);
+            balanceEl.classList.toggle('balance-positive', balance >= 0);
+            balanceEl.classList.toggle('balance-negative', balance < 0);
+        }
 
         function updateFoodTotals() {
             const weeklyBudget = 125;
