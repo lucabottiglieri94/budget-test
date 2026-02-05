@@ -2,28 +2,28 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Risparmi anno con Google Login</title>
+  <title>Risparmi anno con Google Login + Logout</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     h1 { color: #333; }
     #yearTotal { margin-bottom: 20px; }
-    #loginButton { margin-bottom: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    button { margin-bottom: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
   <h1>Risparmio annuale</h1>
   <button id="loginButton">Login con Google</button>
+  <button id="logoutButton" style="display:none;">Logout</button>
   <h2 id="yearTotal">Accedi per vedere i dati...</h2>
   <canvas id="savingsChart" width="800" height="400"></canvas>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // CONFIG FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
       authDomain: "budget-luca.firebaseapp.com",
@@ -40,26 +40,48 @@
     const provider = new GoogleAuthProvider();
 
     const mesi = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
-    let risparmi = []; // array globale dei risparmi
+    let risparmi = [];
 
     const loginButton = document.getElementById("loginButton");
-    loginButton.addEventListener("click", loginGoogle);
+    const logoutButton = document.getElementById("logoutButton");
+    const yearTotalEl = document.getElementById("yearTotal");
+    const canvasEl = document.getElementById("savingsChart");
 
-    async function loginGoogle() {
+    // Login Google
+    loginButton.addEventListener("click", async () => {
       try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        console.log("Utente loggato:", user.email);
-
-        loginButton.style.display = "none"; // nascondi bottone login
-        document.getElementById("yearTotal").innerText = "Caricamento dati...";
-
-        caricaDatiAnno();
+        await signInWithPopup(auth, provider);
       } catch (error) {
         console.error("Errore login Google:", error);
-        alert("Login Google fallito. Controlla la console per dettagli.");
+        alert("Login Google fallito. Controlla la console.");
       }
-    }
+    });
+
+    // Logout
+    logoutButton.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error("Errore logout:", error);
+      }
+    });
+
+    // Stato login automatico
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loginButton.style.display = "none";
+        logoutButton.style.display = "inline-block";
+        yearTotalEl.innerText = "Caricamento dati...";
+        caricaDatiAnno();
+      } else {
+        loginButton.style.display = "inline-block";
+        logoutButton.style.display = "none";
+        yearTotalEl.innerText = "Accedi con Google per vedere i dati.";
+        if (canvasEl.chartInstance) {
+          canvasEl.chartInstance.destroy();
+        }
+      }
+    });
 
     async function caricaDatiAnno() {
       try {
@@ -100,41 +122,30 @@
 
       } catch (err) {
         console.error("Errore caricamento dati:", err);
-        document.getElementById("yearTotal").innerText = "Errore nel caricamento dei dati.";
+        yearTotalEl.innerText = "Errore nel caricamento dei dati.";
       }
     }
 
     function aggiornaTesto(meseIndex, anno) {
-      const yearTotalEl = document.getElementById("yearTotal");
-      if (yearTotalEl) {
-        yearTotalEl.innerText = `Risparmio ${mesi[meseIndex]} ${anno}: ${risparmi[meseIndex].toFixed(2)} €`;
-      }
+      yearTotalEl.innerText = `Risparmio ${mesi[meseIndex]} ${anno}: ${risparmi[meseIndex].toFixed(2)} €`;
     }
 
     function disegnaGraficoAnno(risparmi, colori, anno) {
-      const canvasEl = document.getElementById("savingsChart");
       if (!canvasEl) return;
-      const ctx = canvasEl.getContext('2d');
+      if (canvasEl.chartInstance) canvasEl.chartInstance.destroy();
 
-      new Chart(ctx, {
+      const ctx = canvasEl.getContext('2d');
+      const chart = new Chart(ctx, {
         type: "bar",
         data: {
           labels: mesi,
-          datasets: [{
-            label: "Risparmio mese €",
-            data: risparmi,
-            backgroundColor: colori
-          }]
+          datasets: [{ label: "Risparmio mese €", data: risparmi, backgroundColor: colori }]
         },
         options: {
           responsive: true,
           scales: { y: { beginAtZero: true } },
           plugins: {
-            tooltip: {
-              callbacks: {
-                label: (context) => `${context.dataset.label}: ${context.raw.toFixed(2)} €`
-              }
-            }
+            tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.raw.toFixed(2)} €` } }
           },
           onClick: (evt, elements) => {
             if (elements.length > 0) {
@@ -144,6 +155,7 @@
           }
         }
       });
+      canvasEl.chartInstance = chart;
     }
   </script>
 </body>
