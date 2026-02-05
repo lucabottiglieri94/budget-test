@@ -1200,18 +1200,14 @@ if (contentEl && headerEl) {
     contentEl.addEventListener('scroll', () => {
         const currentScroll = contentEl.scrollTop;
 
-        if (window.innerWidth <= 768) {
+        // Se NON sei in cima → header nascosto
+        if (currentScroll > 10) {
+            headerEl.classList.add('header-hidden');
+        }
 
-            // Se NON sei in cima → header nascosto
-            if (currentScroll > 10) {
-                headerEl.classList.add('header-hidden');
-            }
-
-            // Riappare SOLO quando torni in cima
-            if (currentScroll <= 5) {
-                headerEl.classList.remove('header-hidden');
-            }
-
+        // Riappare SOLO quando torni in cima
+        if (currentScroll <= 5) {
+            headerEl.classList.remove('header-hidden');
         }
     });
 }
