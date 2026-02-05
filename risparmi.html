@@ -7,34 +7,38 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<!-- FIREBASE COMPAT (come index.html) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <style>
-body {
-    font-family: system-ui;
-    background:#f5f5f5;
-    margin:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
+body{
+ font-family:system-ui;
+ background:#f5f5f5;
+ margin:0;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ min-height:100vh;
 }
 
-.box {
-    background:white;
-    padding:25px;
-    border-radius:16px;
-    width:95%;
-    max-width:650px;
-    box-shadow:0 8px 30px rgba(0,0,0,0.1);
+.box{
+ background:white;
+ padding:25px;
+ border-radius:16px;
+ width:95%;
+ max-width:650px;
+ box-shadow:0 8px 30px rgba(0,0,0,0.1);
 }
 
-.salvadanaio {
-    margin-top:20px;
-    padding:18px;
-    border-radius:14px;
-    background:#e8f5e9;
-    text-align:center;
-    font-size:22px;
-    font-weight:700;
+.salvadanaio{
+ margin-top:20px;
+ padding:18px;
+ border-radius:14px;
+ background:#e8f5e9;
+ text-align:center;
+ font-size:22px;
+ font-weight:700;
 }
 </style>
 </head>
@@ -52,49 +56,64 @@ body {
 <a href="index.html">← Torna</a>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+<script>
 
-const app = initializeApp({
+const firebaseConfig = {
  apiKey:"AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
  authDomain:"budget-luca.firebaseapp.com",
- projectId:"budget-luca"
-});
+ projectId:"budget-luca",
+ storageBucket:"budget-luca.firebasestorage.app",
+ messagingSenderId:"67496424698",
+ appId:"1:67496424698:web:b1822e04ef4efc07408543"
+};
 
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 function sumE(d){
- let t=0;(d.entrate||[]).forEach(x=>t+=+x.amount||0);return t;
+ let t=0;
+ (d.entrate||[]).forEach(x=> t+=Number(x.amount)||0);
+ return t;
 }
+
 function sumS(d){
- let t=0;(d.spese||[]).forEach(x=>t+=+x.amount||0);return t;
+ let t=0;
+ (d.spese||[]).forEach(x=> t+=Number(x.amount)||0);
+ return t;
 }
 
 const chart = new Chart(document.getElementById("chart"),{
  type:"bar",
  data:{
   labels:["Entrate","Spese","Risparmio"],
-  datasets:[{data:[0,0,0]}]
+  datasets:[{
+    data:[0,0,0]
+  }]
  },
- options:{scales:{y:{beginAtZero:true}}}
+ options:{
+  responsive:true,
+  scales:{y:{beginAtZero:true}}
+ }
 });
 
-onSnapshot(collection(db,"budgets"), snap=>{
+db.collection("budgets").onSnapshot(snap=>{
 
  let totaleSalvadanaio = 0;
- let ultimoDoc = null;
+ let ultimo = null;
 
  snap.forEach(doc=>{
-   ultimoDoc = doc; // ultimo mese trovato
+   ultimo = doc;
  });
 
- if(!ultimoDoc) return;
+ if(!ultimo){
+   console.log("Nessun documento budgets");
+   return;
+ }
 
- const d = ultimoDoc.data();
+ const d = ultimo.data();
  const e = sumE(d);
  const s = sumS(d);
- const r = e-s;
+ const r = e - s;
 
  chart.data.datasets[0].data=[e,s,r];
  chart.update();
@@ -108,8 +127,10 @@ onSnapshot(collection(db,"budgets"), snap=>{
    totaleSalvadanaio.toFixed(2)+" €";
 
  document.getElementById("titolo").innerText =
-   "📊 Mese "+ultimoDoc.id;
+   "📊 Mese " + ultimo.id;
+
 });
+
 </script>
 
 </body>
