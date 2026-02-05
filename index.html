@@ -5,408 +5,212 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Budget Mensile - Gestione Familiare</title>
 <style>
-:root {
-    --color-primary: #2196F3;
-    --color-success: #4CAF50;
-    --color-danger: #F44336;
-    --color-warning: #FF9800;
-    --color-light: #f5f5f5;
-    --color-dark: #333;
-    --color-border: #ddd;
-}
-
-* {margin:0;padding:0;box-sizing:border-box;}
-
 body {
-    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: var(--color-dark);
-    width: 100%;
-    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#f0f4f8,#e2e8f0);
     margin:0;
+    padding:0;
+    color:#333;
 }
-
-.container {
-    max-width:100vw;
-    min-height:100vh;
-    background:white;
-    display:flex;
-    flex-direction:column;
-}
-
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color:white;
-    padding: 25px 20px;
     text-align:center;
-    position: fixed;
-    top:0; left:0; right:0;
-    z-index: 1000;
+    padding:20px 10px;
 }
-
-header h1 { font-size:1.8em; margin-bottom:5px; font-weight:700;}
-header p { font-size:0.85em; opacity:0.95; font-weight:300;}
-
-.content {
-    flex:1;
-    margin-top:180px;
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-    overflow-y:auto;
+h1 {
+    margin:0;
+    font-size:2em;
 }
-
-.section {
-    background: var(--color-light);
-    padding:20px;
-    border-radius:15px;
-    border-left:5px solid var(--color-primary);
+p {
+    margin:5px 0 20px;
+    font-size:1em;
+    color:#555;
 }
-
-.section.entrate { border-left-color: var(--color-success);}
-.section.spese { border-left-color: var(--color-danger);}
-.section.budget { border-left-color: var(--color-warning);}
-
-.section h2 { font-size:1.25em; font-weight:600; margin-bottom:15px;}
-
-.entry-items { display:flex; flex-direction:column; gap:10px; margin-bottom:12px;}
-.entry-item {
-    background:white; padding:12px; border-radius:10px;
-    display:flex; gap:8px; align-items:center; border:1px solid var(--color-border);
-}
-
-.item-label-input, .item-amount-input {
-    padding:8px;
-    border-radius:8px;
-    font-family:inherit;
-}
-
-.item-label-input { flex:1; font-weight:600;}
-.item-amount-input { width:90px; text-align:right; font-weight:600;}
-
-.btn-remove { background: var(--color-danger); color:white; border:none;
-    padding:8px 10px; border-radius:8px; cursor:pointer; font-size:0.9em; min-width:35px;}
-
-.btn-add { width:100%; padding:12px; border:none; border-radius:10px; cursor:pointer; color:white; font-weight:600; margin-bottom:12px;}
-
-.btn-add-entrate { background: var(--color-success);}
-.btn-add-spese { background: var(--color-danger);}
-
-.total-row {
-    background:white; padding:15px; border-radius:10px;
-    display:flex; justify-content:space-between; align-items:center;
-    border:2px solid var(--color-primary); font-weight:700; margin-top:8px;
-}
-
-.summary {
-    background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-    color:white;
-    padding:20px;
-    border-radius:15px;
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:12px;
-    text-align:center;
-}
-
-.summary-card { background: rgba(255,255,255,0.15); padding:15px; border-radius:12px;}
-.summary-label { font-size:0.8em; opacity:0.9; margin-bottom:6px; font-weight:600;}
-.summary-value { font-size:1.5em; font-weight:700;}
-
-.balance-positive { color:#4CAF50; }
-.balance-negative { color:#FF6B6B; }
-
-#risparmi-btn, #comparatori-btn {
-    position:fixed; bottom:20px; padding:10px 18px; border-radius:999px;
-    border:none; color:white; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.2);
-    z-index:1500;
-}
-
-#risparmi-btn { left:20px; background:#ff9800;}
-#comparatori-btn { right:20px; background:#4CAF50;}
-
-#risparmi-btn:active, #comparatori-btn:active { transform: scale(0.98);}
-
-/* Moneta AI */
-#coin-ai {
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    width: 80px;
-    height: 80px;
-    cursor: pointer;
-    z-index: 1600;
-}
-
-#coin-ai img { width:100%; animation: bounce 1.5s infinite; }
-
-@keyframes bounce {
-    0% { transform: translateY(0);}
-    50% { transform: translateY(-10px);}
-    100% { transform: translateY(0);}
-}
-
-#ai-tip {
-    position: fixed;
-    bottom: 190px;
-    right: 20px;
-    width: 250px;
-    background: white;
-    border-radius: 15px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.2);
-    padding:15px;
-    display:none;
+select, button {
     font-size:0.9em;
-    z-index:1600;
+    padding:5px 10px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+.card {
+    background:white;
+    padding:12px 18px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    margin:5px;
+}
+#budget-table {
+    width:90%;
+    max-width:800px;
+    margin:20px auto;
+    border-collapse: collapse;
+}
+#budget-table th, #budget-table td {
+    padding:10px;
+    border:1px solid #ccc;
+    text-align:center;
+}
+#budget-table th {
+    background:#2196F3;
+    color:white;
+}
+#save-moneta {
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    font-size:1.5em;
+    background:#ff9800;
+    padding:12px;
+    border-radius:50%;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
 }
 </style>
-</head>
-<body>
-<div class="container">
-<header>
-<h1>💰 Budget Mensile</h1>
-<p>Gestione entrate e spese familiari (sincronizzato)</p>
-<div style="margin-top:15px;">
-    <select id="month-selector" onchange="changeMonth()">
-        <option value="2026-02">Febbraio 2026</option>
-        <option value="2026-03">Marzo 2026</option>
-        <option value="2026-04">Aprile 2026</option>
-    </select>
-</div>
-<div style="margin-top:10px;">
-    <button id="login-btn">Accedi con Google</button>
-    <span id="user-info" style="font-size:0.8em;margin-left:8px;"></span>
-</div>
-<div id="sync-status" style="margin-top:10px; font-size:0.8em;">
-    🔄 Stato sincronizzazione: <span id="sync-label">In attesa...</span>
-</div>
-</header>
-
-<div class="content">
-
-<button id="risparmi-btn" onclick="location.href='risparmi.html'">📈 Grafico Risparmi</button>
-<button id="comparatori-btn" onclick="location.href='comparatori.html'">📊 Comparatori</button>
-
-<!-- ENTRATE -->
-<div class="section entrate">
-<h2>📥 Entrate</h2>
-<div class="entry-items" id="entrate-items"></div>
-<button class="btn-add btn-add-entrate" onclick="addEntryItem('entrate')">+ Aggiungi Entrata</button>
-<div class="total-row">
-<span class="total-label">Totale Entrate</span>
-<span class="total-amount entrata" id="total-entrate">€0,00</span>
-</div>
-</div>
-
-<!-- SPESE -->
-<div class="section spese">
-<h2>📤 Spese</h2>
-<div class="entry-items" id="spese-items"></div>
-<button class="btn-add btn-add-spese" onclick="addEntryItem('spese')">+ Aggiungi Spesa</button>
-<div class="total-row">
-<span class="total-label">Totale Spese</span>
-<span class="total-amount spesa" id="total-spese">€0,00</span>
-</div>
-</div>
-
-<!-- BUDGET SETTIMANALE -->
-<div class="section budget">
-<h2>📝 Budget Settimanale</h2>
-<div style="display:flex;gap:10px; align-items:center;">
-    <label>Limite Settimanale €</label>
-    <input type="number" id="weekly-budget" value="300" style="padding:6px;border-radius:6px;" oninput="checkWeeklyBudget()">
-</div>
-<div style="margin-top:10px;">Spesa Settimanale Attuale: €<span id="weekly-spesa">0</span></div>
-</div>
-
-<!-- RIEPILOGO -->
-<div class="summary">
-<div class="summary-card">
-<div class="summary-label">📥 Entrate</div>
-<div class="summary-value" style="color:#4CAF50;" id="summary-entrate">€0,00</div>
-</div>
-<div class="summary-card">
-<div class="summary-label">📤 Spese</div>
-<div class="summary-value" style="color:#F44336;" id="summary-spese">€0,00</div>
-</div>
-<div class="summary-card">
-<div class="summary-label">💾 Risparmio</div>
-<div class="summary-value balance-positive" id="summary-balance">€0,00</div>
-</div>
-</div>
-
-<!-- MONETA AI -->
-<div id="coin-ai">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Euro_coin_2_Euro.png/64px-Euro_coin_2_Euro.png" alt="Moneta AI">
-</div>
-<div id="ai-tip">💡 Consiglio AI: Controlla le spese superflue e risparmia fino a €50 questo mese!</div>
-
-</div>
-</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js";
+import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
 
 const firebaseConfig = {
-apiKey:"AIzaSyAdZBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
-authDomain:"budget-luca.firebaseapp.com",
-projectId:"budget-luca",
-storageBucket:"budget-luca.firebasestorage.app",
-messagingSenderId:"67496424698",
-appId:"1:67496424698:web:b1822e04ef4efc07408543"
+  apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+  authDomain: "budget-luca.firebaseapp.com",
+  databaseURL: "https://budget-luca-default-rtdb.firebaseio.com",
+  projectId: "budget-luca",
+  storageBucket: "budget-luca.firebasestorage.app",
+  messagingSenderId: "67496424698",
+  appId: "1:67496424698:web:b1822e04ef4efc07408543",
+  measurementId: "G-7LEYRZE9QN"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const auth = getAuth();
 const provider = new GoogleAuthProvider();
-
-let currentUser = null;
-let currentMonth = '2026-02';
-let unsubscribe = null;
-let isSaving = false;
+const db = getDatabase();
 
 const loginBtn = document.getElementById('login-btn');
+const loginStatus = document.getElementById('login-status');
 const userInfo = document.getElementById('user-info');
-const syncLabel = document.getElementById('sync-label');
+const monthSelector = document.getElementById('month-selector');
+const budgetTable = document.getElementById('budget-table');
+
+let currentUser = null;
+let currentMonth = monthSelector.value;
 
 loginBtn.addEventListener('click', async ()=>{
     if(currentUser){
+        setLoginStatus("Disconnessione...");
         await signOut(auth);
+        setLoginStatus("Accedi con Google");
     } else {
-        await signInWithPopup(auth, provider);
+        try{
+            setLoginStatus("Attendere...");
+            await signInWithPopup(auth, provider);
+        }catch(e){
+            console.error(e);
+            setLoginStatus("Errore! Riprova");
+        }
     }
 });
+
+function setLoginStatus(text){
+    loginStatus.textContent = text;
+}
 
 onAuthStateChanged(auth, (user)=>{
     currentUser = user;
     if(user){
         loginBtn.textContent = 'Esci';
         userInfo.textContent = user.email;
+        setLoginStatus("✅ Connesso");
         attachRealtimeListener();
     } else {
         loginBtn.textContent = 'Accedi con Google';
         userInfo.textContent = '';
+        setLoginStatus("In attesa...");
+        budgetTable.innerHTML = '';
     }
 });
 
-function setSyncStatus(text,color="#fff"){ syncLabel.textContent=text; syncLabel.style.color=color; }
-
-function changeMonth(){ currentMonth = document.getElementById('month-selector').value; attachRealtimeListener(); }
-
-function collectCurrentData(){
-    const data={month:currentMonth,entrate:[],spese:[],weeklyBudget:parseFloat(document.getElementById('weekly-budget').value)||0, lastModified:new Date().toISOString()};
-    document.querySelectorAll('#entrate-items .entry-item').forEach(i=>{
-        const label=i.querySelector('.item-label-input').value;
-        const amount=i.querySelector('.item-amount-input').value;
-        if(label||amount)data.entrate.push({label,amount});
-    });
-    document.querySelectorAll('#spese-items .entry-item').forEach(i=>{
-        const label=i.querySelector('.item-label-input').value;
-        const amount=i.querySelector('.item-amount-input').value;
-        if(label||amount)data.spese.push({label,amount});
-    });
-    return data;
-}
-
-async function saveMonthData(){
-    if(!currentUser)return;
-    isSaving=true;
-    setSyncStatus("Salvataggio...", "#ffeb3b");
-    try{
-        const ref = doc(db,"budgets",currentMonth);
-        await setDoc(ref, collectCurrentData(),{merge:true});
-        setSyncStatus("Salvato ✅","#8bc34a");
-    }catch(e){ console.error(e); setSyncStatus("Errore ❌","#ff5252");}
-    finally{ setTimeout(()=>{isSaving=false},300); updateWeeklyBudgetTip(); }
-}
-
-function populateUIFromData(data){
-    document.getElementById('weekly-budget').value = data.weeklyBudget||300;
-
-    const entrateContainer=document.getElementById('entrate-items');
-    entrateContainer.innerHTML='';
-    const entrate=data.entrate.length?data.entrate:[{label:'Stipendio Luca',amount:'1460'}];
-    entrate.forEach(item=>{
-        const div=document.createElement('div');
-        div.className='entry-item';
-        div.innerHTML=`<input type="text" class="item-label-input entrata-input" placeholder="Nome" value="${item.label}" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
-        <input type="number" class="item-amount-input entrata-input" placeholder="€" value="${item.amount}" step="0.01" min="0" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
-        <button class="btn-remove" onclick="removeEntry(this)">✕</button>`;
-        entrateContainer.appendChild(div);
-    });
-
-    const speseContainer=document.getElementById('spese-items');
-    speseContainer.innerHTML='';
-    const spese=data.spese.length?data.spese:[{label:'Affitto',amount:'600'}];
-    spese.forEach(item=>{
-        const div=document.createElement('div');
-        div.className='entry-item';
-        div.innerHTML=`<input type="text" class="item-label-input spesa-input" placeholder="Nome" value="${item.label}" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
-        <input type="number" class="item-amount-input spesa-input" placeholder="€" value="${item.amount}" step="0.01" min="0" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
-        <button class="btn-remove" onclick="removeEntry(this)">✕</button>`;
-        speseContainer.appendChild(div);
-    });
-    updateTotals();
-}
+monthSelector.addEventListener('change', ()=>{
+    currentMonth = monthSelector.value;
+    loadBudget();
+});
 
 function attachRealtimeListener(){
-    if(!currentUser)return;
-    if(unsubscribe){ unsubscribe(); unsubscribe=null; }
-    const ref = doc(db,"budgets",currentMonth);
-    unsubscribe = onSnapshot(ref,(snap)=>{
-        if(isSaving) return;
-        if(snap.exists()){ populateUIFromData(snap.data()); setSyncStatus("Sincronizzato ✅","#8bc34a"); }
-        else populateUIFromData({entrate:[],spese:[],weeklyBudget:300});
+    if(!currentUser) return;
+    const budgetRef = ref(db, 'budget/' + currentUser.uid + '/' + currentMonth);
+    onValue(budgetRef, (snapshot)=>{
+        const data = snapshot.val() || {};
+        renderBudgetTable(data);
     });
 }
 
-function addEntryItem(type){
-    const container=document.getElementById(type==='entrate'?'entrate-items':'spese-items');
-    const cls=type==='entrate'?'entrata-input':'spesa-input';
-    const div=document.createElement('div');
-    div.className='entry-item';
-    div.innerHTML=`<input type="text" class="item-label-input ${cls}" placeholder="Nome" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
-    <input type="number" class="item-amount-input ${cls}" placeholder="€" step="0.01" min="0" onchange="updateTotals();saveMonthData()" oninput="updateTotals()">
-    <button class="btn-remove" onclick="removeEntry(this)">✕</button>`;
-    container.appendChild(div);
+function loadBudget(){
+    if(!currentUser) return;
+    const budgetRef = ref(db, 'budget/' + currentUser.uid + '/' + currentMonth);
+    get(budgetRef).then(snapshot=>{
+        const data = snapshot.val() || {};
+        renderBudgetTable(data);
+    });
 }
 
-function removeEntry(btn){ btn.closest('.entry-item').remove(); updateTotals(); saveMonthData(); }
-
-function updateTotals(){
-    let totEntrate=0, totSpese=0;
-    document.querySelectorAll('#entrate-items .item-amount-input').forEach(i=>totEntrate+=parseFloat(i.value)||0);
-    document.querySelectorAll('#spese-items .item-amount-input').forEach(i=>totSpese+=parseFloat(i.value)||0);
-    const bal=totEntrate-totSpese;
-    document.getElementById('total-entrate').textContent='€'+totEntrate.toFixed(2);
-    document.getElementById('total-spese').textContent='€'+totSpese.toFixed(2);
-    document.getElementById('summary-entrate').textContent='€'+totEntrate.toFixed(2);
-    document.getElementById('summary-spese').textContent='€'+totSpese.toFixed(2);
-    const balEl=document.getElementById('summary-balance');
-    balEl.textContent='€'+bal.toFixed(2);
-    balEl.classList.toggle('balance-positive',bal>=0);
-    balEl.classList.toggle('balance-negative',bal<0);
-
-    checkWeeklyBudget();
+function renderBudgetTable(data){
+    const rows = Object.keys(data).map(key=>{
+        return `<tr>
+            <td>${key}</td>
+            <td>${data[key].spesa || 0} €</td>
+            <td>${data[key].budget || 0} €</td>
+            <td>${(data[key].budget - data[key].spesa) || 0} €</td>
+        </tr>`;
+    }).join('');
+    budgetTable.innerHTML = `<tr><th>Categoria</th><th>Spesa</th><th>Budget</th><th>Rimanente</th></tr>` + rows;
 }
 
-function checkWeeklyBudget(){
-    const weeklyLimit=parseFloat(document.getElementById('weekly-budget').value)||0;
-    const spesaSettimanale = parseFloat(document.getElementById('total-spese').textContent.replace('€',''))/4;
-    document.getElementById('weekly-spesa').textContent=spesaSettimanale.toFixed(2);
-    if(spesaSettimanale>weeklyLimit){
-        alert("⚠️ Attenzione: hai superato il budget settimanale!");
-    }
-}
-
-document.getElementById('coin-ai').addEventListener('click',()=>{
-    const tip=document.getElementById('ai-tip');
-    tip.style.display = tip.style.display==='none'?'block':'none';
+document.getElementById('save-moneta').addEventListener('click', ()=>{
+    if(!currentUser) { alert("Devi loggarti!"); return;}
+    const monetaRef = ref(db,'moneta/' + currentUser.uid);
+    set(monetaRef,{ saved: true, timestamp: Date.now() });
+    alert("Moneta AI salvata! 🎉");
 });
 </script>
+</head>
+<body>
+<header>
+<h1>💰 Budget Mensile</h1>
+<p>Gestione entrate e spese familiari</p>
+
+<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px; margin-top:20px;">
+    <div class="card">
+      <label for="month-selector" style="font-weight:600; margin-right:8px;">📅 Mese:</label>
+      <select id="month-selector">
+        <option value="2026-01">Gennaio 2026</option>
+        <option value="2026-02">Febbraio 2026</option>
+        <option value="2026-03">Marzo 2026</option>
+        <option value="2026-04">Aprile 2026</option>
+        <option value="2026-05">Maggio 2026</option>
+        <option value="2026-06">Giugno 2026</option>
+        <option value="2026-07">Luglio 2026</option>
+        <option value="2026-08">Agosto 2026</option>
+        <option value="2026-09">Settembre 2026</option>
+        <option value="2026-10">Ottobre 2026</option>
+        <option value="2026-11">Novembre 2026</option>
+        <option value="2026-12">Dicembre 2026</option>
+      </select>
+    </div>
+
+    <div class="card" id="login-card">
+      <button id="login-btn">Accedi con Google</button>
+      <span id="login-status">In attesa...</span>
+      <span id="user-info"></span>
+    </div>
+</div>
+</header>
+
+<table id="budget-table"></table>
+
+<div id="save-moneta" title="Salva la moneta AI">🪙</div>
 </body>
 </html>
