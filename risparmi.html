@@ -2,22 +2,85 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Risparmi anno con Google Login + Logout</title>
+  <title>Risparmi Mensili - Web 3.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h1 { color: #333; }
-    #yearTotal { margin-bottom: 20px; }
-    button { margin-bottom: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    /* ----- Reset e base ----- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    h1 { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; margin-bottom: 20px; text-align: center; }
+    h2 { font-size: 1.5rem; margin-bottom: 30px; text-align: center; }
+
+    button {
+      padding: 12px 25px;
+      margin: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    #loginButton { background: #4285F4; color: #fff; }
+    #loginButton:hover { background: #357ae8; transform: translateY(-2px); }
+    #logoutButton { background: #e74c3c; color: #fff; }
+    #logoutButton:hover { background: #c0392b; transform: translateY(-2px); }
+
+    #yearTotal {
+      background: rgba(255,255,255,0.1);
+      padding: 15px 25px;
+      border-radius: 25px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      backdrop-filter: blur(5px);
+      margin-bottom: 30px;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    #chartContainer {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      max-width: 900px;
+      width: 100%;
+    }
+
+    canvas { border-radius: 20px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.2rem; }
+    }
   </style>
 </head>
 <body>
-  <h1>Risparmio annuale</h1>
-  <button id="loginButton">Login con Google</button>
-  <button id="logoutButton" style="display:none;">Logout</button>
+
+  <h1>Risparmi Mensili</h1>
+  <div>
+    <button id="loginButton">Login con Google</button>
+    <button id="logoutButton" style="display:none;">Logout</button>
+  </div>
   <h2 id="yearTotal">Accedi per vedere i dati...</h2>
-  <canvas id="savingsChart" width="800" height="400"></canvas>
+
+  <div id="chartContainer">
+    <canvas id="savingsChart"></canvas>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -47,28 +110,18 @@
     const yearTotalEl = document.getElementById("yearTotal");
     const canvasEl = document.getElementById("savingsChart");
 
-    // Login Google
     loginButton.addEventListener("click", async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        console.error("Errore login Google:", error);
-        alert("Login Google fallito. Controlla la console.");
-      }
+      try { await signInWithPopup(auth, provider); } 
+      catch (err) { console.error(err); alert("Login fallito"); }
     });
 
-    // Logout
     logoutButton.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        console.error("Errore logout:", error);
-      }
+      try { await signOut(auth); } 
+      catch (err) { console.error(err); }
     });
 
-    // Stato login automatico
     onAuthStateChanged(auth, user => {
-      if (user) {
+      if(user){
         loginButton.style.display = "none";
         logoutButton.style.display = "inline-block";
         yearTotalEl.innerText = "Caricamento dati...";
@@ -77,14 +130,12 @@
         loginButton.style.display = "inline-block";
         logoutButton.style.display = "none";
         yearTotalEl.innerText = "Accedi con Google per vedere i dati.";
-        if (canvasEl.chartInstance) {
-          canvasEl.chartInstance.destroy();
-        }
+        if(canvasEl.chartInstance) canvasEl.chartInstance.destroy();
       }
     });
 
-    async function caricaDatiAnno() {
-      try {
+    async function caricaDatiAnno(){
+      try{
         const oggi = new Date();
         const anno = oggi.getFullYear();
         const meseCorrente = oggi.getMonth();
@@ -95,60 +146,51 @@
         const budgetsRef = collection(db, "budgets");
         const snap = await getDocs(budgetsRef);
 
-        snap.forEach(docSnap => {
+        snap.forEach(docSnap=>{
           const id = docSnap.id;
           const [annoDoc, meseDoc] = id.split("-").map(Number);
-          if (annoDoc !== anno) return;
+          if(annoDoc!==anno) return;
 
           const d = docSnap.data();
           let totEntrate = 0;
-          (d.entrate || []).forEach(e => {
-            const v = parseFloat((e.amount || "0").toString().replace(",", "."));
-            if (!isNaN(v)) totEntrate += v;
-          });
-          let totSpese = 0;
-          (d.spese || []).forEach(s => {
-            const v = parseFloat((s.amount || "0").toString().replace(",", "."));
-            if (!isNaN(v)) totSpese += v;
-          });
-
+          (d.entrate||[]).forEach(e=>{ const v=parseFloat((e.amount||"0").toString().replace(",", ".")); if(!isNaN(v)) totEntrate+=v; });
+          let totSpese=0;
+          (d.spese||[]).forEach(s=>{ const v=parseFloat((s.amount||"0").toString().replace(",", ".")); if(!isNaN(v)) totSpese+=v; });
           const risparmio = totEntrate - totSpese;
-          risparmi[meseDoc - 1] = risparmio;
-          colori[meseDoc - 1] = risparmio >= 0 ? "#4CAF50" : "#e74c3c";
+          risparmi[meseDoc-1] = risparmio;
+          colori[meseDoc-1] = risparmio>=0?"#4CAF50":"#e74c3c";
         });
 
         aggiornaTesto(meseCorrente, anno);
         disegnaGraficoAnno(risparmi, colori, anno);
 
-      } catch (err) {
-        console.error("Errore caricamento dati:", err);
+      } catch(err){
+        console.error(err);
         yearTotalEl.innerText = "Errore nel caricamento dei dati.";
       }
     }
 
-    function aggiornaTesto(meseIndex, anno) {
+    function aggiornaTesto(meseIndex, anno){
       yearTotalEl.innerText = `Risparmio ${mesi[meseIndex]} ${anno}: ${risparmi[meseIndex].toFixed(2)} €`;
     }
 
-    function disegnaGraficoAnno(risparmi, colori, anno) {
-      if (!canvasEl) return;
-      if (canvasEl.chartInstance) canvasEl.chartInstance.destroy();
+    function disegnaGraficoAnno(risparmi, colori, anno){
+      if(!canvasEl) return;
+      if(canvasEl.chartInstance) canvasEl.chartInstance.destroy();
 
       const ctx = canvasEl.getContext('2d');
-      const chart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: mesi,
-          datasets: [{ label: "Risparmio mese €", data: risparmi, backgroundColor: colori }]
+      const chart = new Chart(ctx,{
+        type:"bar",
+        data:{
+          labels:mesi,
+          datasets:[{label:"Risparmio mese €",data:risparmi,backgroundColor:colori, borderRadius:10, barThickness:40}]
         },
-        options: {
-          responsive: true,
-          scales: { y: { beginAtZero: true } },
-          plugins: {
-            tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.raw.toFixed(2)} €` } }
-          },
-          onClick: (evt, elements) => {
-            if (elements.length > 0) {
+        options:{
+          responsive:true,
+          scales:{ y:{ beginAtZero:true, grid:{ color:'rgba(255,255,255,0.2)' } }, x:{ grid:{ display:false } } },
+          plugins:{ tooltip:{ callbacks:{ label:(c)=>`${c.dataset.label}: ${c.raw.toFixed(2)} €` } } },
+          onClick:(evt,elements)=>{
+            if(elements.length>0){
               const index = elements[0].index;
               aggiornaTesto(index, anno);
             }
@@ -157,6 +199,8 @@
       });
       canvasEl.chartInstance = chart;
     }
+
   </script>
+
 </body>
 </html>
