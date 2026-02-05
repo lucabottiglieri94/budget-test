@@ -1008,10 +1008,14 @@
     function updateSavingsGoal() {
         const goalAmount = 250; // Obiettivo di 250 euro
         
-        // Calcola il risparmio attuale dal riepilogo
-        const balanceElement = document.getElementById('summary-balance');
-        const savedAmount = balanceElement ? parseFloat(balanceElement.textContent.replace('€', '').replace('.', '').replace(',', '.').trim()) : 0;
+        // Calcola il risparmio come: Totale Entrate - Totale Spese
+        const incomeElement = document.getElementById('summary-income');
+        const expenseElement = document.getElementById('summary-expense');
         
+        const totalIncome = incomeElement ? parseFloat(incomeElement.textContent.replace('€', '').replace('.', '').replace(',', '.').trim()) : 0;
+        const totalExpense = expenseElement ? parseFloat(expenseElement.textContent.replace('€', '').replace('.', '').replace(',', '.').trim()) : 0;
+        
+        const savedAmount = totalIncome - totalExpense; // Risparmio accumulato        
         // Calcola la percentuale
         let percentage = (savedAmount / goalAmount) * 100;
         percentage = Math.max(0, Math.min(100, percentage)); // Limita tra 0 e 100
