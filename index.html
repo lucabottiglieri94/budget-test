@@ -348,6 +348,79 @@
 </head>
 <body>
     <div class="container">
+
+                /* Obiettivo di Risparmio */
+        .savings-goal {
+            margin-top: 20px;
+        }
+
+        .goal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .goal-label {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .goal-amount {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-success) 0%, #45a049 100%);
+            border-radius: 20px;
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            font-size: 1.1em;
+        }
+
+        .goal-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .goal-footer strong {
+            color: var(--color-dark);
+        }
         <header>
             <h1>💰 Budget Mensile</h1>
             <p>Gestione entrate e spese familiari (sincronizzato)</p>
@@ -419,6 +492,26 @@
                     <div class="summary-value balance-positive" id="summary-balance">€ 0,00</div>
                 </div>
             </div>
+
+                    <!-- OBIETTIVO DI RISPARMIO -->
+        <div class="section savings-goal">
+            <h2>💰 Obiettivo di Risparmio</h2>
+            <div class="goal-card">
+                <div class="goal-header">
+                    <span class="goal-label">Obiettivo mensile:</span>
+                    <span class="goal-amount">€250,00</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="savings-progress-bar">
+                        <span class="progress-text" id="progress-percentage">0%</span>
+                    </div>
+                </div>
+                <div class="goal-footer">
+                    <span>Risparmiato: <strong id="saved-amount">€0,00</strong></span>
+                    <span>Mancano: <strong id="remaining-amount">€250,00</strong></span>
+                </div>
+            </div>
+        </div>
 
             <!-- LISTA DELLA SPESA SETTIMANALE -->
             <div class="section" style="border-left-color: #FF9800;">
@@ -609,6 +702,8 @@
         let isSaving = false;
         let syncLabel = null;
         let unsubscribe = null;
+
+        
         let currentUser = null;
         let loginBtn = null;
         let userInfo = null;
@@ -907,6 +1002,52 @@
                 }
             }, 300);
         });
+
+            // Funzione per aggiornare la barra di progresso dell'obiettivo di risparmio
+    function updateSavingsGoal() {
+        const goalAmount = 250; // Obiettivo di 250 euro
+        
+        // Calcola il risparmio attuale dal riepilogo
+        const balanceElement = document.getElementById('summary-balance');
+        const savedAmount = balanceElement ? parseFloat(balanceElement.textContent.replace('€', '').replace('.', '').replace(',', '.').trim()) : 0;
+        
+        // Calcola la percentuale
+        let percentage = (savedAmount / goalAmount) * 100;
+        percentage = Math.max(0, Math.min(100, percentage)); // Limita tra 0 e 100
+        
+        // Aggiorna la barra di progresso
+        const progressBar = document.getElementById('savings-progress-bar');
+        const progressText = document.getElementById('progress-percentage');
+        const savedAmountElement = document.getElementById('saved-amount');
+        const remainingAmountElement = document.getElementById('remaining-amount');
+        
+        if (progressBar) {
+            progressBar.style.width = percentage + '%';
+        }
+        
+        if (progressText) {
+            progressText.textContent = percentage.toFixed(0) + '%';
+        }
+        
+        if (savedAmountElement) {
+            savedAmountElement.textContent = '€' + savedAmount.toFixed(2).replace('.', ',');
+        }
+        
+        if (remainingAmountElement) {
+            const remaining = Math.max(0, goalAmount - savedAmount);
+            remainingAmountElement.textContent = '€' + remaining.toFixed(2).replace('.', ',');
+        }
+    }
+    
+    // Chiama updateSavingsGoal ogni volta che i totali vengono aggiornati
+    const originalUpdateBudgetTotals = updateBudgetTotals;
+    updateBudgetTotals = function() {
+        originalUpdateBudgetTotals();
+        setTimeout(updateSavingsGoal, 100);
+    };
+    
+    // Aggiorna all'avvio
+    setTimeout(updateSavingsGoal, 500);
     </script>
 </body>
 </html>
