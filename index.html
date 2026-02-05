@@ -1294,53 +1294,65 @@ if (contentEl) {
 ">
 </div>
 
+<!-- Moneta e tooltip -->
+<img id="ai-coin" src="https://image2url.com/r2/default/images/1770325569777-148ee72e-c1cc-4e77-87b8-041b2d9969f4.png" alt="Moneta AI" style="width:80px; cursor:pointer; position:fixed; bottom:20px; right:20px; z-index:1000;">
+<div id="ai-tooltip" style="position:fixed; bottom:110px; right:20px; background:rgba(0,0,0,0.8); color:#fff; padding:10px 15px; border-radius:10px; opacity:0; transition:0.3s; max-width:250px; text-align:center; z-index:1000;"></div>
+
 <script>
-    const aiCoin = document.getElementById('ai-coin');
-    const aiTooltip = document.getElementById('ai-tooltip');
+const aiCoin = document.getElementById('ai-coin');
+const aiTooltip = document.getElementById('ai-tooltip');
 
-    // Movimento rimbalzo
-    let direction = 1;
-    let y = 0;
-    function bounceCoin() {
-        y += 0.8 * direction;
-        if (y > 15 || y < 0) direction *= -1;
-        aiCoin.style.transform = `translateY(${-y}px)`;
-        requestAnimationFrame(bounceCoin);
+// Rimbalzo della moneta
+let direction = 1;
+let y = 0;
+function bounceCoin() {
+    y += 0.8 * direction;
+    if (y > 15 || y < 0) direction *= -1;
+    aiCoin.style.transform = `translateY(${-y}px)`;
+    requestAnimationFrame(bounceCoin);
+}
+bounceCoin();
+
+// Funzione per formattare euro
+function formatCurrency(value) {
+    return "€ " + value.toFixed(2).replace('.', ',');
+}
+
+// Suggerimenti interattivi al click
+aiCoin.addEventListener('click', () => {
+    const entrate = Array.from(document.querySelectorAll('#entrate-items .item-amount-input'))
+        .map(i => parseFloat(i.value.replace(',', '.') || 0))
+        .reduce((a,b) => a+b, 0);
+
+    const spese = Array.from(document.querySelectorAll('#spese-items .item-amount-input'))
+        .map(i => parseFloat(i.value.replace(',', '.') || 0))
+        .reduce((a,b) => a+b, 0);
+
+    const risparmio = entrate - spese;
+
+    let message = '';
+
+    if (risparmio > 500) {
+        message = `🎉 Ottimo! Hai un risparmio di ${formatCurrency(risparmio)}! Continua così.`;
+    } else if (risparmio > 0) {
+        // Suggerimenti extra in base alle spese più alte
+        const speseArray = Array.from(document.querySelectorAll('#spese-items .item-amount-input'))
+            .map(i => ({name: i.dataset.name || "Spesa", value: parseFloat(i.value.replace(',', '.') || 0)}))
+            .sort((a,b) => b.value - a.value);
+
+        let topSpesa = speseArray[0];
+        message = `💡 Hai un risparmio di ${formatCurrency(risparmio)}. Potresti ridurre "${topSpesa.name}" (${formatCurrency(topSpesa.value)}) per risparmiare di più.`;
+    } else {
+        message = `⚠ Attenzione! Sei in negativo di ${formatCurrency(Math.abs(risparmio))}. Controlla le spese più grandi per migliorare.`;
     }
-    bounceCoin();
 
-    // Mostra suggerimenti quando si clicca sulla moneta
-    aiCoin.addEventListener('click', () => {
-        const entrate = Array.from(document.querySelectorAll('#entrate-items .item-amount-input'))
-            .map(i => parseFloat(i.value.replace(',', '.') || 0))
-            .reduce((a,b) => a+b, 0);
+    aiTooltip.textContent = message;
+    aiTooltip.style.opacity = 1;
 
-        const spese = Array.from(document.querySelectorAll('#spese-items .item-amount-input'))
-            .map(i => parseFloat(i.value.replace(',', '.') || 0))
-            .reduce((a,b) => a+b, 0);
-
-        const risparmio = entrate - spese;
-
-        let message = '';
-        if (risparmio > 500) {
-            message = `🎉 Ottimo! Hai un risparmio di ${formatCurrency(risparmio)}! Continua così.`;
-        } else if (risparmio > 0) {
-            message = `💡 Hai un risparmio di ${formatCurrency(risparmio)}. Potresti ridurre qualche spesa per crescere di più.`;
-        } else {
-            message = `⚠ Attenzione! Sei in negativo di ${formatCurrency(Math.abs(risparmio))}. Controlla le spese.`;
-        }
-
-        aiTooltip.textContent = message;
-        aiTooltip.style.opacity = 1;
-
-        setTimeout(() => {
-            aiTooltip.style.opacity = 0;
-        }, 5000);
-    });
-
-    function formatCurrency(value) {
-        return "€ " + value.toFixed(2).replace('.', ',');
-    }
+    setTimeout(() => {
+        aiTooltip.style.opacity = 0;
+    }, 5000);
+});
 </script>
 
 </body>
