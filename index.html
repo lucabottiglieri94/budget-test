@@ -857,6 +857,8 @@
 
     <script>
         let currentMonth = '2026-02';
+        localStorage.setItem("budgetMonth", currentMonth);
+
         let isSaving = false;
         let syncLabel = null;
         let unsubscribe = null;
