@@ -1257,5 +1257,203 @@ if (contentEl) {
 
         
     </script>
+    <!-- ================= MONETA AI ASSISTENTE ================= -->
+<style>
+    /* Contenitore generale della moneta/AI */
+    #ai-coin-assistant {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Fumetto dei suggerimenti */
+    #ai-coin-tooltip {
+        max-width: 260px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 0.85em;
+        line-height: 1.4;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    #ai-coin-tooltip.visible {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    #ai-coin-tooltip strong {
+        color: #FFEB3B;
+    }
+
+    /* Moneta */
+    #ai-coin-button {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d 60%, #f57f17);
+        box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.6),
+            0 12px 20px rgba(0,0,0,0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        animation: coin-bounce 2s ease-in-out infinite;
+    }
+
+    /* Immagine della moneta */
+    #ai-coin-button img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+        pointer-events: none;
+    }
+
+    /* Effetto “pulse” al click */
+    #ai-coin-button::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.6);
+        opacity: 0;
+        transform: scale(0.5);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    #ai-coin-button.clicked::after {
+        opacity: 1;
+        transform: scale(1.15);
+    }
+
+    /* Animazione rimbalzo moneta */
+    @keyframes coin-bounce {
+        0%, 100% { transform: translateY(0); }
+        20%      { transform: translateY(-8px); }
+        40%      { transform: translateY(0); }
+        60%      { transform: translateY(-4px); }
+        80%      { transform: translateY(0); }
+    }
+
+    /* Piccola notifica di “typing” AI */
+    #ai-coin-typing {
+        font-size: 0.75em;
+        color: #ddd;
+        display: none;
+        margin-top: 2px;
+    }
+</style>
+
+<div id="ai-coin-assistant">
+    <div id="ai-coin-tooltip"></div>
+    <button id="ai-coin-button" aria-label="Assistente AI budget">
+        <img src="https://image2url.com/r2/default/images/1770325569777-148ee72e-c1cc-4e77-87b8-041b2d9969f4.png" alt="AI Coin">
+    </button>
+    <div id="ai-coin-typing">Sto analizzando il tuo budget…</div>
+</div>
+
+<script>
+    (function () {
+        const tooltip = document.getElementById('ai-coin-tooltip');
+        const button = document.getElementById('ai-coin-button');
+        const typing = document.getElementById('ai-coin-typing');
+
+        // Frasi base che la “AI” usa in base a cosa trova nella pagina
+        function generaSuggerimentiDallaPagina() {
+            const suggestions = [];
+
+            // 1) Controllo se esistono totali entrate/spese/saldo
+            const totalEntrate = document.getElementById('total-entrate');
+            const totalSpese = document.getElementById('total-spese');
+            const balanceEl = document.getElementById('balance-value');
+
+            // 2) Analisi generica del saldo
+            let balanceVal = 0;
+            if (balanceEl) {
+                const text = balanceEl.textContent.replace(/[€\s\.]/g, '').replace(',', '.');
+                const n = parseFloat(text);
+                if (!isNaN(n)) balanceVal = n;
+            }
+
+            if (balanceVal > 0) {
+                suggestions.push("Il tuo saldo è positivo: valuta se destinare una parte a risparmio o fondo emergenze.");
+            } else if (balanceVal < 0) {
+                suggestions.push("Il saldo è negativo: prova a ridurre le spese variabili (es. tempo libero, extra, ristoranti) nella prossima settimana.");
+            }
+
+            // 3) Controllo presenza sezioni specifiche (per come è strutturato il tuo file)
+            const foodBudgetSection = document.querySelector('.food-budget-section');
+            if (foodBudgetSection) {
+                suggestions.push("Hai una sezione spesa alimentare: confronta il budget settimanale con le spese reali per capire dove stai sforando.");
+            }
+
+            const fixedCostsLabels = Array.from(document.querySelectorAll('.entry-item .item-label-input'))
+                .map(i => i.value?.toLowerCase() || '');
+
+            if (fixedCostsLabels.some(v => v.includes('mutuo') || v.includes('affitto'))) {
+                suggestions.push("Vedo spese fisse come mutuo/affitto: assicurati che non superino il 30–35% delle entrate totali.");
+            }
+
+            if (fixedCostsLabels.some(v => v.includes('auto') || v.includes('assicurazione'))) {
+                suggestions.push("Controlla i costi auto/assicurazione: se sono alti, valuta preventivi alternativi o una rata più sostenibile.");
+            }
+
+            // 4) Fallback se non trovo nulla
+            if (suggestions.length === 0) {
+                suggestions.push("Compila entrate e spese: ti aiuterò a capire dove puoi ottimizzare il tuo bilancio.");
+            }
+
+            // Restituisco una frase “composta”
+            const intro = "Ciao, sono la tua AI del budget. ";
+            const body = suggestions.slice(0, 3).join(" ");
+            return intro + body;
+        }
+
+        function mostraSuggerimento() {
+            typing.style.display = 'block';
+            tooltip.classList.remove('visible');
+
+            setTimeout(() => {
+                const testo = generaSuggerimentiDallaPagina();
+                tooltip.innerHTML = testo;
+                typing.style.display = 'none';
+                tooltip.classList.add('visible');
+            }, 600); // piccolo delay tipo “sto pensando…”
+        }
+
+        // Click sulla moneta: rimbalzo + nuovo suggerimento
+        button.addEventListener('click', () => {
+            button.classList.add('clicked');
+            setTimeout(() => button.classList.remove('clicked'), 250);
+            mostraSuggerimento();
+        });
+
+        // Primo suggerimento automatico dopo qualche secondo
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                mostraSuggerimento();
+            }, 2000);
+        });
+    })();
+</script>
+<!-- =============== FINE MONETA AI ASSISTENTE =============== -->
+
 </body>
 </html>
