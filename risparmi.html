@@ -1,56 +1,8 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<title>Grafico Risparmi</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background: #f5f6fa;
-}
-
-.container {
-    max-width: 900px;
-    margin: auto;
-    background: white;
-    padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.total {
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    margin-top: 20px;
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-    <h1>📈 Risparmio Mensile</h1>
-    <canvas id="savingsChart"></canvas>
-    <div class="total" id="yearTotal">Totale anno: 0 €</div>
-</div>
-
 <script type="module">
-
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-   
     apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
     authDomain: "budget-luca.firebaseapp.com",
     projectId: "budget-luca",
@@ -63,64 +15,61 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ====== LOGICA CALCOLO RISPARMI ====== */
+/* ====== LOGICA CALCOLO RISPARMIO MESE CORRENTE (come in index) ====== */
 
 const mesi = [
-"Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
-"Lug", "Ago", "Set", "Ott", "Nov", "Dic"
+  "Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
+  "Lug", "Ago", "Set", "Ott", "Nov", "Dic"
 ];
 
-const risparmioPerMese = new Array(12).fill(0);
-
 async function caricaDati() {
+  const oggi = new Date();
+  const anno = oggi.getFullYear();
+  const meseIndex = oggi.getMonth(); // 0 = Gennaio
+  const meseString = String(meseIndex + 1).padStart(2, "0");
+  const currentMonthId = `${anno}-${meseString}`; // es: 2026-02
 
-    // stessa collection che usi per movimenti
-    const snap = await getDocs(collection(db, "movimenti"));
+  const budgetsRef = collection(db, "budgets");
+  const snap = await getDocs(budgetsRef);
 
-    snap.forEach(doc => {
-        const d = doc.data();
+  let risparmioMese = 0;
 
-        if (!d.data || !d.importo) return;
+  snap.forEach(docSnap => {
+    if (docSnap.id !== currentMonthId) return;
+    const d = docSnap.data();
 
-        const mese = new Date(d.data).getMonth();
-
-        // ENTRATE positive → contribuiscono al risparmio
-        // USCITE negative → riducono risparmio
-        risparmioPerMese[mese] += Number(d.importo);
+    // Somma entrate
+    let totEntrate = 0;
+    (d.entrate || []).forEach(e => {
+      const v = parseFloat((e.amount || "0").toString().replace(",", "."));
+      if (!isNaN(v)) totEntrate += v;
     });
 
-    disegnaGrafico();
-}
-
-function disegnaGrafico() {
-
-    const totaleAnno = risparmioPerMese.reduce((a,b)=>a+b,0);
-
-    document.getElementById("yearTotal").innerText =
-        "Totale anno: " + totaleAnno.toFixed(2) + " €";
-
-    new Chart(document.getElementById("savingsChart"), {
-        type: "bar",
-        data: {
-            labels: mesi,
-            datasets: [{
-                label: "Risparmio €",
-                data: risparmioPerMese
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
+    // Somma spese
+    let totSpese = 0;
+    (d.spese || []).forEach(s => {
+      const v = parseFloat((s.amount || "0").toString().replace(",", "."));
+      if (!isNaN(v)) totSpese += v;
     });
+
+    risparmioMese = totEntrate - totSpese;
+  });
+
+  disegnaGrafico(meseIndex, risparmioMese);
 }
 
-caricaDati();
+function disegnaGrafico(meseIndex, risparmioMese) {
+  document.getElementById("yearTotal").innerText =
+    `Risparmio ${mesi[meseIndex]}: ${risparmioMese.toFixed(2)} €`;
 
-</script>
-
-</body>
-</html>
-
+  new Chart(document.getElementById("savingsChart"), {
+    type: "bar",
+    data: {
+      labels: [mesi[meseIndex]],
+      datasets: [{
+        label: "Risparmio mese",
+        data: [risparmioMese],
+        backgroundColor: "#4CAF50"
+      }]
+    },
+    opt
