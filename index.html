@@ -534,6 +534,131 @@
   z-index: 1500;
 }
 
+/* AI CHAT BOT */
+.ai-chat-widget {
+  position: fixed;
+  right: 20px;
+  bottom: 150px;
+  width: min(360px, calc(100vw - 30px));
+  max-height: 460px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 16px 30px rgba(0,0,0,0.25);
+  border: 1px solid #e8e8e8;
+  z-index: 2200;
+  display: none;
+  overflow: hidden;
+}
+
+.ai-chat-widget.open {
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #1f2937;
+  color: #fff;
+}
+
+.ai-chat-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.6);
+}
+
+.ai-chat-title {
+  font-weight: 700;
+  font-size: 0.95em;
+}
+
+.ai-chat-subtitle {
+  font-size: 0.75em;
+  opacity: 0.9;
+}
+
+.ai-chat-messages {
+  padding: 12px;
+  background: #f8fafc;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.ai-msg {
+  padding: 9px 11px;
+  border-radius: 12px;
+  font-size: 0.9em;
+  line-height: 1.35;
+  max-width: 90%;
+}
+
+.ai-msg.user {
+  align-self: flex-end;
+  background: #dbeafe;
+}
+
+.ai-msg.bot {
+  align-self: flex-start;
+  background: #ecfeff;
+}
+
+.ai-chat-form {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid #ebebeb;
+  background: #fff;
+}
+
+.ai-chat-input {
+  flex: 1;
+  border: 1px solid #d7d7d7;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.ai-chat-send {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ai-chat-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 84px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  z-index: 2300;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  box-shadow: 0 12px 22px rgba(37,99,235,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-chat-toggle img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
     </style>
 </head>
 <body>
@@ -817,6 +942,26 @@
             </div>
         </div>
     </div>
+
+        <div id="ai-chat-widget" class="ai-chat-widget" aria-live="polite">
+            <div class="ai-chat-header">
+                <img class="ai-chat-avatar" src="https://image2url.com/r2/default/images/1770325569777-148ee72e-c1cc-4e77-87b8-041b2d9969f4.png" alt="Moneta AI">
+                <div>
+                    <div class="ai-chat-title">AI Budget Coin Bot</div>
+                    <div class="ai-chat-subtitle">Conosco il file index.html</div>
+                </div>
+            </div>
+            <div id="ai-chat-messages" class="ai-chat-messages">
+                <div class="ai-msg bot">Ciao! Sono il tuo AI Chat Bot. Posso rispondere su tutto quello che c'è in questa pagina.</div>
+            </div>
+            <form id="ai-chat-form" class="ai-chat-form">
+                <input id="ai-chat-input" class="ai-chat-input" type="text" placeholder="Scrivi una domanda su index.html..." autocomplete="off">
+                <button type="submit" class="ai-chat-send">Invia</button>
+            </form>
+        </div>
+        <button id="ai-chat-toggle" class="ai-chat-toggle" type="button" aria-label="Apri chat AI" title="Apri chat AI">
+            <img src="https://image2url.com/r2/default/images/1770325569777-148ee72e-c1cc-4e77-87b8-041b2d9969f4.png" alt="Apri chat AI">
+        </button>
 
     <!-- Firebase + Firestore + Auth -->
     <script type="module">
@@ -1252,6 +1397,90 @@ window.addEventListener('scroll', () => {
 if (contentEl) {
     contentEl.addEventListener('scroll', () => {
         handleHeaderScroll(contentEl.scrollTop);
+    });
+}
+
+
+// ===== AI CHAT BOT (conoscenza locale di index.html) =====
+const aiChatWidget = document.getElementById('ai-chat-widget');
+const aiChatToggle = document.getElementById('ai-chat-toggle');
+const aiChatMessages = document.getElementById('ai-chat-messages');
+const aiChatForm = document.getElementById('ai-chat-form');
+const aiChatInput = document.getElementById('ai-chat-input');
+
+const aiKnowledgeSummary = {
+    titolo: 'Budget Mensile - Gestione Familiare',
+    sezioni: [
+        'Entrate con aggiunta/rimozione righe e totale',
+        'Spese con aggiunta/rimozione righe e totale',
+        'Riepilogo entrate/spese/risparmio',
+        'Obiettivo risparmio con barra di progresso',
+        'Spesa alimentare settimanale con controllo budget',
+        'Sync Firebase/Firestore + login Google'
+    ],
+    bottoni: ['Grafico Risparmi', 'Comparatori', 'Chat AI'],
+    meseDefault: '2026-02'
+};
+
+const pageTextMemory = (document.documentElement.innerText || '').toLowerCase();
+
+function aiAddMessage(text, who = 'bot') {
+    if (!aiChatMessages) return;
+    const msg = document.createElement('div');
+    msg.className = `ai-msg ${who}`;
+    msg.textContent = text;
+    aiChatMessages.appendChild(msg);
+    aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+}
+
+function aiGenerateReply(questionRaw) {
+    const q = (questionRaw || '').toLowerCase().trim();
+    if (!q) return 'Scrivimi una domanda e ti aiuto subito.';
+
+    if (q.includes('titolo')) {
+        return `Il titolo della pagina è: "${aiKnowledgeSummary.titolo}".`;
+    }
+
+    if (q.includes('sezioni') || q.includes('cosa c') || q.includes('contenuto')) {
+        return `Le sezioni principali sono: ${aiKnowledgeSummary.sezioni.join(', ')}.`;
+    }
+
+    if (q.includes('firebase') || q.includes('sincron')) {
+        return 'Sì, la pagina usa Firebase/Firestore e autenticazione Google, con salvataggio e sincronizzazione in tempo reale per mese.';
+    }
+
+    if (q.includes('obiettivo') || q.includes('risparmio')) {
+        return 'C'è un obiettivo risparmio mensile di €250 con barra percentuale che si aggiorna dal saldo Entrate - Spese.';
+    }
+
+    if (q.includes('settiman') || q.includes('aliment')) {
+        return 'La parte alimentare gestisce 4 settimane con budget 125€ a settimana e totale mensile 500€.';
+    }
+
+    const words = q.split(/\s+/).filter(w => w.length > 2);
+    const found = words.filter(w => pageTextMemory.includes(w));
+    if (found.length) {
+        return `Ho trovato nella pagina riferimenti a: ${found.slice(0, 8).join(', ')}. Se vuoi, fammi una domanda più precisa su questi punti.`;
+    }
+
+    return 'Conosco questa pagina index.html: chiedimi su entrate, spese, riepilogo, obiettivo risparmio, spesa alimentare, login o sincronizzazione.';
+}
+
+if (aiChatToggle && aiChatWidget) {
+    aiChatToggle.addEventListener('click', () => {
+        aiChatWidget.classList.toggle('open');
+    });
+}
+
+if (aiChatForm && aiChatInput) {
+    aiChatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = aiChatInput.value.trim();
+        if (!text) return;
+        aiAddMessage(text, 'user');
+        const reply = aiGenerateReply(text);
+        setTimeout(() => aiAddMessage(reply, 'bot'), 150);
+        aiChatInput.value = '';
     });
 }
 
