@@ -416,13 +416,122 @@
         .goal-footer strong {
             color: var(--color-dark);
         }
+
+                /* Notifica Budget Superato */
+        .budget-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            animation: slideIn 0.5s ease;
+        }
+
+        .budget-alert.hidden {
+            display: none;
+        }
+
+        .alert-content {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 300px;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .flame-container {
+            font-size: 2.5em;
+            animation: flameAnimation 1s infinite alternate;
+        }
+
+        @keyframes flameAnimation {
+            0% {
+                transform: scale(1) rotate(-5deg);
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(5deg);
+                filter: hue-rotate(20deg);
+            }
+            100% {
+                transform: scale(1.2) rotate(-5deg);
+                filter: hue-rotate(40deg);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-text {
+            flex: 1;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .alert-text strong {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .alert-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .alert-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
 <body>
     <div class="container">
 
+        
+
+
+        
+        
                
         <header>
+
+                <!-- Notifica Budget Superato -->
+    <div id="budget-alert" class="budget-alert hidden">
+        <div class="alert-content">
+            <div class="flame-container">
+                <div class="flame">🔥</div>
+            </div>
+            <div class="alert-text">
+                <strong>Attenzione!</strong> Hai superato il budget settimanale di €125!
+            </div>
+            <button class="alert-close" onclick="closeBudgetAlert()">×</button>
+        </div>
+    </div>
             <h1>💰 Budget Mensile</h1>
             <p>Gestione entrate e spese familiari (sincronizzato)</p>
             <div style="margin-top: 15px;">
@@ -939,6 +1048,8 @@
                         statusEl.textContent = `⚠ Sforato di ${formatCurrency(Math.abs(remaining))}`;
                         statusEl.style.backgroundColor = '#FFEBEE';
                         statusEl.style.color = '#C62828';
+                                            // Mostra notifica se supera il budget
+                    showBudgetAlert();
                     }
                 }
             }
@@ -1052,6 +1163,21 @@
     };
     
     // Aggiorna all'avvio
+
+            // Funzioni per la notifica budget
+    function showBudgetAlert() {
+        const alert = document.getElementById('budget-alert');
+        if (alert) {
+            alert.classList.remove('hidden');
+        }
+    }
+    
+    function closeBudgetAlert() {
+        const alert = document.getElementById('budget-alert');
+        if (alert) {
+            alert.classList.add('hidden');
+        }
+    }
     setTimeout(updateSavingsGoal, 500);
     </script>
 </body>
