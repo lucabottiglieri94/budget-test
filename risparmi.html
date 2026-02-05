@@ -27,11 +27,6 @@ body {
     box-shadow:0 8px 30px rgba(0,0,0,0.1);
 }
 
-h1 {
-    text-align:center;
-    margin-bottom:10px;
-}
-
 .salvadanaio {
     margin-top:20px;
     padding:18px;
@@ -41,121 +36,79 @@ h1 {
     font-size:22px;
     font-weight:700;
 }
-
-.salvadanaio span {
-    font-size:28px;
-}
-
-a {
-    display:block;
-    margin-top:20px;
-    text-align:center;
-    padding:10px;
-    background:#2196F3;
-    color:white;
-    border-radius:8px;
-    text-decoration:none;
-    font-weight:600;
-}
 </style>
 </head>
 
 <body>
 
 <div class="box">
-    <h1 id="title"></h1>
+<h2 id="titolo">📊 Risparmi</h2>
+<canvas id="chart"></canvas>
 
-    <canvas id="chart"></canvas>
+<div class="salvadanaio">
+🐷 Totale risparmi: <span id="tot">0 €</span>
+</div>
 
-    <div class="salvadanaio">
-        🐷 Salvadanaio Totale<br>
-        <span id="totale">0 €</span>
-    </div>
-
-    <a href="index.html">← Torna al Budget</a>
+<a href="index.html">← Torna</a>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  onSnapshot,
-  collection,
-  onSnapshot as onSnapColl
-} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-const firebaseConfig = {
- apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
- authDomain: "budget-luca.firebaseapp.com",
- projectId: "budget-luca",
- storageBucket: "budget-luca.firebasestorage.app",
- messagingSenderId: "67496424698",
- appId: "1:67496424698:web:b1822e04ef4efc07408543"
-};
+const app = initializeApp({
+ apiKey:"AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+ authDomain:"budget-luca.firebaseapp.com",
+ projectId:"budget-luca"
+});
 
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const month = localStorage.getItem("budgetMonth") || "2026-02";
-document.getElementById("title").innerText = "📊 Mese " + month;
-
-function totEntrate(data){
-    let t=0;
-    (data.entrate||[]).forEach(x=> t+=parseFloat(x.amount||0));
-    return t;
+function sumE(d){
+ let t=0;(d.entrate||[]).forEach(x=>t+=+x.amount||0);return t;
+}
+function sumS(d){
+ let t=0;(d.spese||[]).forEach(x=>t+=+x.amount||0);return t;
 }
 
-function totSpese(data){
-    let t=0;
-    (data.spese||[]).forEach(x=> t+=parseFloat(x.amount||0));
-    return t;
-}
-
-const chart = new Chart(document.getElementById("chart"), {
-    type: "bar",
-    data: {
-        labels: ["Entrate","Spese","Risparmio"],
-        datasets: [{
-            data: [0,0,0]
-        }]
-    },
-    options: {
-        responsive:true,
-        scales:{ y:{ beginAtZero:true } }
-    }
+const chart = new Chart(document.getElementById("chart"),{
+ type:"bar",
+ data:{
+  labels:["Entrate","Spese","Risparmio"],
+  datasets:[{data:[0,0,0]}]
+ },
+ options:{scales:{y:{beginAtZero:true}}}
 });
 
+onSnapshot(collection(db,"budgets"), snap=>{
 
-// 🔵 GRAFICO MESE CORRENTE
-onSnapshot(doc(db,"budgets",month), snap=>{
-    if(!snap.exists()){
-        chart.data.datasets[0].data=[0,0,0];
-        chart.update();
-        return;
-    }
+ let totaleSalvadanaio = 0;
+ let ultimoDoc = null;
 
-    const d = snap.data();
-    const e = totEntrate(d);
-    const s = totSpese(d);
-    const r = e - s;
+ snap.forEach(doc=>{
+   ultimoDoc = doc; // ultimo mese trovato
+ });
 
-    chart.data.datasets[0].data=[e,s,r];
-    chart.update();
-});
+ if(!ultimoDoc) return;
 
+ const d = ultimoDoc.data();
+ const e = sumE(d);
+ const s = sumS(d);
+ const r = e-s;
 
-// 🐷 SALVADANAIO TOTALE (tutti i mesi)
-onSnapColl(collection(db,"budgets"), qs=>{
-    let totale = 0;
+ chart.data.datasets[0].data=[e,s,r];
+ chart.update();
 
-    qs.forEach(docSnap=>{
-        const d = docSnap.data();
-        totale += (totEntrate(d) - totSpese(d));
-    });
+ snap.forEach(doc=>{
+   const d2 = doc.data();
+   totaleSalvadanaio += sumE(d2)-sumS(d2);
+ });
 
-    document.getElementById("totale").innerText =
-        totale.toFixed(2) + " €";
+ document.getElementById("tot").innerText =
+   totaleSalvadanaio.toFixed(2)+" €";
+
+ document.getElementById("titolo").innerText =
+   "📊 Mese "+ultimoDoc.id;
 });
 </script>
 
