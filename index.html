@@ -1436,55 +1436,58 @@ if (contentEl) {
 
 function rispostaAI(domanda) {
     const dati = leggiDatiPagina();
-    const text = domanda.toLowerCase();
+    const testo = domanda.toLowerCase();
     let response = "";
 
-    // Se chiede il totale entrate
-    if (text.includes("entrate") || text.includes("guadagno") || text.includes("stipendio")) {
-        response = "Le tue entrate totali: " + dati.entrateText + ".";
+    // Trova tutte le voci e importi
+    const labels = Array.from(document.querySelectorAll('.entry-item .item-label-input'))
+                        .map(i => i.value.toLowerCase());
+    const values = Array.from(document.querySelectorAll('.entry-item .item-amount-input'))
+                        .map(i => parseFloat(i.value.replace(',', '.') || 0));
+
+    // Entrate
+    if (testo.includes("entrate") || testo.includes("guadagno") || testo.includes("stipendio")) {
+        response = "Entrate totali: " + dati.entrateText + ".";
     }
-    // Se chiede il totale spese
-    else if (text.includes("spese") || text.includes("uscite") || text.includes("quanto spendo")) {
-        response = "Le tue spese totali: " + dati.speseText + ".";
+    // Spese
+    else if (testo.includes("spese") || testo.includes("uscite") || testo.includes("quanto spendo")) {
+        response = "Spese totali: " + dati.speseText + ".";
     }
-    // Se chiede il saldo
-    else if (text.includes("saldo") || text.includes("avanzo") || text.includes("disavanzo")) {
+    // Saldo
+    else if (testo.includes("saldo") || testo.includes("avanzo") || testo.includes("disavanzo")) {
         response = "Il saldo attuale: " + dati.saldoText + ".";
-        if (parseFloat(dati.saldoText.replace(/[€\s\.]/g,'').replace(',','.')) < 0) {
-            response += " ⚠️ Sei in negativo, valuta di ridurre spese variabili come tempo libero o ristoranti.";
-        }
     }
-    // Se chiede come risparmiare di più
-    else if (text.includes("risparmiare") || text.includes("risparmio")) {
-        let speseValues = Array.from(document.querySelectorAll('.entry-item .item-amount-input'))
-                                .map(i => parseFloat(i.value.replace(',', '.') || 0));
-        let speseLabels = Array.from(document.querySelectorAll('.entry-item .item-label-input'))
-                                .map(i => i.value || "Voce");
-
-        // Trova la spesa maggiore
-        let maxSpesa = Math.max(...speseValues);
-        let indexMax = speseValues.indexOf(maxSpesa);
-
-        response = "Per risparmiare di più puoi ridurre la spesa maggiore: ";
-        response += speseLabels[indexMax] + " (" + formatCurrency(maxSpesa) + ").";
-        response += " Valuta anche di controllare spese variabili come cibo, tempo libero o extra.";
-    }
-    // Se chiede per categoria
-    else if (text.includes("categorie") || text.includes("voci") || text.includes("cosa ho")) {
-        if (dati.labels.length > 0) {
-            response = "Attualmente nel tuo budget ci sono queste voci: " + dati.labels.join(", ") + ".";
+    // Risparmiare di più
+    else if (testo.includes("risparmiare") || testo.includes("risparmio") || testo.includes("come risparmiare")) {
+        if (values.length > 0) {
+            let maxValue = Math.max(...values);
+            let maxIndex = values.indexOf(maxValue);
+            response = "Per risparmiare di più puoi ridurre la spesa maggiore: ";
+            response += labels[maxIndex] + " (" + formatCurrency(maxValue) + ").";
+            response += " Controlla anche spese variabili come cibo, tempo libero o extra.";
         } else {
-            response = "Non vedo ancora voci compilate. Aggiungi nomi alle tue spese/entrate per consigli più precisi.";
+            response = "Non vedo spese inserite. Compila le voci per consigli su risparmio.";
         }
     }
-    // Domanda generica: prova a rispondere con dati principali
+    // Domanda su una voce specifica
     else {
-        response = "Ho letto la pagina. Entrate: " + dati.entrateText + ", Spese: " + dati.speseText + ", Saldo: " + dati.saldoText + ".";
-        response += " Puoi chiedere su 'entrate', 'spese', 'saldo' o 'categorie' per risposte più dettagliate.";
+        let trovato = false;
+        for (let i = 0; i < labels.length; i++) {
+            if (testo.includes(labels[i])) {
+                response = "La voce '" + labels[i] + "' ha un importo di " + formatCurrency(values[i]) + ".";
+                trovato = true;
+                break;
+            }
+        }
+        if (!trovato) {
+            response = "Ho letto la pagina. Entrate: " + dati.entrateText + ", Spese: " + dati.speseText + ", Saldo: " + dati.saldoText + ".";
+            response += " Puoi chiedere su 'entrate', 'spese', 'saldo', 'risparmiare' o nomi specifici delle voci per dettagli.";
+        }
     }
 
     return response;
 }
+
 
 
     function inviaDomanda(){
