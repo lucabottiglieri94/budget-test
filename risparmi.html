@@ -2,134 +2,122 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Risparmi</title>
+<title>Grafico Risparmi</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- FIREBASE COMPAT (come index.html) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <style>
-body{
- font-family:system-ui;
- background:#f5f5f5;
- margin:0;
- display:flex;
- justify-content:center;
- align-items:center;
- min-height:100vh;
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f5f6fa;
 }
 
-.box{
- background:white;
- padding:25px;
- border-radius:16px;
- width:95%;
- max-width:650px;
- box-shadow:0 8px 30px rgba(0,0,0,0.1);
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
-.salvadanaio{
- margin-top:20px;
- padding:18px;
- border-radius:14px;
- background:#e8f5e9;
- text-align:center;
- font-size:22px;
- font-weight:700;
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.total {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 20px;
 }
 </style>
 </head>
-
 <body>
 
-<div class="box">
-<h2 id="titolo">📊 Risparmi</h2>
-<canvas id="chart"></canvas>
-
-<div class="salvadanaio">
-🐷 Totale risparmi: <span id="tot">0 €</span>
+<div class="container">
+    <h1>📈 Risparmio Mensile</h1>
+    <canvas id="savingsChart"></canvas>
+    <div class="total" id="yearTotal">Totale anno: 0 €</div>
 </div>
 
-<a href="index.html">← Torna</a>
-</div>
+<script type="module">
 
-<script>
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
- apiKey:"AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
- authDomain:"budget-luca.firebaseapp.com",
- projectId:"budget-luca",
- storageBucket:"budget-luca.firebasestorage.app",
- messagingSenderId:"67496424698",
- appId:"1:67496424698:web:b1822e04ef4efc07408543"
+   
+    apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+    authDomain: "budget-luca.firebaseapp.com",
+    projectId: "budget-luca",
+    storageBucket: "budget-luca.firebasestorage.app",
+    messagingSenderId: "67496424698",
+    appId: "1:67496424698:web:b1822e04ef4efc07408543",
+    measurementId: "G-7LEYRZE9QN"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-function sumE(d){
- let t=0;
- (d.entrate||[]).forEach(x=> t+=Number(x.amount)||0);
- return t;
+/* ====== LOGICA CALCOLO RISPARMI ====== */
+
+const mesi = [
+"Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
+"Lug", "Ago", "Set", "Ott", "Nov", "Dic"
+];
+
+const risparmioPerMese = new Array(12).fill(0);
+
+async function caricaDati() {
+
+    // stessa collection che usi per movimenti
+    const snap = await getDocs(collection(db, "movimenti"));
+
+    snap.forEach(doc => {
+        const d = doc.data();
+
+        if (!d.data || !d.importo) return;
+
+        const mese = new Date(d.data).getMonth();
+
+        // ENTRATE positive → contribuiscono al risparmio
+        // USCITE negative → riducono risparmio
+        risparmioPerMese[mese] += Number(d.importo);
+    });
+
+    disegnaGrafico();
 }
 
-function sumS(d){
- let t=0;
- (d.spese||[]).forEach(x=> t+=Number(x.amount)||0);
- return t;
+function disegnaGrafico() {
+
+    const totaleAnno = risparmioPerMese.reduce((a,b)=>a+b,0);
+
+    document.getElementById("yearTotal").innerText =
+        "Totale anno: " + totaleAnno.toFixed(2) + " €";
+
+    new Chart(document.getElementById("savingsChart"), {
+        type: "bar",
+        data: {
+            labels: mesi,
+            datasets: [{
+                label: "Risparmio €",
+                data: risparmioPerMese
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
 }
 
-const chart = new Chart(document.getElementById("chart"),{
- type:"bar",
- data:{
-  labels:["Entrate","Spese","Risparmio"],
-  datasets:[{
-    data:[0,0,0]
-  }]
- },
- options:{
-  responsive:true,
-  scales:{y:{beginAtZero:true}}
- }
-});
-
-db.collection("budgets").onSnapshot(snap=>{
-
- let totaleSalvadanaio = 0;
- let ultimo = null;
-
- snap.forEach(doc=>{
-   ultimo = doc;
- });
-
- if(!ultimo){
-   console.log("Nessun documento budgets");
-   return;
- }
-
- const d = ultimo.data();
- const e = sumE(d);
- const s = sumS(d);
- const r = e - s;
-
- chart.data.datasets[0].data=[e,s,r];
- chart.update();
-
- snap.forEach(doc=>{
-   const d2 = doc.data();
-   totaleSalvadanaio += sumE(d2)-sumS(d2);
- });
-
- document.getElementById("tot").innerText =
-   totaleSalvadanaio.toFixed(2)+" €";
-
- document.getElementById("titolo").innerText =
-   "📊 Mese " + ultimo.id;
-
-});
+caricaDati();
 
 </script>
 
