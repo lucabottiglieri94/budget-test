@@ -1192,26 +1192,27 @@
         }
     }
     setTimeout(updateSavingsGoal, 500);
+// ===== HEADER AUTO HIDE — UNIVERSALE =====
 const headerEl = document.querySelector('header');
+const contentEl = document.querySelector('.content');
 
-window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY || window.pageYOffset;
-
-    // Nasconde se scendi
-    if (currentScrollY > 10) {
+function handleHeaderScroll(scrollValue) {
+    if (scrollValue > 10) {
         headerEl.classList.add('header-hidden');
-    }
-
-    // Riappare SOLO quando torni in cima
-    if (currentScrollY <= 5) {
+    } else {
         headerEl.classList.remove('header-hidden');
     }
+}
+
+// scroll pagina
+window.addEventListener('scroll', () => {
+    handleHeaderScroll(window.scrollY || window.pageYOffset);
 });
 
-        // Riappare SOLO quando torni in cima
-        if (currentScroll <= 5) {
-            headerEl.classList.remove('header-hidden');
-        }
+// scroll container interno (se presente)
+if (contentEl) {
+    contentEl.addEventListener('scroll', () => {
+        handleHeaderScroll(contentEl.scrollTop);
     });
 }
 
