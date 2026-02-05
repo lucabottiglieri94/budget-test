@@ -1,87 +1,115 @@
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Risparmi mese</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
-    authDomain: "budget-luca.firebaseapp.com",
-    projectId: "budget-luca",
-    storageBucket: "budget-luca.firebasestorage.app",
-    messagingSenderId: "67496424698",
-    appId: "1:67496424698:web:b1822e04ef4efc07408543",
-    measurementId: "G-7LEYRZE9QN"
-};
+  <!-- Chart.js UMD (crea la variabile globale Chart) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <h1>Risparmio mensile</h1>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  <!-- Testo con il risparmio -->
+  <h2 id="yearTotal">Caricamento...</h2>
 
-/* ====== CALCOLO RISPARMIO MESE CORRENTE ====== */
+  <!-- Canvas per il grafico -->
+  <canvas id="savingsChart"></canvas>
 
-const mesi = [
-  "Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
-  "Lug", "Ago", "Set", "Ott", "Nov", "Dic"
-];
+  <!-- Firebase + logica risparmi -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-async function caricaDati() {
-  const oggi = new Date();
-  const anno = oggi.getFullYear();
-  const meseIndex = oggi.getMonth(); // 0 = Gennaio
-  const meseString = String(meseIndex + 1).padStart(2, "0");
-  const currentMonthId = `${anno}-${meseString}`; // es: 2026-02
+    const firebaseConfig = {
+      apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+      authDomain: "budget-luca.firebaseapp.com",
+      projectId: "budget-luca",
+      storageBucket: "budget-luca.firebasestorage.app",
+      messagingSenderId: "67496424698",
+      appId: "1:67496424698:web:b1822e04ef4efc07408543",
+      measurementId: "G-7LEYRZE9QN"
+    };
 
-  const budgetsRef = collection(db, "budgets");
-  const snap = await getDocs(budgetsRef);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  let risparmioMese = 0;
+    const mesi = [
+      "Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
+      "Lug", "Ago", "Set", "Ott", "Nov", "Dic"
+    ];
 
-  snap.forEach(docSnap => {
-    if (docSnap.id !== currentMonthId) return;
-    const d = docSnap.data();
+    async function caricaDati() {
+      const oggi = new Date();
+      const anno = oggi.getFullYear();
+      const meseIndex = oggi.getMonth(); // 0 = Gennaio
+      const meseString = String(meseIndex + 1).padStart(2, "0");
+      const currentMonthId = `${anno}-${meseString}`; // es: 2026-02
 
-    // Somma entrate
-    let totEntrate = 0;
-    (d.entrate || []).forEach(e => {
-      const v = parseFloat((e.amount || "0").toString().replace(",", "."));
-      if (!isNaN(v)) totEntrate += v;
-    });
+      const budgetsRef = collection(db, "budgets");
+      const snap = await getDocs(budgetsRef);
 
-    // Somma spese
-    let totSpese = 0;
-    (d.spese || []).forEach(s => {
-      const v = parseFloat((s.amount || "0").toString().replace(",", "."));
-      if (!isNaN(v)) totSpese += v;
-    });
+      let risparmioMese = 0;
 
-    risparmioMese = totEntrate - totSpese;
-  });
+      snap.forEach(docSnap => {
+        if (docSnap.id !== currentMonthId) return;
+        const d = docSnap.data();
 
-  disegnaGrafico(meseIndex, risparmioMese);
-}
+        // Somma entrate
+        let totEntrate = 0;
+        (d.entrate || []).forEach(e => {
+          const v = parseFloat((e.amount || "0").toString().replace(",", "."));
+          if (!isNaN(v)) totEntrate += v;
+        });
 
-function disegnaGrafico(meseIndex, risparmioMese) {
-  document.getElementById("yearTotal").innerText =
-    `Risparmio ${mesi[meseIndex]} 2026: ${risparmioMese.toFixed(2)} €`;
+        // Somma spese
+        let totSpese = 0;
+        (d.spese || []).forEach(s => {
+          const v = parseFloat((s.amount || "0").toString().replace(",", "."));
+          if (!isNaN(v)) totSpese += v;
+        });
 
-  const colore = risparmioMese >= 0 ? "#4CAF50" : "#e74c3c";
+        risparmioMese = totEntrate - totSpese;
+      });
 
-  new Chart(document.getElementById("savingsChart"), {
-    type: "bar",
-    data: {
-      labels: [mesi[meseIndex]],
-      datasets: [{
-        label: "Risparmio mese €",
-        data: [risparmioMese],
-        backgroundColor: colore
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      }
+      disegnaGrafico(meseIndex, risparmioMese, anno);
     }
-  });
-}
 
-caricaDati();
-</script>
+    function disegnaGrafico(meseIndex, risparmioMese, anno) {
+      const yearTotalEl = document.getElementById("yearTotal");
+      const canvasEl = document.getElementById("savingsChart");
+
+      if (!yearTotalEl || !canvasEl) {
+        console.error("Elementi yearTotal o savingsChart mancanti nell'HTML");
+        return;
+      }
+
+      yearTotalEl.innerText =
+        `Risparmio ${mesi[meseIndex]} ${anno}: ${risparmioMese.toFixed(2)} €`;
+
+      const colore = risparmioMese >= 0 ? "#4CAF50" : "#e74c3c";
+
+      new Chart(canvasEl, {
+        type: "bar",
+        data: {
+          labels: [mesi[meseIndex]],
+          datasets: [{
+            label: "Risparmio mese €",
+            data: [risparmioMese],
+            backgroundColor: colore
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    caricaDati();
+  </script>
+</body>
+</html>
