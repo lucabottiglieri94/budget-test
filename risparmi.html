@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ====== LOGICA CALCOLO RISPARMIO MESE CORRENTE (come in index) ====== */
+/* ====== CALCOLO RISPARMIO MESE CORRENTE ====== */
 
 const mesi = [
   "Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
@@ -60,16 +60,28 @@ async function caricaDati() {
 
 function disegnaGrafico(meseIndex, risparmioMese) {
   document.getElementById("yearTotal").innerText =
-    `Risparmio ${mesi[meseIndex]}: ${risparmioMese.toFixed(2)} €`;
+    `Risparmio ${mesi[meseIndex]} 2026: ${risparmioMese.toFixed(2)} €`;
+
+  const colore = risparmioMese >= 0 ? "#4CAF50" : "#e74c3c";
 
   new Chart(document.getElementById("savingsChart"), {
     type: "bar",
     data: {
       labels: [mesi[meseIndex]],
       datasets: [{
-        label: "Risparmio mese",
+        label: "Risparmio mese €",
         data: [risparmioMese],
-        backgroundColor: "#4CAF50"
+        backgroundColor: colore
       }]
     },
-    opt
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+caricaDati();
+</script>
