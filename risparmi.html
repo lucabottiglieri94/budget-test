@@ -3,153 +3,161 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grafico Risparmi</title>
+<title>Risparmi</title>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: #f5f5f5;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
+body {
+    font-family: system-ui;
+    background:#f5f5f5;
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
 
-    .container {
-        width: 90%;
-        max-width: 700px;
-        background: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
+.box {
+    background:white;
+    padding:25px;
+    border-radius:16px;
+    width:95%;
+    max-width:650px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.1);
+}
 
-    h1 {
-        text-align: center;
-        margin-bottom: 25px;
-        color: #333;
-    }
+h1 {
+    text-align:center;
+    margin-bottom:10px;
+}
 
-    canvas {
-        background: #fff;
-        border-radius: 10px;
-        padding: 10px;
-    }
+.salvadanaio {
+    margin-top:20px;
+    padding:18px;
+    border-radius:14px;
+    background:#e8f5e9;
+    text-align:center;
+    font-size:22px;
+    font-weight:700;
+}
 
-    #back-btn {
-        display: block;
-        margin: 20px auto 0;
-        padding: 10px 20px;
-        background: #2196F3;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        text-align: center;
-    }
+.salvadanaio span {
+    font-size:28px;
+}
+
+a {
+    display:block;
+    margin-top:20px;
+    text-align:center;
+    padding:10px;
+    background:#2196F3;
+    color:white;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+}
 </style>
 </head>
+
 <body>
-<div class="container">
-    <h1>📈 Grafico Risparmi Mensili</h1>
-    <canvas id="savingsChart" width="400" height="300"></canvas>
-    <a href="index.html" id="back-btn">← Torna al Budget</a>
+
+<div class="box">
+    <h1 id="title"></h1>
+
+    <canvas id="chart"></canvas>
+
+    <div class="salvadanaio">
+        🐷 Salvadanaio Totale<br>
+        <span id="totale">0 €</span>
+    </div>
+
+    <a href="index.html">← Torna al Budget</a>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import {
+  getFirestore,
+  doc,
+  onSnapshot,
+  collection,
+  onSnapshot as onSnapColl
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
-    authDomain: "budget-luca.firebaseapp.com",
-    projectId: "budget-luca",
-    storageBucket: "budget-luca.firebasestorage.app",
-    messagingSenderId: "67496424698",
-    appId: "1:67496424698:web:b1822e04ef4efc07408543",
-    measurementId: "G-7LEYRZE9QN"
+ apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+ authDomain: "budget-luca.firebaseapp.com",
+ projectId: "budget-luca",
+ storageBucket: "budget-luca.firebasestorage.app",
+ messagingSenderId: "67496424698",
+ appId: "1:67496424698:web:b1822e04ef4efc07408543"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const ctx = document.getElementById('savingsChart').getContext('2d');
+const month = localStorage.getItem("budgetMonth") || "2026-02";
+document.getElementById("title").innerText = "📊 Mese " + month;
 
-let savingsChart = new Chart(ctx, {
-    type: 'bar',
+function totEntrate(data){
+    let t=0;
+    (data.entrate||[]).forEach(x=> t+=parseFloat(x.amount||0));
+    return t;
+}
+
+function totSpese(data){
+    let t=0;
+    (data.spese||[]).forEach(x=> t+=parseFloat(x.amount||0));
+    return t;
+}
+
+const chart = new Chart(document.getElementById("chart"), {
+    type: "bar",
     data: {
-        labels: [], // mesi
+        labels: ["Entrate","Spese","Risparmio"],
         datasets: [{
-            label: 'Risparmio (€)',
-            data: [],
-            backgroundColor: '#4CAF50',
-            borderRadius: 8
+            data: [0,0,0]
         }]
     },
     options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false },
-            tooltip: { mode: 'index', intersect: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+        responsive:true,
+        scales:{ y:{ beginAtZero:true } }
     }
 });
 
-// Funzione per formattare l'importo
-function formatCurrency(value) {
-    return Number(value).toFixed(2).replace('.', ',');
-}
 
-// Funzione per aggiornare il grafico
-function updateChart(dataObj) {
-    const labels = [];
-    const data = [];
-    const months = Object.keys(dataObj).sort(); // ordina per anno-mese
+// 🔵 GRAFICO MESE CORRENTE
+onSnapshot(doc(db,"budgets",month), snap=>{
+    if(!snap.exists()){
+        chart.data.datasets[0].data=[0,0,0];
+        chart.update();
+        return;
+    }
 
-    months.forEach(month => {
-        const monthData = dataObj[month];
-        let totalEntrate = 0;
-        let totalSpese = 0;
+    const d = snap.data();
+    const e = totEntrate(d);
+    const s = totSpese(d);
+    const r = e - s;
 
-        if (monthData.entrate) {
-            monthData.entrate.forEach(e => totalEntrate += parseFloat(e.amount || 0));
-        }
-        if (monthData.spese) {
-            monthData.spese.forEach(s => totalSpese += parseFloat(s.amount || 0));
-        }
+    chart.data.datasets[0].data=[e,s,r];
+    chart.update();
+});
 
-        const saved = totalEntrate - totalSpese;
-        labels.push(month);
-        data.push(saved);
+
+// 🐷 SALVADANAIO TOTALE (tutti i mesi)
+onSnapColl(collection(db,"budgets"), qs=>{
+    let totale = 0;
+
+    qs.forEach(docSnap=>{
+        const d = docSnap.data();
+        totale += (totEntrate(d) - totSpese(d));
     });
 
-    savingsChart.data.labels = labels;
-    savingsChart.data.datasets[0].data = data;
-    savingsChart.update();
-}
-
-// Listener per aggiornamento realtime di tutti i mesi
-const months = ["2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08","2026-09","2026-10","2026-11","2026-12","2027-01"];
-let allData = {};
-
-months.forEach(month => {
-    const ref = doc(db, "budgets", month);
-    onSnapshot(ref, snap => {
-        if (snap.exists()) {
-            allData[month] = snap.data();
-            updateChart(allData);
-        }
-    });
+    document.getElementById("totale").innerText =
+        totale.toFixed(2) + " €";
 });
 </script>
+
 </body>
 </html>
