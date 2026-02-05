@@ -2,22 +2,20 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Risparmi mese</title>
+  <title>Risparmi anno interattivo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Chart.js UMD (crea la variabile globale Chart) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #333; }
+    #yearTotal { margin-bottom: 20px; }
+  </style>
 </head>
 <body>
-  <h1>Risparmio mensile</h1>
-
-  <!-- Testo con il risparmio -->
+  <h1>Risparmio annuale</h1>
   <h2 id="yearTotal">Caricamento...</h2>
+  <canvas id="savingsChart" width="800" height="400"></canvas>
 
-  <!-- Canvas per il grafico -->
-  <canvas id="savingsChart"></canvas>
-
-  <!-- Firebase + logica risparmi -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -35,81 +33,97 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const mesi = [
-      "Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
-      "Lug", "Ago", "Set", "Ott", "Nov", "Dic"
-    ];
+    const mesi = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
+    let risparmi = []; // array globale per tooltip interattivo
 
-    async function caricaDati() {
-      const oggi = new Date();
-      const anno = oggi.getFullYear();
-      const meseIndex = oggi.getMonth(); // 0 = Gennaio
-      const meseString = String(meseIndex + 1).padStart(2, "0");
-      const currentMonthId = `${anno}-${meseString}`; // es: 2026-02
+    async function caricaDatiAnno() {
+      try {
+        const oggi = new Date();
+        const anno = oggi.getFullYear();
+        const meseCorrente = oggi.getMonth();
 
-      const budgetsRef = collection(db, "budgets");
-      const snap = await getDocs(budgetsRef);
+        risparmi = Array(12).fill(0);
+        const colori = Array(12).fill("#999");
 
-      let risparmioMese = 0;
+        const budgetsRef = collection(db, "budgets");
+        const snap = await getDocs(budgetsRef);
 
-      snap.forEach(docSnap => {
-        if (docSnap.id !== currentMonthId) return;
-        const d = docSnap.data();
+        snap.forEach(docSnap => {
+          const id = docSnap.id;
+          const [annoDoc, meseDoc] = id.split("-").map(Number);
+          if (annoDoc !== anno) return;
 
-        // Somma entrate
-        let totEntrate = 0;
-        (d.entrate || []).forEach(e => {
-          const v = parseFloat((e.amount || "0").toString().replace(",", "."));
-          if (!isNaN(v)) totEntrate += v;
+          const d = docSnap.data();
+          let totEntrate = 0;
+          (d.entrate || []).forEach(e => {
+            const v = parseFloat((e.amount || "0").toString().replace(",", "."));
+            if (!isNaN(v)) totEntrate += v;
+          });
+          let totSpese = 0;
+          (d.spese || []).forEach(s => {
+            const v = parseFloat((s.amount || "0").toString().replace(",", "."));
+            if (!isNaN(v)) totSpese += v;
+          });
+
+          const risparmio = totEntrate - totSpese;
+          risparmi[meseDoc - 1] = risparmio;
+          colori[meseDoc - 1] = risparmio >= 0 ? "#4CAF50" : "#e74c3c";
         });
 
-        // Somma spese
-        let totSpese = 0;
-        (d.spese || []).forEach(s => {
-          const v = parseFloat((s.amount || "0").toString().replace(",", "."));
-          if (!isNaN(v)) totSpese += v;
-        });
+        // Mostra mese corrente all'apertura
+        aggiornaTesto(meseCorrente, anno);
 
-        risparmioMese = totEntrate - totSpese;
-      });
-
-      disegnaGrafico(meseIndex, risparmioMese, anno);
+        disegnaGraficoAnno(risparmi, colori, anno);
+      } catch (err) {
+        console.error("Errore caricamento dati:", err);
+        document.getElementById("yearTotal").innerText = "Errore nel caricamento dei dati.";
+      }
     }
 
-    function disegnaGrafico(meseIndex, risparmioMese, anno) {
+    function aggiornaTesto(meseIndex, anno) {
       const yearTotalEl = document.getElementById("yearTotal");
-      const canvasEl = document.getElementById("savingsChart");
-
-      if (!yearTotalEl || !canvasEl) {
-        console.error("Elementi yearTotal o savingsChart mancanti nell'HTML");
-        return;
+      if (yearTotalEl) {
+        yearTotalEl.innerText = `Risparmio ${mesi[meseIndex]} ${anno}: ${risparmi[meseIndex].toFixed(2)} €`;
       }
+    }
 
-      yearTotalEl.innerText =
-        `Risparmio ${mesi[meseIndex]} ${anno}: ${risparmioMese.toFixed(2)} €`;
+    function disegnaGraficoAnno(risparmi, colori, anno) {
+      const canvasEl = document.getElementById("savingsChart");
+      if (!canvasEl) return;
 
-      const colore = risparmioMese >= 0 ? "#4CAF50" : "#e74c3c";
+      const ctx = canvasEl.getContext('2d');
 
-      new Chart(canvasEl, {
+      const chart = new Chart(ctx, {
         type: "bar",
         data: {
-          labels: [mesi[meseIndex]],
+          labels: mesi,
           datasets: [{
             label: "Risparmio mese €",
-            data: [risparmioMese],
-            backgroundColor: colore
+            data: risparmi,
+            backgroundColor: colori
           }]
         },
         options: {
           responsive: true,
-          scales: {
-            y: { beginAtZero: true }
+          scales: { y: { beginAtZero: true } },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: (context) => `${context.dataset.label}: ${context.raw.toFixed(2)} €`
+              }
+            }
+          },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              aggiornaTesto(index, anno);
+            }
           }
         }
       });
     }
 
-    caricaDati();
+    caricaDatiAnno();
   </script>
 </body>
 </html>
