@@ -1,162 +1,125 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Risparmi anno con Google Login + Logout</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h1 { color: #333; }
-    #yearTotal { margin-bottom: 20px; }
-    button { margin-bottom: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
-  </style>
+<meta charset="UTF-8">
+<title>Grafico Risparmi</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f5f6fa;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.total {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+</style>
 </head>
 <body>
-  <h1>Risparmio annuale</h1>
-  <button id="loginButton">Login con Google</button>
-  <button id="logoutButton" style="display:none;">Logout</button>
-  <h2 id="yearTotal">Accedi per vedere i dati...</h2>
-  <canvas id="savingsChart" width="800" height="400"></canvas>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<div class="container">
+    <h1>📈 Risparmio Mensile</h1>
+    <canvas id="savingsChart"></canvas>
+    <div class="total" id="yearTotal">Totale anno: 0 €</div>
+</div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
-      authDomain: "budget-luca.firebaseapp.com",
-      projectId: "budget-luca",
-      storageBucket: "budget-luca.firebasestorage.app",
-      messagingSenderId: "67496424698",
-      appId: "1:67496424698:web:b1822e04ef4efc07408543",
-      measurementId: "G-7LEYRZE9QN"
-    };
+<script type="module">
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
 
-    const mesi = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
-    let risparmi = [];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const loginButton = document.getElementById("loginButton");
-    const logoutButton = document.getElementById("logoutButton");
-    const yearTotalEl = document.getElementById("yearTotal");
-    const canvasEl = document.getElementById("savingsChart");
+const firebaseConfig = {
+   
+    apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+    authDomain: "budget-luca.firebaseapp.com",
+    projectId: "budget-luca",
+    storageBucket: "budget-luca.firebasestorage.app",
+    messagingSenderId: "67496424698",
+    appId: "1:67496424698:web:b1822e04ef4efc07408543",
+    measurementId: "G-7LEYRZE9QN"
+};
 
-    // Login Google
-    loginButton.addEventListener("click", async () => {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        console.error("Errore login Google:", error);
-        alert("Login Google fallito. Controlla la console.");
-      }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ====== LOGICA CALCOLO RISPARMI ====== */
+
+const mesi = [
+"Gen", "Feb", "Mar", "Apr", "Mag", "Giu",
+"Lug", "Ago", "Set", "Ott", "Nov", "Dic"
+];
+
+const risparmioPerMese = new Array(12).fill(0);
+
+async function caricaDati() {
+
+    // stessa collection che usi per movimenti
+    const snap = await getDocs(collection(db, "movimenti"));
+
+    snap.forEach(doc => {
+        const d = doc.data();
+
+        if (!d.data || !d.importo) return;
+
+        const mese = new Date(d.data).getMonth();
+
+        // ENTRATE positive → contribuiscono al risparmio
+        // USCITE negative → riducono risparmio
+        risparmioPerMese[mese] += Number(d.importo);
     });
 
-    // Logout
-    logoutButton.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        console.error("Errore logout:", error);
-      }
-    });
+    disegnaGrafico();
+}
 
-    // Stato login automatico
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        loginButton.style.display = "none";
-        logoutButton.style.display = "inline-block";
-        yearTotalEl.innerText = "Caricamento dati...";
-        caricaDatiAnno();
-      } else {
-        loginButton.style.display = "inline-block";
-        logoutButton.style.display = "none";
-        yearTotalEl.innerText = "Accedi con Google per vedere i dati.";
-        if (canvasEl.chartInstance) {
-          canvasEl.chartInstance.destroy();
-        }
-      }
-    });
+function disegnaGrafico() {
 
-    async function caricaDatiAnno() {
-      try {
-        const oggi = new Date();
-        const anno = oggi.getFullYear();
-        const meseCorrente = oggi.getMonth();
+    const totaleAnno = risparmioPerMese.reduce((a,b)=>a+b,0);
 
-        risparmi = Array(12).fill(0);
-        const colori = Array(12).fill("#999");
+    document.getElementById("yearTotal").innerText =
+        "Totale anno: " + totaleAnno.toFixed(2) + " €";
 
-        const budgetsRef = collection(db, "budgets");
-        const snap = await getDocs(budgetsRef);
-
-        snap.forEach(docSnap => {
-          const id = docSnap.id;
-          const [annoDoc, meseDoc] = id.split("-").map(Number);
-          if (annoDoc !== anno) return;
-
-          const d = docSnap.data();
-          let totEntrate = 0;
-          (d.entrate || []).forEach(e => {
-            const v = parseFloat((e.amount || "0").toString().replace(",", "."));
-            if (!isNaN(v)) totEntrate += v;
-          });
-          let totSpese = 0;
-          (d.spese || []).forEach(s => {
-            const v = parseFloat((s.amount || "0").toString().replace(",", "."));
-            if (!isNaN(v)) totSpese += v;
-          });
-
-          const risparmio = totEntrate - totSpese;
-          risparmi[meseDoc - 1] = risparmio;
-          colori[meseDoc - 1] = risparmio >= 0 ? "#4CAF50" : "#e74c3c";
-        });
-
-        aggiornaTesto(meseCorrente, anno);
-        disegnaGraficoAnno(risparmi, colori, anno);
-
-      } catch (err) {
-        console.error("Errore caricamento dati:", err);
-        yearTotalEl.innerText = "Errore nel caricamento dei dati.";
-      }
-    }
-
-    function aggiornaTesto(meseIndex, anno) {
-      yearTotalEl.innerText = `Risparmio ${mesi[meseIndex]} ${anno}: ${risparmi[meseIndex].toFixed(2)} €`;
-    }
-
-    function disegnaGraficoAnno(risparmi, colori, anno) {
-      if (!canvasEl) return;
-      if (canvasEl.chartInstance) canvasEl.chartInstance.destroy();
-
-      const ctx = canvasEl.getContext('2d');
-      const chart = new Chart(ctx, {
+    new Chart(document.getElementById("savingsChart"), {
         type: "bar",
         data: {
-          labels: mesi,
-          datasets: [{ label: "Risparmio mese €", data: risparmi, backgroundColor: colori }]
+            labels: mesi,
+            datasets: [{
+                label: "Risparmio €",
+                data: risparmioPerMese
+            }]
         },
         options: {
-          responsive: true,
-          scales: { y: { beginAtZero: true } },
-          plugins: {
-            tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.raw.toFixed(2)} €` } }
-          },
-          onClick: (evt, elements) => {
-            if (elements.length > 0) {
-              const index = elements[0].index;
-              aggiornaTesto(index, anno);
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
             }
-          }
         }
-      });
-      canvasEl.chartInstance = chart;
-    }
-  </script>
+    });
+}
+
+caricaDati();
+
+</script>
+
 </body>
 </html>
