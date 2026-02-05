@@ -639,25 +639,23 @@
             }
         }
 
-        function changeMonth() {
-            const selector = document.getElementById('month-selector');
-            currentMonth = selector.value;
-            attachRealtimeListener();
-        }
+function collectCurrentData() {
+    const data = {
+        month: currentMonth,
+        entrate: [],
+        spese: [],
+        spesaAlimentare: {
+            week1: [],
+            week2: [],
+            week3: [],
+            week4: []
+        },
+        goal: {
+            monthlyTarget: parseFloat(document.getElementById('monthly-goal-input')?.value || '300')
+        },
+        lastModified: new Date().toISOString()
+    };
 
-        function collectCurrentData() {
-            const data = {
-                month: currentMonth,
-                entrate: [],
-                spese: [],
-                spesaAlimentare: {
-                    week1: [],
-                    week2: [],
-                    week3: [],
-                    week4: []
-                },
-                lastModified: new Date().toISOString()
-            };
 
             document.querySelectorAll('#entrate-items .entry-item').forEach(item => {
                 const label = item.querySelector('.item-label-input').value;
