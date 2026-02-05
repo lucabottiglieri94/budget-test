@@ -760,6 +760,54 @@ function collectCurrentData() {
 
             updateBudgetTotals();
             updateFoodTotals();
+            function updateGoalBar() {
+    const goalInput = document.getElementById('monthly-goal-input');
+    if (!goalInput) return;
+
+    const target = parseFloat(goalInput.value || '0') || 0;
+
+    // saldo attuale = entrate - spese
+    let totalEntrate = 0;
+    document.querySelectorAll('#entrate-items .item-amount-input').forEach(input => {
+        const val = parseFloat((input.value || "").replace(',', '.')) || 0;
+        totalEntrate += val;
+    });
+
+    let totalSpese = 0;
+    document.querySelectorAll('#spese-items .item-amount-input').forEach(input => {
+        const val = parseFloat((input.value || "").replace(',', '.')) || 0;
+        totalSpese += val;
+    });
+
+    const balance = totalEntrate - totalSpese;
+
+    const bar = document.getElementById('goal-progress-bar');
+    const text = document.getElementById('goal-progress-text');
+
+    if (!bar || !text) return;
+
+    if (target <= 0) {
+        bar.style.width = "0%";
+        bar.style.background = "#ccc";
+        text.textContent = "Nessun obiettivo impostato.";
+        return;
+    }
+
+    let percent = (balance / target) * 100;
+    if (percent < 0) percent = 0;
+    if (percent > 150) percent = 150;
+
+    bar.style.width = `${Math.min(percent,100)}%`;
+    bar.style.background = balance >= target ? "#4CAF50" : "#FF9800";
+
+    const diff = target - balance;
+    if (balance >= target) {
+        text.textContent = `Obiettivo raggiunto! Hai superato l'obiettivo di ${formatCurrency(balance - target)}.`;
+    } else {
+        text.textContent = `Mancano ${formatCurrency(diff)} per l’obiettivo.`;
+    }
+}
+
         }
 
         }
