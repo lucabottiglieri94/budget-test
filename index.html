@@ -29,8 +29,7 @@
             margin: 0;
             color: var(--color-dark);
             display: flex;
-            justify-content: center;
-            align-items: center;
+    padding: 0;            align-items: center;
             width: 100%;
         }
 
@@ -42,6 +41,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             margin: 0;
+                padding-top: 120px;
             height: 100vh;
             max-height: 100vh;
             display: flex;
@@ -58,8 +58,18 @@
 
         header h1 {
             font-size: 1.8em;
+                position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out;
             margin-bottom: 5px;
             font-weight: 700;
+        }
+
+                header.hidden {
+            transform: translateY(-100%);
         }
 
         header p {
@@ -518,7 +528,7 @@
         
         
                
-        <header>
+        <header id="main-header">
 
                 <!-- Notifica Budget Superato -->
     <div id="budget-alert" class="budget-alert hidden">
@@ -1181,4 +1191,22 @@
     setTimeout(updateSavingsGoal, 500);
     </script>
 </body>
+        // Gestione scroll per nascondere header su mobile
+        let lastScrollTop = 0;
+        const header = document.getElementById('main-header');
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scroll down - nascondi header
+                header.classList.add('hidden');
+            } else {
+                // Scroll up - mostra header
+                header.classList.remove('hidden');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
 </html>
