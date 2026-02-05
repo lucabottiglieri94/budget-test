@@ -874,11 +874,13 @@
             }
         }
 
-        function changeMonth() {
-            const selector = document.getElementById('month-selector');
-            currentMonth = selector.value;
-            attachRealtimeListener();
-        }
+function changeMonth() {
+    const selector = document.getElementById('month-selector');
+    currentMonth = selector.value;
+    localStorage.setItem("budgetMonth", currentMonth);
+    attachRealtimeListener();
+}
+
 
         function collectCurrentData() {
             const data = {
