@@ -1257,7 +1257,7 @@ if (contentEl) {
 
         
     </script>
-    <!-- ================= MONETA AI ASSISTENTE ================= -->
+ <!-- ================= MONETA AI + CHAT (SOLO DATI HTML) ================= -->
 <style>
     /* Contenitore generale della moneta/AI */
     #ai-coin-assistant {
@@ -1298,7 +1298,7 @@ if (contentEl) {
         color: #FFEB3B;
     }
 
-    /* Moneta */
+    /* Bottone moneta: solo PNG, niente palla gialla */
     #ai-coin-button {
         width: 70px;
         height: 70px;
@@ -1306,22 +1306,20 @@ if (contentEl) {
         border: none;
         cursor: pointer;
         padding: 0;
-        background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d 60%, #f57f17);
-        box-shadow:
-            0 0 0 3px rgba(255, 255, 255, 0.6),
-            0 12px 20px rgba(0,0,0,0.35);
+        background: transparent;
+        box-shadow: 0 12px 20px rgba(0,0,0,0.35);
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
+        overflow: visible;
         position: relative;
         animation: coin-bounce 2s ease-in-out infinite;
     }
 
     /* Immagine della moneta */
     #ai-coin-button img {
-        width: 80%;
-        height: 80%;
+        width: 100%;
+        height: 100%;
         object-fit: contain;
         pointer-events: none;
     }
@@ -1359,13 +1357,142 @@ if (contentEl) {
         display: none;
         margin-top: 2px;
     }
+
+    /* CHAT BOX */
+    #ai-chat-box {
+        width: 320px;
+        max-height: 420px;
+        background: #ffffff;
+        border-radius: 14px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+        overflow: hidden;
+        display: none; /* nascosta di default, si apre al click */
+        flex-direction: column;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    #ai-chat-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.9em;
+    }
+
+    #ai-chat-header-title {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #ai-chat-header-title span:first-child {
+        font-weight: 600;
+    }
+
+    #ai-chat-header-title span:last-child {
+        font-size: 0.75em;
+        opacity: 0.85;
+    }
+
+    #ai-chat-close {
+        cursor: pointer;
+        font-size: 1.1em;
+        opacity: 0.9;
+    }
+
+    #ai-chat-messages {
+        padding: 10px;
+        background: #f5f5f5;
+        flex: 1;
+        overflow-y: auto;
+        font-size: 0.85em;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .ai-chat-msg {
+        max-width: 85%;
+        padding: 8px 10px;
+        border-radius: 10px;
+        line-height: 1.4;
+    }
+
+    .ai-chat-msg.ai {
+        background: #ffffff;
+        align-self: flex-start;
+        border-bottom-left-radius: 2px;
+    }
+
+    .ai-chat-msg.user {
+        background: #667eea;
+        color: #fff;
+        align-self: flex-end;
+        border-bottom-right-radius: 2px;
+    }
+
+    #ai-chat-input-area {
+        border-top: 1px solid #ddd;
+        padding: 8px;
+        background: #fff;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    #ai-chat-input {
+        flex: 1;
+        border-radius: 999px;
+        border: 1px solid #ccc;
+        padding: 6px 10px;
+        font-size: 0.85em;
+        font-family: inherit;
+        outline: none;
+    }
+
+    #ai-chat-send {
+        border-radius: 999px;
+        border: none;
+        background: #667eea;
+        color: #fff;
+        padding: 6px 12px;
+        font-size: 0.85em;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    #ai-chat-send:active {
+        transform: scale(0.98);
+    }
 </style>
 
 <div id="ai-coin-assistant">
     <div id="ai-coin-tooltip"></div>
+
+    <div id="ai-chat-box">
+        <div id="ai-chat-header">
+            <div id="ai-chat-header-title">
+                <span>AI Budget Coach</span>
+                <span>Usa solo i dati della pagina</span>
+            </div>
+            <div id="ai-chat-close">&times;</div>
+        </div>
+        <div id="ai-chat-messages">
+            <div class="ai-chat-msg ai">
+                Ciao! Sono la tua assistente del budget. Fai una domanda su entrate, spese o saldo e userò i dati di questa pagina per aiutarti.
+            </div>
+        </div>
+        <div id="ai-chat-input-area">
+            <input id="ai-chat-input" type="text" placeholder="Scrivi una domanda..." />
+            <button id="ai-chat-send">Invia</button>
+        </div>
+    </div>
+
     <button id="ai-coin-button" aria-label="Assistente AI budget">
         <img src="https://image2url.com/r2/default/images/1770325569777-148ee72e-c1cc-4e77-87b8-041b2d9969f4.png" alt="AI Coin">
     </button>
+
     <div id="ai-coin-typing">Sto analizzando il tuo budget…</div>
 </div>
 
@@ -1374,17 +1501,21 @@ if (contentEl) {
         const tooltip = document.getElementById('ai-coin-tooltip');
         const button = document.getElementById('ai-coin-button');
         const typing = document.getElementById('ai-coin-typing');
+        const chatBox = document.getElementById('ai-chat-box');
+        const chatClose = document.getElementById('ai-chat-close');
+        const chatMessages = document.getElementById('ai-chat-messages');
+        const chatInput = document.getElementById('ai-chat-input');
+        const chatSend = document.getElementById('ai-chat-send');
 
-        // Frasi base che la “AI” usa in base a cosa trova nella pagina
+        let tooltipTimeoutId = null;
+
         function generaSuggerimentiDallaPagina() {
             const suggestions = [];
 
-            // 1) Controllo se esistono totali entrate/spese/saldo
             const totalEntrate = document.getElementById('total-entrate');
             const totalSpese = document.getElementById('total-spese');
             const balanceEl = document.getElementById('balance-value');
 
-            // 2) Analisi generica del saldo
             let balanceVal = 0;
             if (balanceEl) {
                 const text = balanceEl.textContent.replace(/[€\s\.]/g, '').replace(',', '.');
@@ -1398,7 +1529,6 @@ if (contentEl) {
                 suggestions.push("Il saldo è negativo: prova a ridurre le spese variabili (es. tempo libero, extra, ristoranti) nella prossima settimana.");
             }
 
-            // 3) Controllo presenza sezioni specifiche (per come è strutturato il tuo file)
             const foodBudgetSection = document.querySelector('.food-budget-section');
             if (foodBudgetSection) {
                 suggestions.push("Hai una sezione spesa alimentare: confronta il budget settimanale con le spese reali per capire dove stai sforando.");
@@ -1415,12 +1545,10 @@ if (contentEl) {
                 suggestions.push("Controlla i costi auto/assicurazione: se sono alti, valuta preventivi alternativi o una rata più sostenibile.");
             }
 
-            // 4) Fallback se non trovo nulla
             if (suggestions.length === 0) {
                 suggestions.push("Compila entrate e spese: ti aiuterò a capire dove puoi ottimizzare il tuo bilancio.");
             }
 
-            // Restituisco una frase “composta”
             const intro = "Ciao, sono la tua AI del budget. ";
             const body = suggestions.slice(0, 3).join(" ");
             return intro + body;
@@ -1430,22 +1558,118 @@ if (contentEl) {
             typing.style.display = 'block';
             tooltip.classList.remove('visible');
 
+            if (tooltipTimeoutId) {
+                clearTimeout(tooltipTimeoutId);
+                tooltipTimeoutId = null;
+            }
+
             setTimeout(() => {
                 const testo = generaSuggerimentiDallaPagina();
                 tooltip.innerHTML = testo;
                 typing.style.display = 'none';
                 tooltip.classList.add('visible');
-            }, 600); // piccolo delay tipo “sto pensando…”
+
+                // Nasconde il tooltip dopo 6 secondi
+                tooltipTimeoutId = setTimeout(() => {
+                    tooltip.classList.remove('visible');
+                }, 6000);
+            }, 600);
         }
 
-        // Click sulla moneta: rimbalzo + nuovo suggerimento
+        /* --- FUNZIONI CHAT --- */
+
+        function appendMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = 'ai-chat-msg ' + type;
+            div.textContent = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function leggiDatiPagina() {
+            const totalEntrate = document.getElementById('total-entrate');
+            const totalSpese = document.getElementById('total-spese');
+            const balanceEl = document.getElementById('balance-value');
+
+            let entrateText = totalEntrate ? totalEntrate.textContent.trim() : "non disponibili";
+            let speseText = totalSpese ? totalSpese.textContent.trim() : "non disponibili";
+            let saldoText = balanceEl ? balanceEl.textContent.trim() : "non disponibile";
+
+            const labels = Array.from(document.querySelectorAll('.entry-item .item-label-input'))
+                .map(i => i.value || '')
+                .filter(v => v.trim() !== '');
+
+            return { entrateText, speseText, saldoText, labels };
+        }
+
+        function rispostaAI(domanda) {
+            const lower = domanda.toLowerCase();
+            const dati = leggiDatiPagina();
+
+            if (lower.includes('entrate') || lower.includes('guadagno') || lower.includes('stipendio')) {
+                return "Le tue entrate totali attualmente risultano: " + dati.entrateText + ".";
+            }
+
+            if (lower.includes('spese') || lower.includes('uscite') || lower.includes('quanto spendo')) {
+                return "Le tue spese totali attualmente risultano: " + dati.speseText + ".";
+            }
+
+            if (lower.includes('saldo') || lower.includes('avanzo') || lower.includes('disavanzo')) {
+                return "Il tuo saldo attuale risulta: " + dati.saldoText + ". Se è negativo, prova a tagliare qualche voce variabile.";
+            }
+
+            if (lower.includes('categorie') || lower.includes('voci') || lower.includes('cosa ho')) {
+                if (dati.labels.length > 0) {
+                    return "Al momento vedo queste voci nel tuo budget: " + dati.labels.join(", ") + ".";
+                } else {
+                    return "Non vedo ancora nomi di voci compilati. Aggiungi le descrizioni alle tue spese/entrate per un’analisi più precisa.";
+                }
+            }
+
+            return "Ho analizzato i dati della pagina: entrate " + dati.entrateText +
+                ", spese " + dati.speseText + ", saldo " + dati.saldoText +
+                ". Fai domande usando parole come \"entrate\", \"spese\", \"saldo\" o \"categorie\" per risposte più specifiche.";
+        }
+
+        function inviaDomanda() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            appendMessage(text, 'user');
+            chatInput.value = '';
+
+            setTimeout(() => {
+                const reply = rispostaAI(text);
+                appendMessage(reply, 'ai');
+            }, 500);
+        }
+
+        // Click sulla moneta: rimbalzo + toggle chat + suggerimento
         button.addEventListener('click', () => {
             button.classList.add('clicked');
             setTimeout(() => button.classList.remove('clicked'), 250);
+
+            if (chatBox.style.display === 'none' || chatBox.style.display === '') {
+                chatBox.style.display = 'flex';
+            } else {
+                chatBox.style.display = 'none';
+            }
+
             mostraSuggerimento();
         });
 
-        // Primo suggerimento automatico dopo qualche secondo
+        chatClose.addEventListener('click', () => {
+            chatBox.style.display = 'none';
+        });
+
+        chatSend.addEventListener('click', inviaDomanda);
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                inviaDomanda();
+            }
+        });
+
         window.addEventListener('load', () => {
             setTimeout(() => {
                 mostraSuggerimento();
@@ -1453,7 +1677,7 @@ if (contentEl) {
         });
     })();
 </script>
-<!-- =============== FINE MONETA AI ASSISTENTE =============== -->
+<!-- =============== FINE MONETA AI + CHAT ================= -->
 
 </body>
 </html>
