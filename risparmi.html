@@ -45,12 +45,19 @@ h1 {
 
 <script type="module">
 
-/* ====== COPIA QUI LA STESSA CONFIG FIREBASE DEL TUO INDEX ====== */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    /* INCOLLA QUI LA TUA CONFIG */
+   
+    apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+    authDomain: "budget-luca.firebaseapp.com",
+    projectId: "budget-luca",
+    storageBucket: "budget-luca.firebasestorage.app",
+    messagingSenderId: "67496424698",
+    appId: "1:67496424698:web:b1822e04ef4efc07408543",
+    measurementId: "G-7LEYRZE9QN"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -116,3 +123,4 @@ caricaDati();
 
 </body>
 </html>
+
