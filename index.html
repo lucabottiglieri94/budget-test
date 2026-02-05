@@ -1192,18 +1192,21 @@
         }
     }
     setTimeout(updateSavingsGoal, 500);
-        let lastScrollTop = 0;
 const headerEl = document.querySelector('header');
-const contentEl = document.querySelector('.content');
 
-if (contentEl && headerEl) {
-    contentEl.addEventListener('scroll', () => {
-        const currentScroll = contentEl.scrollTop;
+window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY || window.pageYOffset;
 
-        // Se NON sei in cima → header nascosto
-        if (currentScroll > 10) {
-            headerEl.classList.add('header-hidden');
-        }
+    // Nasconde se scendi
+    if (currentScrollY > 10) {
+        headerEl.classList.add('header-hidden');
+    }
+
+    // Riappare SOLO quando torni in cima
+    if (currentScrollY <= 5) {
+        headerEl.classList.remove('header-hidden');
+    }
+});
 
         // Riappare SOLO quando torni in cima
         if (currentScroll <= 5) {
