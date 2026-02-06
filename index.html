@@ -1510,16 +1510,31 @@ const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/';
 
       const typingId = addAiMessage('Sto analizzando il file e la tua domanda, un attimo...');
 
-      fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          question: text,
-          context_html: comparatoriContent
-        })
-      })
+   // 👉 legge i numeri del budget dalla pagina
+function getText(id){
+  return document.getElementById(id)?.textContent || "";
+}
+
+const budgetContext = {
+  entrate: getText("summary-entrate"),
+  spese: getText("summary-spese"),
+  saldo: getText("summary-balance"),
+  risparmio: getText("summary-risparmio"),
+  obiettivo: getText("summary-obiettivo")
+};
+
+fetch(API_URL, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    question: text,
+    context_html: comparatoriContent,
+    budget: budgetContext
+  })
+})
+
       .then(res => {
         if (!res.ok) throw new Error('Errore nella risposta AI');
         return res.json();
