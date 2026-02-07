@@ -12,7 +12,6 @@
       --bg1:#667eea; --bg2:#764ba2;
       --primary:#2196F3;
       --success:#4CAF50;
-      --danger:#F44336;
       --light:#f5f5f5;
       --dark:#111827;
       --muted:#6b7280;
@@ -149,7 +148,7 @@
       padding:18px;
       border-radius:15px;
       display:grid;
-      grid-template-columns:1fr 1fr 1fr;
+      grid-template-columns:1fr;
       gap:12px;
       text-align:center;
     }
@@ -168,7 +167,7 @@
       font-weight:900;
     }
     .summary-value{
-      font-size:1.45em;
+      font-size:1.55em;
       font-weight:1000;
     }
 
@@ -208,7 +207,6 @@
     .banner.error{background:#fff5f5;border-color:#fecaca;color:#991b1b}
 
     @media (max-width:860px){
-      .summary{grid-template-columns:1fr}
       header h1{font-size:1.55em}
       .content{padding-top:260px}
     }
@@ -219,8 +217,8 @@
   <div class="container">
 
     <header>
-      <h1>📈 Risparmi Mensili</h1>
-      <p>Entrate (verde) • Spese (rosso) • Delta (blu) — barre aggiunte solo quando entri nel mese</p>
+      <h1>💾 Risparmi</h1>
+      <p>Barre mensili aggiunte solo quando entri nel mese (es. Feb = Gen+Feb)</p>
 
       <div class="top-controls">
         <span id="status-pill" class="pill">🔄 Inizializzo…</span>
@@ -239,29 +237,22 @@
       <div id="bannerInfo" class="banner info show">Devi fare login per vedere i tuoi dati.</div>
       <div id="bannerError" class="banner error">Errore nel caricamento dei dati.</div>
 
+      <!-- SOLO TOTALE RISPARMIO -->
       <div class="summary">
         <div class="summary-card">
-          <div class="summary-label">📥 Entrate (anno selezionato)</div>
-          <div class="summary-value" id="kpi-income">€ 0,00</div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-label">📤 Spese (anno selezionato)</div>
-          <div class="summary-value" id="kpi-expense">€ 0,00</div>
-        </div>
-        <div class="summary-card">
-          <div class="summary-label">💾 Delta (anno selezionato)</div>
+          <div class="summary-label">Totale Risparmio (anno selezionato)</div>
           <div class="summary-value balance-positive" id="kpi-savings">€ 0,00</div>
         </div>
       </div>
 
       <div class="section">
-        <h2>📊 Entrate vs Spese vs Delta (solo mesi “raggiunti”)</h2>
+        <h2>📊 Risparmi mensili</h2>
         <div class="chart-wrap">
           <div class="chart-holder">
-            <canvas id="incomeExpenseChart"></canvas>
+            <canvas id="savingsChart"></canvas>
           </div>
           <div class="note">
-            Vedrai solo i mesi fino a quello corrente (es. Feb: Gen+Feb). Quando entrerai in Marzo su index.html, qui si aggiungerà automaticamente Marzo.
+            Ogni barra rappresenta: <strong>Entrate - Spese</strong> del mese.
           </div>
         </div>
       </div>
@@ -302,17 +293,14 @@
     const bannerInfo = document.getElementById("bannerInfo");
     const bannerError = document.getElementById("bannerError");
     const yearSelector = document.getElementById("year-selector");
-
-    const kpiIncome = document.getElementById("kpi-income");
-    const kpiExpense = document.getElementById("kpi-expense");
     const kpiSavings = document.getElementById("kpi-savings");
 
     let currentUser = null;
     let unsub = null;
     let chart = null;
 
-    // cache: year -> month(1..12) -> {income, expense}
-    let dataByYear = {};
+    // cache: year -> month(1..12) -> savings
+    let savingsByYear = {};
 
     const MONTHS = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
 
@@ -333,10 +321,8 @@
     }
 
     function getCurrentMonthKey(){
-      // prende il mese corrente usato da index.html se presente
       const m = localStorage.getItem("budgetMonth"); // es "2026-02"
       if (/^\d{4}-\d{2}$/.test(m || "")) return m;
-      // fallback: mese reale di oggi
       const d = new Date();
       const y = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -344,16 +330,14 @@
     }
 
     function monthLimitForYear(year){
-      // se anno selezionato == anno mese corrente (da localStorage), mostra solo fino a quel mese
-      const current = getCurrentMonthKey(); // "YYYY-MM"
+      const current = getCurrentMonthKey();
       const [cy, cm] = current.split("-");
-      const y = String(year);
-      if (y !== cy) return 12; // anni passati/futuri: mostra tutti i mesi che esistono (vedi sotto)
+      if (String(year) !== cy) return null; // anni diversi: mostra solo mesi presenti
       return Math.max(1, Math.min(12, parseInt(cm, 10) || 1));
     }
 
     function ensureChart(){
-      const canvas = document.getElementById("incomeExpenseChart");
+      const canvas = document.getElementById("savingsChart");
       if (!canvas || typeof Chart === "undefined") return null;
       if (chart) return chart;
 
@@ -363,21 +347,9 @@
           labels: [],
           datasets: [
             {
-              label: "Entrate",
+              label: "Risparmio",
               data: [],
-              backgroundColor: "rgba(76,175,80,0.85)",
-              borderRadius: 10
-            },
-            {
-              label: "Spese",
-              data: [],
-              backgroundColor: "rgba(244,67,54,0.85)",
-              borderRadius: 10
-            },
-            {
-              label: "Delta",
-              data: [],
-              backgroundColor: "rgba(33,150,243,0.85)",
+              backgroundColor: "rgba(76,175,80,0.88)",
               borderRadius: 10
             }
           ]
@@ -387,11 +359,13 @@
           maintainAspectRatio: false,
           animation: false,
           plugins: {
-            legend: { position: "bottom", labels: { boxWidth: 14, boxHeight: 14, padding: 14 } },
-            tooltip: { callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${euro(ctx.parsed.y || 0)}` } }
+            legend: { display: false },
+            tooltip: {
+              callbacks: { label: (ctx) => ` Risparmio: ${euro(ctx.parsed.y || 0)}` }
+            }
           },
           scales: {
-            x: { grid: { color: "rgba(0,0,0,0.06)" }, ticks: { color: "#111827", font: { weight: 800 } } },
+            x: { grid: { color: "rgba(0,0,0,0.06)" }, ticks: { color: "#111827", font: { weight: 900 } } },
             y: { grid: { color: "rgba(0,0,0,0.06)" }, ticks: { color: "#111827", font: { weight: 800 }, callback: (v)=>euro(v) } }
           }
         }
@@ -401,11 +375,9 @@
     }
 
     function resetData(){
-      dataByYear = {};
+      savingsByYear = {};
       yearSelector.innerHTML = `<option value="">Anno…</option>`;
       yearSelector.value = "";
-      kpiIncome.textContent = euro(0);
-      kpiExpense.textContent = euro(0);
       kpiSavings.textContent = euro(0);
       kpiSavings.classList.add("balance-positive");
       kpiSavings.classList.remove("balance-negative");
@@ -413,20 +385,20 @@
       const c = ensureChart();
       if (c){
         c.data.labels = [];
-        c.data.datasets.forEach(ds => ds.data = []);
+        c.data.datasets[0].data = [];
         c.update();
       }
     }
 
-    function calcIncomeExpense(docData){
+    function calcSavings(docData){
       let inc = 0, exp = 0;
       (docData.entrate || []).forEach(i => inc += parseAmount(i.amount));
       (docData.spese || []).forEach(i => exp += parseAmount(i.amount));
-      return { inc, exp };
+      return inc - exp;
     }
 
     function buildYearsSelector(){
-      const years = Object.keys(dataByYear).sort();
+      const years = Object.keys(savingsByYear).sort();
       yearSelector.innerHTML = `<option value="">Anno…</option>` + years.map(y => `<option value="${y}">${y}</option>`).join("");
 
       if (!yearSelector.value){
@@ -445,70 +417,43 @@
 
     function updateYearView(year){
       const y = String(year);
-      const monthsObj = dataByYear[y] || {};
+      const monthsObj = savingsByYear[y] || {};
 
-      // ✅ MOSTRA SOLO FINO AL MESE CORRENTE (se stesso anno del mese corrente)
-      // per anni diversi: mostri SOLO i mesi che esistono nei dati
       const limit = monthLimitForYear(y);
 
-      let labels = [];
-      let incomeArr = [];
-      let expenseArr = [];
-      let deltaArr = [];
+      const labels = [];
+      const values = [];
 
-      let totalInc = 0;
-      let totalExp = 0;
+      let total = 0;
 
-      if (y === getCurrentMonthKey().split("-")[0]) {
-        // anno corrente: da Gen fino al mese corrente (limit)
+      if (limit != null) {
+        // anno corrente: mostra da Gen fino al mese corrente (limit), anche se alcuni mesi sono 0
         for (let m = 1; m <= limit; m++){
-          const rec = monthsObj[m] || { income:0, expense:0 };
-          const inc = rec.income || 0;
-          const exp = rec.expense || 0;
-          const delta = inc - exp;
-
+          const v = monthsObj[m] ?? 0;
           labels.push(MONTHS[m-1]);
-          incomeArr.push(inc);
-          expenseArr.push(exp);
-          deltaArr.push(delta);
-
-          totalInc += inc;
-          totalExp += exp;
+          values.push(v);
+          total += v;
         }
       } else {
-        // altri anni: mostra solo i mesi presenti, in ordine
+        // anni diversi: mostra SOLO i mesi presenti
         const presentMonths = Object.keys(monthsObj).map(n=>parseInt(n,10)).filter(n=>n>=1 && n<=12).sort((a,b)=>a-b);
         for (const m of presentMonths){
-          const rec = monthsObj[m] || { income:0, expense:0 };
-          const inc = rec.income || 0;
-          const exp = rec.expense || 0;
-          const delta = inc - exp;
-
+          const v = monthsObj[m] ?? 0;
           labels.push(MONTHS[m-1]);
-          incomeArr.push(inc);
-          expenseArr.push(exp);
-          deltaArr.push(delta);
-
-          totalInc += inc;
-          totalExp += exp;
+          values.push(v);
+          total += v;
         }
       }
 
-      const savings = totalInc - totalExp;
-
-      kpiIncome.textContent = euro(totalInc);
-      kpiExpense.textContent = euro(totalExp);
-      kpiSavings.textContent = euro(savings);
-      kpiSavings.classList.toggle("balance-positive", savings >= 0);
-      kpiSavings.classList.toggle("balance-negative", savings < 0);
+      kpiSavings.textContent = euro(total);
+      kpiSavings.classList.toggle("balance-positive", total >= 0);
+      kpiSavings.classList.toggle("balance-negative", total < 0);
 
       const c = ensureChart();
       if (!c) return;
 
       c.data.labels = labels;
-      c.data.datasets[0].data = incomeArr;
-      c.data.datasets[1].data = expenseArr;
-      c.data.datasets[2].data = deltaArr;
+      c.data.datasets[0].data = values;
       c.update();
     }
 
@@ -524,7 +469,7 @@
       hideError();
 
       unsub = onSnapshot(colRef, (snap) => {
-        dataByYear = {};
+        savingsByYear = {};
 
         snap.forEach(docSnap => {
           const id = docSnap.id; // "YYYY-MM"
@@ -535,9 +480,9 @@
           const monthNum = parseInt(m[2], 10);
           if (!monthNum || monthNum < 1 || monthNum > 12) return;
 
-          const { inc, exp } = calcIncomeExpense(docSnap.data() || {});
-          if (!dataByYear[year]) dataByYear[year] = {};
-          dataByYear[year][monthNum] = { income: inc, expense: exp };
+          const s = calcSavings(docSnap.data() || {});
+          if (!savingsByYear[year]) savingsByYear[year] = {};
+          savingsByYear[year][monthNum] = s;
         });
 
         buildYearsSelector();
