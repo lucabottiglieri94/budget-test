@@ -589,6 +589,296 @@
         </div>
       </div><!-- content -->
     </div><!-- container -->
+    <!-- FLOATING AI CHAT WIDGET (VISIBILE SOLO DOPO LOGIN perché sta dentro #app) -->
+<div id="ai-chat-widget">
+  <button id="ai-chat-button" aria-label="Apri chat AI">
+    <img src="https://image2url.com/r2/default/images/1770371281075-bf035a1c-704a-476c-a3c3-fa76d3b13bc5.png" alt="AI">
+  </button>
+
+  <div id="ai-chat-box" class="hidden">
+    <div class="ai-chat-header">
+      <div class="ai-chat-title"><span>Assistente AI</span></div>
+      <div class="ai-chat-actions">
+        <button id="ai-chat-minimize" title="Minimizza">−</button>
+        <button id="ai-chat-close" title="Chiudi">×</button>
+      </div>
+    </div>
+
+    <div id="ai-chat-messages"></div>
+
+    <form id="ai-chat-form">
+      <input
+        type="text"
+        id="ai-chat-input"
+        placeholder="Chiedimi qualcosa sul tuo budget o sui comparatori…"
+        autocomplete="off"
+      />
+      <button type="submit">Invia</button>
+    </form>
+  </div>
+</div>
+
+<style>
+  #ai-chat-widget {
+    position: fixed;
+    bottom: 100px; /* sopra ai bottoni fissi */
+    right: 20px;
+    z-index: 9999;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  #ai-chat-button {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    cursor: pointer;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  #ai-chat-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  #ai-chat-box {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 360px;
+    max-height: 480px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #ai-chat-box.hidden { display: none; }
+
+  .ai-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #111827;
+    color: #f9fafb;
+    padding: 8px 10px;
+  }
+
+  .ai-chat-title span { font-size: 14px; font-weight: 700; }
+
+  .ai-chat-actions button {
+    background: transparent;
+    border: none;
+    color: #e5e7eb;
+    font-size: 18px;
+    margin-left: 4px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .ai-chat-actions button:hover { color: #ffffff; }
+
+  #ai-chat-messages {
+    padding: 10px;
+    overflow-y: auto;
+    flex: 1;
+    background: #f3f4f6;
+    font-size: 13px;
+  }
+
+  .ai-msg { margin-bottom: 8px; display: flex; }
+  .ai-msg-user { justify-content: flex-end; }
+  .ai-msg-ai { justify-content: flex-start; }
+
+  .ai-msg-bubble {
+    max-width: 80%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+  .ai-msg-user .ai-msg-bubble {
+    background: #2563eb;
+    color: #ffffff;
+    border-bottom-right-radius: 2px;
+  }
+  .ai-msg-ai .ai-msg-bubble {
+    background: #e5e7eb;
+    color: #111827;
+    border-bottom-left-radius: 2px;
+  }
+
+  #ai-chat-form {
+    display: flex;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  #ai-chat-input {
+    flex: 1;
+    border: none;
+    padding: 8px 10px;
+    font-size: 13px;
+    outline: none;
+  }
+
+  #ai-chat-form button[type="submit"] {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    padding: 0 14px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #ai-chat-form button[type="submit"]:hover { background: #1d4ed8; }
+
+  #ai-chat-box.minimized { height: auto; }
+  #ai-chat-box.minimized #ai-chat-messages,
+  #ai-chat-box.minimized #ai-chat-form { display: none; }
+
+  @media (max-width: 480px) {
+    #ai-chat-box {
+      width: 90vw;
+      right: 50%;
+      transform: translateX(50%);
+    }
+  }
+</style>
+
+<script>
+(function () {
+  const chatButton = document.getElementById('ai-chat-button');
+  const chatBox = document.getElementById('ai-chat-box');
+  const closeBtn = document.getElementById('ai-chat-close');
+  const minimizeBtn = document.getElementById('ai-chat-minimize');
+  const messagesEl = document.getElementById('ai-chat-messages');
+  const form = document.getElementById('ai-chat-form');
+  const input = document.getElementById('ai-chat-input');
+
+  // URL backend AI
+  const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/';
+
+  let comparatoriContent = '';
+
+  // Carico il file comparatori1.html (se esiste nel repo)
+  fetch('comparatori1.html')
+    .then(res => res.ok ? res.text() : '')
+    .then(text => { comparatoriContent = text || ''; })
+    .catch(() => { comparatoriContent = ''; });
+
+  function getText(id){
+    return document.getElementById(id)?.textContent?.trim() || "";
+  }
+
+  function addUserMessage(text) {
+    const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'ai-msg ai-msg-user';
+    wrapper.dataset.id = id;
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-msg-bubble';
+    bubble.textContent = text;
+    wrapper.appendChild(bubble);
+    messagesEl.appendChild(wrapper);
+    return id;
+  }
+
+  function addAiMessage(text) {
+    const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'ai-msg ai-msg-ai';
+    wrapper.dataset.id = id;
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-msg-bubble';
+    bubble.textContent = text;
+    wrapper.appendChild(bubble);
+    messagesEl.appendChild(wrapper);
+    return id;
+  }
+
+  function updateAiMessage(id, newText) {
+    const msg = messagesEl.querySelector('[data-id="' + id + '"] .ai-msg-bubble');
+    if (msg) msg.textContent = newText;
+    else addAiMessage(newText);
+  }
+
+  function scrollBottom() {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  chatButton.addEventListener('click', () => {
+    chatBox.classList.remove('hidden');
+    chatBox.classList.remove('minimized');
+    input.focus();
+    if (!messagesEl.dataset.started) {
+      addAiMessage('Ciao! Sono il tuo assistente AI. Posso rispondere sui dati del tuo budget (entrate, spese, risparmio) e anche sui comparatori.');
+      messagesEl.dataset.started = 'true';
+      scrollBottom();
+    }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    chatBox.classList.add('hidden');
+    messagesEl.innerHTML = '';
+    delete messagesEl.dataset.started;
+  });
+
+  minimizeBtn.addEventListener('click', () => {
+    chatBox.classList.toggle('minimized');
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+
+    addUserMessage(text);
+    input.value = '';
+    scrollBottom();
+
+    const typingId = addAiMessage('Sto pensando…');
+    scrollBottom();
+
+    // ✅ CONTEXT BUDGET DELL’UTENTE LOGGATO (valori già filtrati per utente perché il DOM è quello del suo account)
+    const budgetContext = {
+      month: (window.localStorage.getItem("budgetMonth") || ""),
+      entrate: getText("summary-entrate"),
+      spese: getText("summary-spese"),
+      risparmio: getText("summary-balance"),
+      obiettivo_risparmio: "€250,00",
+      risparmiato: getText("saved-amount"),
+      mancano: getText("remaining-amount")
+    };
+
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        question: text,
+        context_html: comparatoriContent,
+        budget: budgetContext
+      })
+    })
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(data => {
+      updateAiMessage(typingId, data.answer || 'Non sono riuscito a rispondere, riprova.');
+      scrollBottom();
+    })
+    .catch(err => {
+      console.error(err);
+      updateAiMessage(typingId, 'Errore nel contattare l’AI. Riprova più tardi.');
+      scrollBottom();
+    });
+  });
+})();
+</script>
+
   </div><!-- app -->
 
   <!-- Firebase + Firestore + Auth -->
