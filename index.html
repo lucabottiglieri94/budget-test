@@ -95,9 +95,7 @@
       text-align: center;
 
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       z-index: 1000;
 
       transition: transform 0.3s ease, opacity 0.3s ease;
@@ -326,6 +324,127 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       z-index: 1500;
     }
+
+    /* ===== AI WIDGET ===== */
+    #ai-chat-widget {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      z-index: 9999999;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    #ai-chat-button {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      cursor: pointer;
+      padding: 0;
+      overflow: hidden;
+    }
+    #ai-chat-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #ai-chat-box {
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 360px;
+      max-height: 480px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #ai-chat-box.hidden { display: none; }
+    .ai-chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #111827;
+      color: #f9fafb;
+      padding: 8px 10px;
+    }
+    .ai-chat-title span { font-size: 14px; font-weight: 800; }
+    .ai-chat-actions button {
+      background: transparent;
+      border: none;
+      color: #e5e7eb;
+      font-size: 18px;
+      margin-left: 4px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .ai-chat-actions button:hover { color: #ffffff; }
+
+    #ai-chat-messages {
+      padding: 10px;
+      overflow-y: auto;
+      flex: 1;
+      background: #f3f4f6;
+      font-size: 13px;
+    }
+    .ai-msg { margin-bottom: 8px; display: flex; }
+    .ai-msg-user { justify-content: flex-end; }
+    .ai-msg-ai { justify-content: flex-start; }
+    .ai-msg-bubble {
+      max-width: 80%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+    .ai-msg-user .ai-msg-bubble {
+      background: #2563eb;
+      color: #ffffff;
+      border-bottom-right-radius: 2px;
+    }
+    .ai-msg-ai .ai-msg-bubble {
+      background: #e5e7eb;
+      color: #111827;
+      border-bottom-left-radius: 2px;
+    }
+    #ai-chat-form {
+      display: flex;
+      border-top: 1px solid #e5e7eb;
+    }
+    #ai-chat-input {
+      flex: 1;
+      border: none;
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+    }
+    #ai-chat-form button[type="submit"] {
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      padding: 0 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #ai-chat-form button[type="submit"]:hover {
+      background: #1d4ed8;
+    }
+    #ai-chat-box.minimized { height: auto; }
+    #ai-chat-box.minimized #ai-chat-messages,
+    #ai-chat-box.minimized #ai-chat-form { display: none; }
+
+    @media (max-width: 480px) {
+      #ai-chat-box {
+        width: 90vw;
+        right: 50%;
+        transform: translateX(50%);
+      }
+    }
   </style>
 </head>
 
@@ -461,27 +580,40 @@
           </div>
         </div>
 
-        <!-- LISTA DELLA SPESA SETTIMANALE -->
+        <!-- LISTA DELLA SPESA SETTIMANALE (UGUALE) -->
         <div class="section" style="border-left-color: #FF9800;">
           <h2>🛒 Spese Alimentari Settimanali</h2>
           <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">Budget: <strong>€500/mese (€125/settimana)</strong></p>
 
           <div id="weeks-container" style="display: flex; flex-direction: column; gap: 15px;">
+
             <!-- Settimana 1 -->
             <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
               <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 1</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
+                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
+                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
+                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
+                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
               </div>
               <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
@@ -497,17 +629,29 @@
             <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
               <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 2</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
+                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
+                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
+                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
+                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
               </div>
               <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
@@ -523,17 +667,29 @@
             <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
               <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 3</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
+                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
+                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
+                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
+                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
               </div>
               <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
@@ -549,17 +705,29 @@
             <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
               <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 4</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
+                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
+                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
+                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div>
+                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
+                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
+                         style="width: 100%; border-color: #FF9800;"
+                         onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
               </div>
               <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
@@ -572,6 +740,7 @@
             </div>
           </div>
 
+          <!-- RIEPILOGO MENSILE ALIMENTARE -->
           <div class="summary" style="margin-top: 20px;">
             <div class="summary-card">
               <div class="summary-label">Budget</div>
@@ -587,297 +756,33 @@
             </div>
           </div>
         </div>
+
       </div><!-- content -->
     </div><!-- container -->
-    <!-- FLOATING AI CHAT WIDGET (VISIBILE SOLO DOPO LOGIN perché sta dentro #app) -->
-<div id="ai-chat-widget">
-  <button id="ai-chat-button" aria-label="Apri chat AI">
-    <img src="https://image2url.com/r2/default/images/1770371281075-bf035a1c-704a-476c-a3c3-fa76d3b13bc5.png" alt="AI">
-  </button>
 
-  <div id="ai-chat-box" class="hidden">
-    <div class="ai-chat-header">
-      <div class="ai-chat-title"><span>Assistente AI</span></div>
-      <div class="ai-chat-actions">
-        <button id="ai-chat-minimize" title="Minimizza">−</button>
-        <button id="ai-chat-close" title="Chiudi">×</button>
+    <!-- ✅ AI CHAT WIDGET (dentro #app) -->
+    <div id="ai-chat-widget">
+      <button id="ai-chat-button" aria-label="Apri chat AI">
+        <img src="https://image2url.com/r2/default/images/1770371281075-bf035a1c-704a-476c-a3c3-fa76d3b13bc5.png" alt="AI">
+      </button>
+
+      <div id="ai-chat-box" class="hidden">
+        <div class="ai-chat-header">
+          <div class="ai-chat-title"><span>Assistente AI</span></div>
+          <div class="ai-chat-actions">
+            <button id="ai-chat-minimize" title="Minimizza">−</button>
+            <button id="ai-chat-close" title="Chiudi">×</button>
+          </div>
+        </div>
+
+        <div id="ai-chat-messages"></div>
+
+        <form id="ai-chat-form">
+          <input type="text" id="ai-chat-input" placeholder="Chiedimi qualcosa sul tuo budget o sui comparatori…" autocomplete="off" />
+          <button type="submit">Invia</button>
+        </form>
       </div>
     </div>
-
-    <div id="ai-chat-messages"></div>
-
-    <form id="ai-chat-form">
-      <input
-        type="text"
-        id="ai-chat-input"
-        placeholder="Chiedimi qualcosa sul tuo budget o sui comparatori…"
-        autocomplete="off"
-      />
-      <button type="submit">Invia</button>
-    </form>
-  </div>
-</div>
-
-<style>
-  #ai-chat-widget {
-    position: fixed;
-    bottom: 100px; /* sopra ai bottoni fissi */
-    right: 20px;
-    z-index: 9999;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-
-  #ai-chat-button {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    border: none;
-    background: transparent;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-    cursor: pointer;
-    padding: 0;
-    overflow: hidden;
-  }
-
-  #ai-chat-button img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  #ai-chat-box {
-    position: absolute;
-    bottom: 80px;
-    right: 0;
-    width: 360px;
-    max-height: 480px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  #ai-chat-box.hidden { display: none; }
-
-  .ai-chat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #111827;
-    color: #f9fafb;
-    padding: 8px 10px;
-  }
-
-  .ai-chat-title span { font-size: 14px; font-weight: 700; }
-
-  .ai-chat-actions button {
-    background: transparent;
-    border: none;
-    color: #e5e7eb;
-    font-size: 18px;
-    margin-left: 4px;
-    cursor: pointer;
-    line-height: 1;
-  }
-  .ai-chat-actions button:hover { color: #ffffff; }
-
-  #ai-chat-messages {
-    padding: 10px;
-    overflow-y: auto;
-    flex: 1;
-    background: #f3f4f6;
-    font-size: 13px;
-  }
-
-  .ai-msg { margin-bottom: 8px; display: flex; }
-  .ai-msg-user { justify-content: flex-end; }
-  .ai-msg-ai { justify-content: flex-start; }
-
-  .ai-msg-bubble {
-    max-width: 80%;
-    padding: 8px 10px;
-    border-radius: 10px;
-    line-height: 1.4;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-  }
-  .ai-msg-user .ai-msg-bubble {
-    background: #2563eb;
-    color: #ffffff;
-    border-bottom-right-radius: 2px;
-  }
-  .ai-msg-ai .ai-msg-bubble {
-    background: #e5e7eb;
-    color: #111827;
-    border-bottom-left-radius: 2px;
-  }
-
-  #ai-chat-form {
-    display: flex;
-    border-top: 1px solid #e5e7eb;
-  }
-
-  #ai-chat-input {
-    flex: 1;
-    border: none;
-    padding: 8px 10px;
-    font-size: 13px;
-    outline: none;
-  }
-
-  #ai-chat-form button[type="submit"] {
-    border: none;
-    background: #2563eb;
-    color: #ffffff;
-    padding: 0 14px;
-    font-size: 13px;
-    cursor: pointer;
-  }
-  #ai-chat-form button[type="submit"]:hover { background: #1d4ed8; }
-
-  #ai-chat-box.minimized { height: auto; }
-  #ai-chat-box.minimized #ai-chat-messages,
-  #ai-chat-box.minimized #ai-chat-form { display: none; }
-
-  @media (max-width: 480px) {
-    #ai-chat-box {
-      width: 90vw;
-      right: 50%;
-      transform: translateX(50%);
-    }
-  }
-</style>
-
-<script>
-(function () {
-  const chatButton = document.getElementById('ai-chat-button');
-  const chatBox = document.getElementById('ai-chat-box');
-  const closeBtn = document.getElementById('ai-chat-close');
-  const minimizeBtn = document.getElementById('ai-chat-minimize');
-  const messagesEl = document.getElementById('ai-chat-messages');
-  const form = document.getElementById('ai-chat-form');
-  const input = document.getElementById('ai-chat-input');
-
-  // URL backend AI
-  const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/';
-
-  let comparatoriContent = '';
-
-  // Carico il file comparatori1.html (se esiste nel repo)
-  fetch('comparatori1.html')
-    .then(res => res.ok ? res.text() : '')
-    .then(text => { comparatoriContent = text || ''; })
-    .catch(() => { comparatoriContent = ''; });
-
-  function getText(id){
-    return document.getElementById(id)?.textContent?.trim() || "";
-  }
-
-  function addUserMessage(text) {
-    const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
-    const wrapper = document.createElement('div');
-    wrapper.className = 'ai-msg ai-msg-user';
-    wrapper.dataset.id = id;
-    const bubble = document.createElement('div');
-    bubble.className = 'ai-msg-bubble';
-    bubble.textContent = text;
-    wrapper.appendChild(bubble);
-    messagesEl.appendChild(wrapper);
-    return id;
-  }
-
-  function addAiMessage(text) {
-    const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
-    const wrapper = document.createElement('div');
-    wrapper.className = 'ai-msg ai-msg-ai';
-    wrapper.dataset.id = id;
-    const bubble = document.createElement('div');
-    bubble.className = 'ai-msg-bubble';
-    bubble.textContent = text;
-    wrapper.appendChild(bubble);
-    messagesEl.appendChild(wrapper);
-    return id;
-  }
-
-  function updateAiMessage(id, newText) {
-    const msg = messagesEl.querySelector('[data-id="' + id + '"] .ai-msg-bubble');
-    if (msg) msg.textContent = newText;
-    else addAiMessage(newText);
-  }
-
-  function scrollBottom() {
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  chatButton.addEventListener('click', () => {
-    chatBox.classList.remove('hidden');
-    chatBox.classList.remove('minimized');
-    input.focus();
-    if (!messagesEl.dataset.started) {
-      addAiMessage('Ciao! Sono il tuo assistente AI. Posso rispondere sui dati del tuo budget (entrate, spese, risparmio) e anche sui comparatori.');
-      messagesEl.dataset.started = 'true';
-      scrollBottom();
-    }
-  });
-
-  closeBtn.addEventListener('click', () => {
-    chatBox.classList.add('hidden');
-    messagesEl.innerHTML = '';
-    delete messagesEl.dataset.started;
-  });
-
-  minimizeBtn.addEventListener('click', () => {
-    chatBox.classList.toggle('minimized');
-  });
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const text = input.value.trim();
-    if (!text) return;
-
-    addUserMessage(text);
-    input.value = '';
-    scrollBottom();
-
-    const typingId = addAiMessage('Sto pensando…');
-    scrollBottom();
-
-    // ✅ CONTEXT BUDGET DELL’UTENTE LOGGATO (valori già filtrati per utente perché il DOM è quello del suo account)
-    const budgetContext = {
-      month: (window.localStorage.getItem("budgetMonth") || ""),
-      entrate: getText("summary-entrate"),
-      spese: getText("summary-spese"),
-      risparmio: getText("summary-balance"),
-      obiettivo_risparmio: "€250,00",
-      risparmiato: getText("saved-amount"),
-      mancano: getText("remaining-amount")
-    };
-
-    fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        question: text,
-        context_html: comparatoriContent,
-        budget: budgetContext
-      })
-    })
-    .then(res => res.ok ? res.json() : Promise.reject())
-    .then(data => {
-      updateAiMessage(typingId, data.answer || 'Non sono riuscito a rispondere, riprova.');
-      scrollBottom();
-    })
-    .catch(err => {
-      console.error(err);
-      updateAiMessage(typingId, 'Errore nel contattare l’AI. Riprova più tardi.');
-      scrollBottom();
-    });
-  });
-})();
-</script>
 
   </div><!-- app -->
 
@@ -885,7 +790,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import {
+      getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut,
+      setPersistence, browserSessionPersistence
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
@@ -900,6 +808,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+
+    // ✅ session-only: se chiudi tab, non resta loggato
+    await setPersistence(auth, browserSessionPersistence);
+
     const provider = new GoogleAuthProvider();
 
     // expose per script non-module
@@ -969,11 +881,12 @@
       try{
         if (unsubscribe){ unsubscribe(); unsubscribe = null; }
         await window._signOut(window._auth);
-        // reset UI
+
         currentUser = null;
         userInfo.textContent = "";
         logoutBtn.style.display = "none";
-        setSyncStatus("Devi accedere per sincronizzare", "#ffc107");
+        setSyncStatus("Login richiesto", "#ffc107");
+
         resetUIEmpty();
         showLoginOnly();
       }catch(e){
@@ -998,7 +911,6 @@
     function euro(v){
       return "€ " + (Number(v || 0)).toFixed(2).replace(".", ",");
     }
-
     function parseAmount(x){
       return parseFloat((x ?? "").toString().replace(",", ".")) || 0;
     }
@@ -1017,7 +929,6 @@
         sumSpese += parseAmount(input.value);
       });
 
-      // placeholder se tutto 0
       const labels = (sumEntrate > 0 || sumSpese > 0) ? ["Entrate", "Spese"] : ["Nessun dato"];
       const values = (sumEntrate > 0 || sumSpese > 0) ? [sumEntrate, sumSpese] : [1];
       const colors = (sumEntrate > 0 || sumSpese > 0)
@@ -1027,10 +938,7 @@
       if (!pieChart){
         pieChart = new Chart(canvas, {
           type: "doughnut",
-          data: {
-            labels,
-            datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }]
-          },
+          data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
           options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -1101,15 +1009,11 @@
     }
 
     function resetUIEmpty(){
-      const entrateContainer = document.getElementById('entrate-items');
-      const speseContainer = document.getElementById('spese-items');
-      entrateContainer.innerHTML = '';
-      speseContainer.innerHTML = '';
-
+      document.getElementById('entrate-items').innerHTML = '';
+      document.getElementById('spese-items').innerHTML = '';
       for (let week=1; week<=4; week++){
         document.querySelectorAll(`.week${week}-shopping`).forEach(input => input.value = '');
       }
-
       updateBudgetTotals();
       updateFoodTotals();
       setTimeout(updateSavingsGoal, 120);
@@ -1176,7 +1080,7 @@
           populateUIFromData(snap.data());
           setSyncStatus("Sincronizzato ✅", "#8bc34a");
         } else {
-          resetUIEmpty(); // nuovo utente/mese vuoto
+          resetUIEmpty();
           setSyncStatus("Vuoto ✅", "#ffffff");
         }
       }, (err)=>{
@@ -1201,6 +1105,7 @@
       updateBudgetTotals();
       updatePieChart();
       setTimeout(updateSavingsGoal, 120);
+      saveMonthData();
     }
 
     function removeEntry(button){
@@ -1209,8 +1114,8 @@
         item.remove();
         updateBudgetTotals();
         updatePieChart();
-        saveMonthData();
         setTimeout(updateSavingsGoal, 120);
+        saveMonthData();
       }
     }
 
@@ -1253,13 +1158,16 @@
         document.querySelectorAll(`.week${week}-shopping`).forEach(input=>{
           weekTotal += parseAmount(input.value);
         });
+
         monthlyTotal += weekTotal;
 
         const weekTotalEl = document.getElementById(`total-week${week}`);
         const statusEl = document.getElementById(`status-week${week}`);
+
         if (weekTotalEl && statusEl){
           weekTotalEl.textContent = formatCurrency(weekTotal);
           const remaining = weeklyBudget - weekTotal;
+
           if (remaining >= 0){
             statusEl.textContent = `✓ OK (rimasti ${formatCurrency(remaining)})`;
             statusEl.style.backgroundColor = '#E8F5E9';
@@ -1274,6 +1182,7 @@
 
       const monthlyBudget = 500;
       const remainingMonthly = monthlyBudget - monthlyTotal;
+
       document.getElementById('total-food-spent').textContent = formatCurrency(monthlyTotal);
 
       const remainingEl = document.getElementById('total-food-remaining');
@@ -1309,16 +1218,118 @@
       }
     }
 
+    // ===== AI CHAT =====
+    (function initAI(){
+      const chatButton = document.getElementById('ai-chat-button');
+      const chatBox = document.getElementById('ai-chat-box');
+      const closeBtn = document.getElementById('ai-chat-close');
+      const minimizeBtn = document.getElementById('ai-chat-minimize');
+      const messagesEl = document.getElementById('ai-chat-messages');
+      const form = document.getElementById('ai-chat-form');
+      const input = document.getElementById('ai-chat-input');
+
+      if (!chatButton || !chatBox || !messagesEl || !form || !input) return;
+
+      const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/';
+      let comparatoriContent = '';
+
+      fetch('comparatori1.html')
+        .then(res => res.ok ? res.text() : '')
+        .then(text => { comparatoriContent = text || ''; })
+        .catch(() => { comparatoriContent = ''; });
+
+      function getText(id){
+        return document.getElementById(id)?.textContent?.trim() || "";
+      }
+
+      function addMsg(text, who){
+        const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'ai-msg ' + (who === 'user' ? 'ai-msg-user' : 'ai-msg-ai');
+        wrapper.dataset.id = id;
+        const bubble = document.createElement('div');
+        bubble.className = 'ai-msg-bubble';
+        bubble.textContent = text;
+        wrapper.appendChild(bubble);
+        messagesEl.appendChild(wrapper);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        return id;
+      }
+
+      function updateMsg(id, text){
+        const el = messagesEl.querySelector('[data-id="' + id + '"] .ai-msg-bubble');
+        if (el) el.textContent = text;
+      }
+
+      chatButton.addEventListener('click', () => {
+        chatBox.classList.remove('hidden');
+        chatBox.classList.remove('minimized');
+        input.focus();
+        if (!messagesEl.dataset.started) {
+          addMsg('Ciao! Sono il tuo assistente AI. Posso rispondere sui tuoi dati (entrate, spese, risparmio) e sui comparatori.', 'ai');
+          messagesEl.dataset.started = 'true';
+        }
+      });
+
+      closeBtn.addEventListener('click', () => {
+        chatBox.classList.add('hidden');
+        messagesEl.innerHTML = '';
+        delete messagesEl.dataset.started;
+      });
+
+      minimizeBtn.addEventListener('click', () => {
+        chatBox.classList.toggle('minimized');
+      });
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMsg(text, 'user');
+        input.value = '';
+
+        const typingId = addMsg('Sto pensando…', 'ai');
+
+        const budgetContext = {
+          uid: (currentUser && currentUser.uid) ? currentUser.uid : "",
+          month: (window.localStorage.getItem("budgetMonth") || ""),
+          entrate: getText("summary-entrate"),
+          spese: getText("summary-spese"),
+          risparmio: getText("summary-balance"),
+          obiettivo_risparmio: "€250,00",
+          risparmiato: getText("saved-amount"),
+          mancano: getText("remaining-amount"),
+          food_speso: getText("total-food-spent"),
+          food_rimasto: getText("total-food-remaining")
+        };
+
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: text,
+            context_html: comparatoriContent,
+            budget: budgetContext
+          })
+        })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(data => updateMsg(typingId, data.answer || 'Non sono riuscito a rispondere, riprova.'))
+        .catch(err => {
+          console.error(err);
+          updateMsg(typingId, 'Errore nel contattare l’AI. Riprova più tardi.');
+        });
+      });
+    })();
+
     // ===== INIT + AUTH =====
     window.addEventListener('load', ()=>{
       const check = setInterval(()=>{
         if (!window._firebaseReady) return;
         clearInterval(check);
 
-        // set month
         monthSelector.value = currentMonth;
 
-        // auth state
         window._onAuthStateChanged(window._auth, (user)=>{
           currentUser = user || null;
 
@@ -1331,18 +1342,15 @@
             return;
           }
 
-          // logged
           showApp();
           logoutBtn.style.display = "inline-block";
           userInfo.textContent = currentUser.email || "";
           setSyncStatus("Pronto ✅", "#ffffff");
 
           attachRealtimeListener();
-          // dopo primo render
-          setTimeout(()=>{ updatePieChart(); updateSavingsGoal(); }, 150);
+          setTimeout(()=>{ updatePieChart(); updateSavingsGoal(); updateFoodTotals(); }, 150);
         });
 
-        // first draw
         setTimeout(()=>{ updatePieChart(); }, 200);
       }, 80);
     });
