@@ -1213,52 +1213,57 @@ spesePerCategoriaChart = new Chart(ctx, {
             return "€ " + value.toFixed(2).replace('.', ',');
         }
 
-        window.addEventListener('load', () => {
-            const check = setInterval(() => {
-                if (window._firebaseReady) {
-                    clearInterval(check);
+      window.addEventListener('load', () => {
+    const check = setInterval(() => {
+        if (window.firebaseReady) {
+            clearInterval(check);
 
-                    syncLabel = document.getElementById('sync-label');
-                    loginBtn = document.getElementById('login-btn');
-                    userInfo = document.getElementById('user-info');
+            syncLabel = document.getElementById('sync-label');
+            loginBtn = document.getElementById('login-btn');
+            userInfo = document.getElementById('user-info');
 
-                    function updateUIForAuth() {
-                        if (!currentUser) {
-                            if (loginBtn) loginBtn.textContent = "Accedi con Google";
-                            if (userInfo) userInfo.textContent = "";
-                            setSyncStatus("Devi accedere per sincronizzare", "#ffc107");
-                        } else {
-                            if (loginBtn) loginBtn.textContent = "Esci";
-                            if (userInfo) userInfo.textContent = currentUser.email;
-                            attachRealtimeListener();
-                        }
-                    }
-
-                    if (loginBtn) {
-                        loginBtn.addEventListener('click', async () => {
-                            if (!window._auth) return;
-                            if (!currentUser) {
-                                try {
-                                    await window._signInWithPopup(window._auth, window._provider);
-                                } catch (e) {
-                                    console.error("Login error:", e);
-                                }
-                            } else {
-                                await window._signOut(window._auth);
-                            }
-                        });
-                    }
-
-                    window._onAuthStateChanged(window._auth, (user) => {
-                        currentUser = user || null;
-                        updateUIForAuth();
-                    });
-
-                    updateBudgetTotals();
-                    updateFoodTotals();
+            function updateUIForAuth() {
+                if (!currentUser) {
+                    if (loginBtn) loginBtn.textContent = "Accedi con Google";
+                    if (userInfo) userInfo.textContent = "";
+                    setSyncStatus("Devi accedere per sincronizzare", "#ffc107");
+                } else {
+                    if (loginBtn) loginBtn.textContent = "Esci";
+                    if (userInfo) userInfo.textContent = currentUser.email;
+                    attachRealtimeListener();
                 }
-            }, 300);
-        });
+            }
+
+            if (loginBtn) {
+                loginBtn.addEventListener('click', async () => {
+                    if (!window.auth) return;
+
+                    if (!currentUser) {
+                        try {
+                            await window.signInWithPopup(window.auth, window.provider);
+                        } catch (e) {
+                            console.error('Login error', e);
+                        }
+                    } else {
+                        await window.signOut(window.auth);
+                    }
+                });
+            }
+
+            window.onAuthStateChanged(window.auth, (user) => {
+                currentUser = user || null;
+                updateUIForAuth();
+                updateBudgetTotals();
+                updateFoodTotals();
+            });
+
+            updateBudgetTotals();
+            updateFoodTotals();
+        }
+    }, 300);
+});
+
+        
 
             // Funzione per aggiornare la barra di progresso dell'obiettivo di risparmio
     function updateSavingsGoal() {
