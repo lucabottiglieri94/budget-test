@@ -10,42 +10,50 @@
   <style>
     :root{
       --bg1:#667eea; --bg2:#764ba2;
-      --card:rgba(255,255,255,0.14);
-      --card2:rgba(255,255,255,0.10);
-      --text:#fff;
-      --muted:rgba(255,255,255,0.85);
+      --text:#111827;
+      --muted:#6b7280;
       --danger:#ff6b6b;
-      --ok:#4CAF50;
-      --warn:#ffeb3b;
+      --border:rgba(0,0,0,0.08);
+      --card:#ffffff;
+      --cardSoft:#f8fafc;
     }
 
     *{box-sizing:border-box;margin:0;padding:0}
+
     body{
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       min-height:100vh;
       background: linear-gradient(135deg,var(--bg1),var(--bg2));
-      color:var(--text);
       display:flex;
       justify-content:center;
       padding:30px 14px;
+      color:var(--text);
     }
 
+    /* CONTENITORE BIANCO (NON PIÙ TUTTO VIOLA) */
     .wrap{
       width:min(980px, 100%);
+      background:#ffffff;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.25);
+      overflow:hidden;
     }
 
     .top{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
       margin-bottom:14px;
+      flex-wrap:wrap;
     }
 
     h1{
       font-size: clamp(28px, 4vw, 44px);
       letter-spacing:0.3px;
       font-weight:900;
+      color:var(--text);
     }
 
     .actions{
@@ -61,7 +69,7 @@
       cursor:pointer;
       padding:10px 14px;
       border-radius:999px;
-      font-weight:800;
+      font-weight:900;
       box-shadow:0 10px 22px rgba(0,0,0,0.18);
       transition: transform .08s ease;
       display:inline-flex;
@@ -70,17 +78,18 @@
       white-space:nowrap;
     }
     .btn:active{transform:scale(0.98)}
-    .btn.primary{background:#ffffff;color:#1f2937}
+    .btn.primary{background:#111827;color:#ffffff}
     .btn.danger{background:var(--danger);color:white}
-    .btn.ghost{background:rgba(255,255,255,0.18);color:white;border:1px solid rgba(255,255,255,0.25)}
+    .btn.ghost{background:#ffffff;color:#111827;border:1px solid var(--border)}
 
     .pill{
       padding:10px 14px;
       border-radius:999px;
-      background:rgba(0,0,0,0.25);
-      color:var(--muted);
-      font-weight:800;
-      box-shadow:0 10px 22px rgba(0,0,0,0.18);
+      background:#f3f4f6;
+      color:#111827;
+      font-weight:900;
+      border:1px solid var(--border);
+      white-space:nowrap;
     }
 
     .grid{
@@ -90,13 +99,13 @@
       margin-top:12px;
     }
 
+    /* CARD BIANCHE */
     .card{
       background: var(--card);
-      border: 1px solid rgba(255,255,255,0.18);
+      border: 1px solid var(--border);
       border-radius:22px;
       padding:16px;
-      box-shadow:0 18px 50px rgba(0,0,0,0.22);
-      backdrop-filter: blur(10px);
+      box-shadow:0 12px 28px rgba(0,0,0,0.12);
     }
 
     .row{
@@ -110,8 +119,8 @@
     }
 
     .kpi{
-      background: var(--card2);
-      border: 1px solid rgba(255,255,255,0.16);
+      background: var(--cardSoft);
+      border: 1px solid var(--border);
       border-radius:18px;
       padding:14px;
     }
@@ -119,17 +128,18 @@
       font-size:12px;
       text-transform:uppercase;
       letter-spacing:0.8px;
-      opacity:0.9;
+      color:var(--muted);
       margin-bottom:6px;
       font-weight:900;
     }
     .kpi .value{
       font-size:22px;
-      font-weight:900;
+      font-weight:1000;
+      color:var(--text);
     }
 
     .chartBox{
-      height: 380px;
+      height: 420px;
       position:relative;
     }
 
@@ -137,7 +147,7 @@
       margin-top:10px;
       color:var(--muted);
       font-size:13px;
-      opacity:0.95;
+      font-weight:800;
     }
 
     .errorBanner{
@@ -145,9 +155,10 @@
       margin-top:10px;
       padding:12px 14px;
       border-radius:16px;
-      background: rgba(255, 107, 107, 0.22);
-      border: 1px solid rgba(255, 107, 107, 0.35);
-      font-weight:800;
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      color:#991b1b;
+      font-weight:900;
     }
     .errorBanner.show{display:block}
 
@@ -156,10 +167,10 @@
       margin-top:14px;
       padding:14px;
       border-radius:18px;
-      background: rgba(255,255,255,0.14);
-      border:1px solid rgba(255,255,255,0.18);
-      font-weight:800;
-      color:var(--muted);
+      background: #eff6ff;
+      border:1px solid #bfdbfe;
+      font-weight:900;
+      color:#1e40af;
     }
     .loginBox.show{display:block}
   </style>
@@ -168,7 +179,9 @@
 <body>
   <div class="wrap">
     <div class="top">
-      <h1>Risparmi Mensili</h1>
+      <div>
+        <h1>Risparmi Mensili</h1>
+      </div>
 
       <div class="actions">
         <span id="status-pill" class="pill">🔄 Inizializzo…</span>
@@ -192,7 +205,7 @@
             <div class="value" id="kpi-year">€ 0,00</div>
           </div>
           <div class="kpi">
-            <div class="label">Questo mese</div>
+            <div class="label">Ultimo mese</div>
             <div class="value" id="kpi-month">€ 0,00</div>
           </div>
           <div class="kpi">
@@ -201,7 +214,9 @@
           </div>
         </div>
 
-        <div class="hint">Il grafico si aggiorna in tempo reale quando modifichi entrate/spese su <strong>index.html</strong>.</div>
+        <div class="hint">
+          Il grafico si aggiorna in tempo reale quando modifichi entrate/spese su <strong>index.html</strong>.
+        </div>
       </div>
 
       <div class="card">
@@ -215,9 +230,7 @@
   <!-- Firebase + Firestore + Auth -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import {
-      getFirestore, collection, onSnapshot
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
     import {
       getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut,
       setPersistence, browserSessionPersistence
@@ -237,12 +250,12 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // ✅ NON resta loggato “per sempre” (solo sessione tab)
+    // ✅ sessione NON persistente (non resta loggato dopo chiusura tab)
     await setPersistence(auth, browserSessionPersistence);
 
     const provider = new GoogleAuthProvider();
 
-    // ---- UI refs
+    // UI
     const statusPill = document.getElementById("status-pill");
     const loginBtn = document.getElementById("login-btn");
     const logoutBtn = document.getElementById("logout-btn");
@@ -257,22 +270,15 @@
     let unsub = null;
     let chart = null;
 
-    function setStatus(text){
-      statusPill.textContent = text;
-    }
+    function setStatus(text){ statusPill.textContent = text; }
     function showError(msg){
       errorBanner.textContent = msg || "Errore nel caricamento dei dati.";
       errorBanner.classList.add("show");
     }
-    function hideError(){
-      errorBanner.classList.remove("show");
-    }
-    function euro(v){
-      return "€ " + (Number(v || 0)).toFixed(2).replace(".", ",");
-    }
-    function parseAmount(x){
-      return parseFloat((x ?? "").toString().replace(",", ".")) || 0;
-    }
+    function hideError(){ errorBanner.classList.remove("show"); }
+
+    function euro(v){ return "€ " + (Number(v || 0)).toFixed(2).replace(".", ","); }
+    function parseAmount(x){ return parseFloat((x ?? "").toString().replace(",", ".")) || 0; }
 
     function monthName(yyyyMm){
       const [y,m] = (yyyyMm || "").split("-");
@@ -282,7 +288,6 @@
     }
 
     function calcSavings(docData){
-      // docData: { entrate:[{amount}], spese:[{amount}] }
       let inc = 0, exp = 0;
       (docData.entrate || []).forEach(i => inc += parseAmount(i.amount));
       (docData.spese || []).forEach(i => exp += parseAmount(i.amount));
@@ -310,15 +315,11 @@
           animation: false,
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => euro(ctx.parsed.y || 0)
-              }
-            }
+            tooltip: { callbacks: { label: (ctx) => euro(ctx.parsed.y || 0) } }
           },
           scales: {
-            x: { ticks: { color: "#ffffff" }, grid: { color: "rgba(255,255,255,0.15)" } },
-            y: { ticks: { color: "#ffffff", callback: (v) => euro(v) }, grid: { color: "rgba(255,255,255,0.15)" } }
+            x: { ticks: { color: "#111827", font:{ weight:700 } }, grid: { color: "rgba(0,0,0,0.08)" } },
+            y: { ticks: { color: "#111827", font:{ weight:700 }, callback: (v)=>euro(v) }, grid: { color: "rgba(0,0,0,0.08)" } }
           }
         }
       });
@@ -327,8 +328,7 @@
     }
 
     function updateUIFromMonths(monthMap){
-      // monthMap: { "2026-02": savingsNumber, ... }
-      const months = Object.keys(monthMap).sort(); // yyyy-mm order
+      const months = Object.keys(monthMap).sort(); // yyyy-mm
       const values = months.map(m => monthMap[m]);
 
       const totalYear = values.reduce((a,b)=>a+b,0);
@@ -350,7 +350,7 @@
     function attachUserListener(){
       if (!currentUser) return;
 
-      // ✅ PERCORSO PER UTENTE:
+      // ✅ dati separati per utente:
       // users/{uid}/budgets/{month}
       const colRef = collection(db, "users", currentUser.uid, "budgets");
 
@@ -372,24 +372,18 @@
       }, (err) => {
         console.error(err);
         setStatus("❌ Errore");
-        showError("Errore nel caricamento dei dati. Controlla regole Firestore e percorso per utente.");
+        showError("Errore nel caricamento dei dati. Controlla le Firestore Rules per users/{uid}/budgets.");
       });
     }
 
     loginBtn.addEventListener("click", async () => {
-      try{
-        await signInWithPopup(auth, provider);
-      }catch(e){
-        console.error(e);
-        showError("Login non riuscito.");
-      }
+      try { await signInWithPopup(auth, provider); }
+      catch(e){ console.error(e); showError("Login non riuscito."); }
     });
 
     logoutBtn.addEventListener("click", async () => {
       try{
         await signOut(auth);
-
-        // pulizia UI
         if (unsub) { unsub(); unsub = null; }
         updateUIFromMonths({});
         setStatus("👋 Disconnesso");
@@ -421,7 +415,18 @@
       attachUserListener();
     });
 
-    setStatus("🔄 Pronto");
+    setStatus("✅ Pronto");
   </script>
+
+  <!-- FIRESTORE RULES (mettile su Firebase)
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /users/{userId}/budgets/{monthId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+  -->
 </body>
 </html>
