@@ -328,6 +328,8 @@
 
     /* Widget AI (rimane nel file come tuo) */
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+
 </head>
 
 <body>
@@ -421,6 +423,19 @@
             <div class="summary-value balance-positive" id="summary-balance">€ 0,00</div>
           </div>
         </div>
+        <!-- GRAFICO A TORTA (auto aggiornante) -->
+<div class="section" id="pie-section" style="border-left-color:#2196F3;">
+  <h2>🥧 Ripartizione (Entrate + Spese)</h2>
+  <div style="background:white;border:1px solid #e5e7eb;border-radius:14px;padding:14px;box-shadow:0 10px 22px rgba(0,0,0,0.08);">
+    <div style="position:relative;height:320px;">
+      <canvas id="budgetPie"></canvas>
+    </div>
+    <div style="margin-top:10px;color:#6b7280;font-size:0.9em;font-weight:700;">
+      Si aggiorna automaticamente quando modifichi le voci.
+    </div>
+  </div>
+</div>
+
 
         <!-- OBIETTIVO DI RISPARMIO -->
         <div class="section savings-goal">
@@ -801,6 +816,7 @@
     function populateUIFromData(data){
       const entrateContainer = document.getElementById('entrate-items');
       const speseContainer = document.getElementById('spese-items');
+      updatePieChart();
 
       entrateContainer.innerHTML = '';
       (data.entrate || []).forEach(item=>{
@@ -860,6 +876,8 @@
         } else {
           // ✅ nuovo utente o mese nuovo: TUTTO VUOTO
           resetUIEmpty();
+          updatePieChart();
+
           setSyncStatus("Nessun dato (vuoto) ✅", "#ffffff");
         }
       }, (err)=>{
@@ -925,7 +943,7 @@
       balanceEl.classList.toggle('balance-positive', balance >= 0);
       balanceEl.classList.toggle('balance-negative', balance < 0);
     }
-
+updatePieChart(); // ✅ aggiorna torta
     function updateFoodTotals(){
       const weeklyBudget = 125;
       let monthlyTotal = 0;
@@ -1063,6 +1081,123 @@
     if (contentEl){
       contentEl.addEventListener('scroll', ()=>handleHeaderScroll(contentEl.scrollTop));
     }
+    // ====== PIE CHART (AUTO) ======
+let pieChart = null;
+
+function getPalette(n, type){
+  // palette semplice: verdi per entrate, rossi per spese
+  const greens = [
+    "rgba(76,175,80,0.85)","rgba(67,160,71,0.85)","rgba(56,142,60,0.85)",
+    "rgba(102,187,106,0.85)","rgba(129,199,132,0.85)"
+  ];
+  const reds = [
+    "rgba(244,67,54,0.85)","rgba(229,57,53,0.85)","rgba(211,47,47,0.85)",
+    "rgba(239,83,80,0.85)","rgba(229,115,115,0.85)"
+  ];
+  const src = type === "entrate" ? greens : reds;
+  const out = [];
+  for (let i=0;i<n;i++) out.push(src[i % src.length]);
+  return out;
+}
+
+function buildPieData(){
+  // prende label+amount dagli input e costruisce la torta
+  const labels = [];
+  const values = [];
+  const colors = [];
+
+  // ENTRATE
+  const entrateItems = Array.from(document.querySelectorAll("#entrate-items .entry-item"));
+  const entrateData = entrateItems
+    .map(item => {
+      const label = (item.querySelector(".item-label-input")?.value || "").trim() || "Entrata";
+      const amount = parseFloat((item.querySelector(".item-amount-input")?.value || "0").replace(",", ".")) || 0;
+      return { label, amount };
+    })
+    .filter(x => x.amount > 0);
+
+  // SPESE
+  const speseItems = Array.from(document.querySelectorAll("#spese-items .entry-item"));
+  const speseData = speseItems
+    .map(item => {
+      const label = (item.querySelector(".item-label-input")?.value || "").trim() || "Spesa";
+      const amount = parseFloat((item.querySelector(".item-amount-input")?.value || "0").replace(",", ".")) || 0;
+      return { label, amount };
+    })
+    .filter(x => x.amount > 0);
+
+  // push entrate
+  const eColors = getPalette(entrateData.length, "entrate");
+  entrateData.forEach((x, i) => {
+    labels.push("📥 " + x.label);
+    values.push(x.amount);
+    colors.push(eColors[i]);
+  });
+
+  // push spese
+  const sColors = getPalette(speseData.length, "spese");
+  speseData.forEach((x, i) => {
+    labels.push("📤 " + x.label);
+    values.push(x.amount);
+    colors.push(sColors[i]);
+  });
+
+  return { labels, values, colors };
+}
+
+function formatEuro(v){
+  return "€ " + (Number(v||0)).toFixed(2).replace(".", ",");
+}
+
+function updatePieChart(){
+  const canvas = document.getElementById("budgetPie");
+  if (!canvas || typeof Chart === "undefined") return;
+
+  const { labels, values, colors } = buildPieData();
+
+  // se non c'è nulla, mostra un placeholder
+  const safeLabels = labels.length ? labels : ["Nessun dato"];
+  const safeValues = values.length ? values : [1];
+  const safeColors = colors.length ? colors : ["rgba(156,163,175,0.35)"];
+
+  if (!pieChart){
+    pieChart = new Chart(canvas, {
+      type: "doughnut",
+      data: {
+        labels: safeLabels,
+        datasets: [{
+          data: safeValues,
+          backgroundColor: safeColors,
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { boxWidth: 12, boxHeight: 12, padding: 12 }
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.label}: ${formatEuro(ctx.parsed)}`
+            }
+          }
+        },
+        cutout: "55%"
+      }
+    });
+    return;
+  }
+
+  pieChart.data.labels = safeLabels;
+  pieChart.data.datasets[0].data = safeValues;
+  pieChart.data.datasets[0].backgroundColor = safeColors;
+  pieChart.update();
+}
+
   </script>
 
   <!-- AI CHAT SCRIPT (usa dati del DOM = utente loggato) -->
