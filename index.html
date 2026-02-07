@@ -1321,6 +1321,25 @@ function updateSpesePerCategoriaChart() {
         }
     }
     setTimeout(updateSavingsGoal, 500);
+        // ===== AUTO SAVE + AUTO UPDATE OGNI 300ms =====
+let lastSnapshot = '';
+
+setInterval(() => {
+  try {
+    updateBudgetTotals();
+    updateFoodTotals();
+
+    const snapshot = JSON.stringify(collectCurrentData());
+
+    if (snapshot !== lastSnapshot) {
+      lastSnapshot = snapshot;
+      saveMonthData();
+    }
+  } catch (e) {
+    console.warn('Autosync error:', e);
+  }
+}, 300);
+
 // ===== HEADER AUTO HIDE — UNIVERSALE =====
 const headerEl = document.querySelector('header');
 const contentEl = document.querySelector('.content');
