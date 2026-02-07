@@ -10,58 +10,79 @@
   <style>
     :root{
       --bg1:#667eea; --bg2:#764ba2;
-      --text:#111827;
+      --primary:#2196F3;
+      --success:#4CAF50;
+      --danger:#F44336;
+      --light:#f5f5f5;
+      --dark:#111827;
       --muted:#6b7280;
-      --danger:#ff6b6b;
-      --border:rgba(0,0,0,0.08);
-      --card:#ffffff;
-      --cardSoft:#f8fafc;
+      --border:#e5e7eb;
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
+    *{margin:0;padding:0;box-sizing:border-box}
 
     body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      min-height:100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      min-height:100vh;
       display:flex;
       justify-content:center;
-      padding:30px 14px;
-      color:var(--text);
+      align-items:center;
+      padding:0;
+      color:var(--dark);
     }
 
-    /* CONTENITORE BIANCO (NON PIÙ TUTTO VIOLA) */
-    .wrap{
-      width:min(980px, 100%);
-      background:#ffffff;
-      border-radius:18px;
-      padding:18px;
-      box-shadow:0 20px 60px rgba(0,0,0,0.25);
+    .container{
+      width:100vw;
+      max-width:100vw;
+      height:100vh;
+      background:#fff;
+      box-shadow:0 20px 60px rgba(0,0,0,0.28);
+      display:flex;
+      flex-direction:column;
       overflow:hidden;
     }
 
-    .top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:14px;
-      flex-wrap:wrap;
+    header{
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:#fff;
+      padding:22px 18px;
+      text-align:center;
+      position:fixed;
+      top:0;left:0;right:0;
+      z-index:1000;
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
+    header.header-hidden{transform:translateY(-100%);opacity:0}
 
-    h1{
-      font-size: clamp(28px, 4vw, 44px);
-      letter-spacing:0.3px;
+    header h1{
+      font-size:1.8em;
+      margin-bottom:6px;
       font-weight:900;
-      color:var(--text);
+      letter-spacing:.2px;
+    }
+    header p{
+      font-size:.85em;
+      opacity:.95;
+      font-weight:400;
     }
 
-    .actions{
+    .top-controls{
+      margin-top:12px;
       display:flex;
-      align-items:center;
       gap:10px;
+      justify-content:center;
+      align-items:center;
       flex-wrap:wrap;
-      justify-content:flex-end;
+    }
+
+    .pill{
+      font-size:.8em;
+      font-weight:900;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.16);
+      border:1px solid rgba(255,255,255,0.25);
     }
 
     .btn{
@@ -78,150 +99,170 @@
       white-space:nowrap;
     }
     .btn:active{transform:scale(0.98)}
-    .btn.primary{background:#111827;color:#ffffff}
-    .btn.danger{background:var(--danger);color:white}
-    .btn.ghost{background:#ffffff;color:#111827;border:1px solid var(--border)}
+    .btn.light{background:#fff;color:#111827}
+    .btn.danger{background:#ff6b6b;color:#fff}
+    .btn.ghost{background:rgba(255,255,255,0.16);color:#fff;border:1px solid rgba(255,255,255,0.22)}
 
-    .pill{
+    select{
       padding:10px 14px;
-      border-radius:999px;
-      background:#f3f4f6;
+      border-radius:10px;
+      border:2px solid rgba(255,255,255,0.55);
+      background:rgba(255,255,255,0.95);
       color:#111827;
       font-weight:900;
-      border:1px solid var(--border);
-      white-space:nowrap;
+      cursor:pointer;
+      box-shadow:0 4px 12px rgba(0,0,0,0.15);
+      outline:none;
     }
 
-    .grid{
+    .content{
+      flex:1;
+      overflow-y:auto;
+      padding:20px;
+      padding-top:220px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      background:#fff;
+    }
+
+    .section{
+      background:var(--light);
+      padding:18px;
+      border-radius:15px;
+      border-left:5px solid var(--primary);
+    }
+
+    .section h2{
+      color:#111827;
+      margin-bottom:14px;
+      font-size:1.25em;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .summary{
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:#fff;
+      padding:18px;
+      border-radius:15px;
       display:grid;
-      grid-template-columns: 1fr;
-      gap:14px;
-      margin-top:12px;
-    }
-
-    /* CARD BIANCHE */
-    .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius:22px;
-      padding:16px;
-      box-shadow:0 12px 28px rgba(0,0,0,0.12);
-    }
-
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns:1fr 1fr 1fr;
       gap:12px;
+      text-align:center;
     }
-    @media (max-width:760px){
-      .row{grid-template-columns:1fr}
-      .actions{justify-content:flex-start}
-    }
-
-    .kpi{
-      background: var(--cardSoft);
-      border: 1px solid var(--border);
-      border-radius:18px;
+    .summary-card{
+      background: rgba(255,255,255,0.15);
       padding:14px;
+      border-radius:12px;
+      backdrop-filter: blur(10px);
     }
-    .kpi .label{
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:0.8px;
-      color:var(--muted);
+    .summary-label{
+      font-size:.78em;
+      opacity:.95;
       margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
       font-weight:900;
     }
-    .kpi .value{
-      font-size:22px;
+    .summary-value{
+      font-size:1.45em;
       font-weight:1000;
-      color:var(--text);
     }
 
-    .chartBox{
-      height: 420px;
+    .balance-positive{color:#b9ffcc}
+    .balance-negative{color:#ffd1d1}
+
+    .chart-wrap{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      box-shadow:0 10px 22px rgba(0,0,0,0.08);
+    }
+
+    .chart-holder{
       position:relative;
+      width:100%;
+      height:420px;
     }
 
-    .hint{
+    .note{
       margin-top:10px;
       color:var(--muted);
-      font-size:13px;
-      font-weight:800;
+      font-size:.9em;
+      font-weight:700;
     }
 
-    .errorBanner{
+    .banner{
       display:none;
-      margin-top:10px;
       padding:12px 14px;
-      border-radius:16px;
-      background: #fff5f5;
-      border: 1px solid #fecaca;
-      color:#991b1b;
+      border-radius:14px;
       font-weight:900;
+      border:1px solid;
     }
-    .errorBanner.show{display:block}
+    .banner.show{display:block}
+    .banner.info{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
+    .banner.error{background:#fff5f5;border-color:#fecaca;color:#991b1b}
 
-    .loginBox{
-      display:none;
-      margin-top:14px;
-      padding:14px;
-      border-radius:18px;
-      background: #eff6ff;
-      border:1px solid #bfdbfe;
-      font-weight:900;
-      color:#1e40af;
+    @media (max-width:860px){
+      .summary{grid-template-columns:1fr}
+      header h1{font-size:1.55em}
+      .content{padding-top:250px}
     }
-    .loginBox.show{display:block}
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div>
-        <h1>Risparmi Mensili</h1>
-      </div>
+  <div class="container">
 
-      <div class="actions">
+    <header>
+      <h1>📈 Risparmi Mensili</h1>
+      <p>Entrate (verde) vs Spese (rosso) — dati separati per ogni account Google</p>
+
+      <div class="top-controls">
         <span id="status-pill" class="pill">🔄 Inizializzo…</span>
-        <button id="back-btn" class="btn ghost" onclick="location.href='index.html'">← Torna al Budget</button>
-        <button id="login-btn" class="btn primary">Accedi Google</button>
-        <button id="logout-btn" class="btn danger" style="display:none;">Logout</button>
+
+        <select id="year-selector" title="Seleziona anno">
+          <option value="">Anno…</option>
+        </select>
+
+        <button class="btn ghost" onclick="location.href='index.html'">← Torna al Budget</button>
+        <button id="login-btn" class="btn light">Accedi Google</button>
+        <button id="logout-btn" class="btn danger" style="display:none;">Esci</button>
       </div>
-    </div>
+    </header>
 
-    <div id="loginBox" class="loginBox">
-      Devi fare login per vedere i tuoi risparmi.
-    </div>
+    <div class="content">
+      <div id="bannerInfo" class="banner info show">Devi fare login per vedere i tuoi dati.</div>
+      <div id="bannerError" class="banner error">Errore nel caricamento dei dati.</div>
 
-    <div id="errorBanner" class="errorBanner">Errore nel caricamento dei dati.</div>
-
-    <div class="grid">
-      <div class="card">
-        <div class="row">
-          <div class="kpi">
-            <div class="label">Totale anno</div>
-            <div class="value" id="kpi-year">€ 0,00</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Ultimo mese</div>
-            <div class="value" id="kpi-month">€ 0,00</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Mesi con dati</div>
-            <div class="value" id="kpi-count">0</div>
-          </div>
+      <div class="summary">
+        <div class="summary-card">
+          <div class="summary-label">📥 Entrate anno</div>
+          <div class="summary-value" id="kpi-income">€ 0,00</div>
         </div>
-
-        <div class="hint">
-          Il grafico si aggiorna in tempo reale quando modifichi entrate/spese su <strong>index.html</strong>.
+        <div class="summary-card">
+          <div class="summary-label">📤 Spese anno</div>
+          <div class="summary-value" id="kpi-expense">€ 0,00</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">💾 Risparmio anno</div>
+          <div class="summary-value balance-positive" id="kpi-savings">€ 0,00</div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="chartBox">
-          <canvas id="savingsChart"></canvas>
+      <div class="section">
+        <h2>📊 Entrate vs Spese (per mese)</h2>
+        <div class="chart-wrap">
+          <div class="chart-holder">
+            <canvas id="incomeExpenseChart"></canvas>
+          </div>
+          <div class="note">
+            Quando cambia mese su <strong>index.html</strong>, comparirà automaticamente anche il nuovo mese qui (con valori 0 finché non inserisci dati).
+          </div>
         </div>
       </div>
     </div>
@@ -250,76 +291,75 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // ✅ sessione NON persistente (non resta loggato dopo chiusura tab)
+    // ✅ non resta loggato dopo chiusura TAB
     await setPersistence(auth, browserSessionPersistence);
 
     const provider = new GoogleAuthProvider();
 
-    // UI
+    // UI refs
     const statusPill = document.getElementById("status-pill");
     const loginBtn = document.getElementById("login-btn");
     const logoutBtn = document.getElementById("logout-btn");
-    const errorBanner = document.getElementById("errorBanner");
-    const loginBox = document.getElementById("loginBox");
+    const bannerInfo = document.getElementById("bannerInfo");
+    const bannerError = document.getElementById("bannerError");
+    const yearSelector = document.getElementById("year-selector");
 
-    const kpiYear = document.getElementById("kpi-year");
-    const kpiMonth = document.getElementById("kpi-month");
-    const kpiCount = document.getElementById("kpi-count");
+    const kpiIncome = document.getElementById("kpi-income");
+    const kpiExpense = document.getElementById("kpi-expense");
+    const kpiSavings = document.getElementById("kpi-savings");
 
     let currentUser = null;
     let unsub = null;
     let chart = null;
 
-    function setStatus(text){ statusPill.textContent = text; }
+    // cache dati: year -> month(1..12) -> {income, expense}
+    let dataByYear = {};
+
+    function setStatus(t){ statusPill.textContent = t; }
+    function showInfo(on){ bannerInfo.classList.toggle("show", !!on); }
     function showError(msg){
-      errorBanner.textContent = msg || "Errore nel caricamento dei dati.";
-      errorBanner.classList.add("show");
+      bannerError.textContent = msg || "Errore nel caricamento dei dati.";
+      bannerError.classList.add("show");
     }
-    function hideError(){ errorBanner.classList.remove("show"); }
+    function hideError(){ bannerError.classList.remove("show"); }
 
-    function euro(v){ return "€ " + (Number(v || 0)).toFixed(2).replace(".", ","); }
-    function parseAmount(x){ return parseFloat((x ?? "").toString().replace(",", ".")) || 0; }
-
-    function monthName(yyyyMm){
-      const [y,m] = (yyyyMm || "").split("-");
-      const mesi = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
-      const idx = Math.max(1, Math.min(12, parseInt(m,10))) - 1;
-      return (mesi[idx] || yyyyMm) + " " + (y || "");
+    function euro(v){
+      const n = Number(v || 0);
+      return "€ " + n.toFixed(2).replace(".", ",");
+    }
+    function parseAmount(x){
+      return parseFloat((x ?? "").toString().replace(",", ".")) || 0;
     }
 
-    function calcSavings(docData){
-      let inc = 0, exp = 0;
-      (docData.entrate || []).forEach(i => inc += parseAmount(i.amount));
-      (docData.spese || []).forEach(i => exp += parseAmount(i.amount));
-      return inc - exp;
-    }
+    const MONTHS = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
 
     function ensureChart(){
-      const canvas = document.getElementById("savingsChart");
+      const canvas = document.getElementById("incomeExpenseChart");
       if (!canvas || typeof Chart === "undefined") return null;
       if (chart) return chart;
 
       chart = new Chart(canvas, {
         type: "bar",
         data: {
-          labels: [],
-          datasets: [{
-            label: "Risparmio mensile",
-            data: [],
-            borderWidth: 0
-          }]
+          labels: MONTHS,
+          datasets: [
+            { label: "Entrate", data: Array(12).fill(0), backgroundColor: "rgba(76,175,80,0.85)", borderRadius: 10 },
+            { label: "Spese", data: Array(12).fill(0), backgroundColor: "rgba(244,67,54,0.85)", borderRadius: 10 }
+          ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
           plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: (ctx) => euro(ctx.parsed.y || 0) } }
+            legend: { position: "bottom", labels: { boxWidth: 14, boxHeight: 14, padding: 14 } },
+            tooltip: {
+              callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${euro(ctx.parsed.y || 0)}` }
+            }
           },
           scales: {
-            x: { ticks: { color: "#111827", font:{ weight:700 } }, grid: { color: "rgba(0,0,0,0.08)" } },
-            y: { ticks: { color: "#111827", font:{ weight:700 }, callback: (v)=>euro(v) }, grid: { color: "rgba(0,0,0,0.08)" } }
+            x: { grid: { color: "rgba(0,0,0,0.06)" }, ticks: { color: "#111827", font: { weight: 800 } } },
+            y: { grid: { color: "rgba(0,0,0,0.06)" }, ticks: { color: "#111827", font: { weight: 800 }, callback: (v)=>euro(v) } }
           }
         }
       });
@@ -327,23 +367,81 @@
       return chart;
     }
 
-    function updateUIFromMonths(monthMap){
-      const months = Object.keys(monthMap).sort(); // yyyy-mm
-      const values = months.map(m => monthMap[m]);
+    function resetData(){
+      dataByYear = {};
+      yearSelector.innerHTML = `<option value="">Anno…</option>`;
+      yearSelector.value = "";
+      kpiIncome.textContent = euro(0);
+      kpiExpense.textContent = euro(0);
+      kpiSavings.textContent = euro(0);
+      kpiSavings.classList.add("balance-positive");
+      kpiSavings.classList.remove("balance-negative");
 
-      const totalYear = values.reduce((a,b)=>a+b,0);
-      const lastMonth = months.length ? months[months.length - 1] : null;
-      const lastVal = lastMonth ? monthMap[lastMonth] : 0;
+      const c = ensureChart();
+      if (c){
+        c.data.labels = MONTHS;
+        c.data.datasets[0].data = Array(12).fill(0);
+        c.data.datasets[1].data = Array(12).fill(0);
+        c.update();
+      }
+    }
 
-      kpiYear.textContent = euro(totalYear);
-      kpiMonth.textContent = euro(lastVal);
-      kpiCount.textContent = String(months.length);
+    function calcIncomeExpense(docData){
+      let inc = 0, exp = 0;
+      (docData.entrate || []).forEach(i => inc += parseAmount(i.amount));
+      (docData.spese || []).forEach(i => exp += parseAmount(i.amount));
+      return { inc, exp };
+    }
+
+    function buildYearsSelector(){
+      const years = Object.keys(dataByYear).sort();
+      yearSelector.innerHTML = `<option value="">Anno…</option>` + years.map(y => `<option value="${y}">${y}</option>`).join("");
+
+      // default: ultimo anno disponibile, altrimenti anno corrente
+      if (!yearSelector.value){
+        if (years.length){
+          yearSelector.value = years[years.length - 1];
+        } else {
+          yearSelector.value = String(new Date().getFullYear());
+        }
+      }
+    }
+
+    function getSelectedYear(){
+      return yearSelector.value || String(new Date().getFullYear());
+    }
+
+    function updateYearView(year){
+      const y = String(year);
+      const months = dataByYear[y] || {};
+
+      // vogliamo SEMPRE 12 mesi (così “quando passa il mese” lo vedi già nel grafico)
+      const incomeArr = [];
+      const expenseArr = [];
+      let totalInc = 0;
+      let totalExp = 0;
+
+      for (let m = 1; m <= 12; m++){
+        const rec = months[m] || { income:0, expense:0 };
+        incomeArr.push(rec.income || 0);
+        expenseArr.push(rec.expense || 0);
+        totalInc += rec.income || 0;
+        totalExp += rec.expense || 0;
+      }
+
+      const savings = totalInc - totalExp;
+
+      kpiIncome.textContent = euro(totalInc);
+      kpiExpense.textContent = euro(totalExp);
+      kpiSavings.textContent = euro(savings);
+      kpiSavings.classList.toggle("balance-positive", savings >= 0);
+      kpiSavings.classList.toggle("balance-negative", savings < 0);
 
       const c = ensureChart();
       if (!c) return;
-
-      c.data.labels = months.map(monthName);
-      c.data.datasets[0].data = values;
+      c.data.labels = MONTHS;
+      c.data.datasets[0].data = incomeArr;
+      c.data.datasets[1].data = expenseArr;
       c.update();
     }
 
@@ -360,21 +458,36 @@
       hideError();
 
       unsub = onSnapshot(colRef, (snap) => {
-        const map = {};
+        dataByYear = {};
+
         snap.forEach(docSnap => {
-          const monthId = docSnap.id; // es. 2026-02
-          const data = docSnap.data() || {};
-          map[monthId] = calcSavings(data);
+          const id = docSnap.id; // "YYYY-MM"
+          const m = /^(\d{4})-(\d{2})$/.exec(id);
+          if (!m) return;
+
+          const year = m[1];
+          const monthNum = parseInt(m[2], 10); // 1..12
+          if (!monthNum || monthNum < 1 || monthNum > 12) return;
+
+          const { inc, exp } = calcIncomeExpense(docSnap.data() || {});
+          if (!dataByYear[year]) dataByYear[year] = {};
+          dataByYear[year][monthNum] = { income: inc, expense: exp };
         });
 
-        updateUIFromMonths(map);
+        buildYearsSelector();
+        updateYearView(getSelectedYear());
+
         setStatus("✅ Sincronizzato");
       }, (err) => {
         console.error(err);
         setStatus("❌ Errore");
-        showError("Errore nel caricamento dei dati. Controlla le Firestore Rules per users/{uid}/budgets.");
+        showError("Errore nel caricamento dei dati. Probabile: Firestore Rules per users/{uid}/budgets.");
       });
     }
+
+    yearSelector.addEventListener("change", () => {
+      updateYearView(getSelectedYear());
+    });
 
     loginBtn.addEventListener("click", async () => {
       try { await signInWithPopup(auth, provider); }
@@ -385,7 +498,7 @@
       try{
         await signOut(auth);
         if (unsub) { unsub(); unsub = null; }
-        updateUIFromMonths({});
+        resetData();
         setStatus("👋 Disconnesso");
         hideError();
       }catch(e){
@@ -400,22 +513,40 @@
       if (!currentUser){
         loginBtn.style.display = "inline-flex";
         logoutBtn.style.display = "none";
-        loginBox.classList.add("show");
+        showInfo(true);
 
         if (unsub) { unsub(); unsub = null; }
-        updateUIFromMonths({});
+        resetData();
+
         setStatus("🔒 Login richiesto");
         return;
       }
 
       loginBtn.style.display = "none";
       logoutBtn.style.display = "inline-flex";
-      loginBox.classList.remove("show");
+      showInfo(false);
 
       attachUserListener();
     });
 
     setStatus("✅ Pronto");
+    ensureChart();
+  </script>
+
+  <script>
+    // HEADER AUTO HIDE (come index)
+    const headerEl = document.querySelector('header');
+    const contentEl = document.querySelector('.content');
+
+    function handleHeaderScroll(scrollValue) {
+      if (scrollValue > 10) headerEl.classList.add('header-hidden');
+      else headerEl.classList.remove('header-hidden');
+    }
+
+    if (contentEl) {
+      contentEl.addEventListener('scroll', () => handleHeaderScroll(contentEl.scrollTop));
+    }
+    window.addEventListener('scroll', () => handleHeaderScroll(window.scrollY || window.pageYOffset));
   </script>
 
   <!-- FIRESTORE RULES (mettile su Firebase)
