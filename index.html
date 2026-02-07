@@ -539,7 +539,8 @@
 <body>
     <div class="container">
 
-            <header>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<header>
 
                 <!-- Notifica Budget Superato -->
     <div id="budget-alert" class="budget-alert hidden">
@@ -634,6 +635,13 @@
                     <span class="total-amount spesa" id="total-spese">€ 0,00</span>
                 </div>
             </div>
+
+                <!-- GRAFICO SPESE PER CATEGORIA -->
+    <div class="section" style="border-left-color:#9C27B0;">
+        <h2>📊 Spese per Categoria</h2>
+        <canvas id="spese-per-categoria-chart"></canvas>
+    </div>
+
 
             <!-- RIEPILOGO -->
             <div class="summary">
@@ -1071,6 +1079,87 @@ function changeMonth() {
             balanceEl.textContent = formatCurrency(balance);
             balanceEl.classList.toggle('balance-positive', balance >= 0);
             balanceEl.classList.toggle('balance-negative', balance < 0);
+
+
+            let spesePerCategoriaChart = null;
+
+function updateSpesePerCategoriaChart() {
+    const ctx = document.getElementById('spese-per-categoria-chart');
+    if (!ctx) return;
+
+    // Raccogli spese per "categoria" usando il label come nome categoria
+    const spesePerCategoria = {};
+
+    document.querySelectorAll('#spese-items .entry-item').forEach(item => {
+        const labelEl = item.querySelector('.item-label-input');
+        const amountEl = item.querySelector('.item-amount-input');
+        if (!labelEl || !amountEl) return;
+
+        const label = (labelEl.value || 'Altro').trim() || 'Altro';
+        const val = parseFloat((amountEl.value || "").replace(',', '.')) || 0;
+
+        if (!spesePerCategoria[label]) {
+            spesePerCategoria[label] = 0;
+        }
+        spesePerCategoria[label] += val;
+    });
+
+    const labels = Object.keys(spesePerCategoria);
+    const values = Object.values(spesePerCategoria);
+
+    // Se non ci sono dati, pulisco il grafico
+    if (labels.length === 0 || values.reduce((a, b) => a + b, 0) === 0) {
+        if (spesePerCategoriaChart) {
+            spesePerCategoriaChart.destroy();
+            spesePerCategoriaChart = null;
+        }
+        return;
+    }
+
+    // Se esiste già, lo distruggo prima
+    if (spesePerCategoriaChart) {
+        spesePerCategoriaChart.destroy();
+    }
+
+    spesePerCategoriaChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: [
+                    '#F44336',
+                    '#FF9800',
+                    '#FFEB3B',
+                    '#4CAF50',
+                    '#2196F3',
+                    '#9C27B0',
+                    '#00BCD4',
+                    '#795548',
+                    '#607D8B'
+                ],
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+    updateSpesePerCategoriaChart();
         }
 
         function updateFoodTotals() {
