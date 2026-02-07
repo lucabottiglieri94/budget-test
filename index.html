@@ -1218,109 +1218,185 @@
       }
     }
 
-    // ===== AI CHAT =====
-    (function initAI(){
-      const chatButton = document.getElementById('ai-chat-button');
-      const chatBox = document.getElementById('ai-chat-box');
-      const closeBtn = document.getElementById('ai-chat-close');
-      const minimizeBtn = document.getElementById('ai-chat-minimize');
-      const messagesEl = document.getElementById('ai-chat-messages');
-      const form = document.getElementById('ai-chat-form');
-      const input = document.getElementById('ai-chat-input');
+<script>
+  // ===== AI CHAT (SOLO DATI DEL DOM + SESSIONE PER UID) =====
+  (function initAI(){
+    const chatButton = document.getElementById('ai-chat-button');
+    const chatBox = document.getElementById('ai-chat-box');
+    const closeBtn = document.getElementById('ai-chat-close');
+    const minimizeBtn = document.getElementById('ai-chat-minimize');
+    const messagesEl = document.getElementById('ai-chat-messages');
+    const form = document.getElementById('ai-chat-form');
+    const input = document.getElementById('ai-chat-input');
 
-      if (!chatButton || !chatBox || !messagesEl || !form || !input) return;
+    if (!chatButton || !chatBox || !messagesEl || !form || !input) return;
 
-      const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/';
-      let comparatoriContent = '';
+    const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/';
+    let comparatoriContent = '';
 
-      fetch('comparatori1.html')
-        .then(res => res.ok ? res.text() : '')
-        .then(text => { comparatoriContent = text || ''; })
-        .catch(() => { comparatoriContent = ''; });
+    // carico eventuale file comparatori1.html (solo testo, non contiene dati utente)
+    fetch('comparatori1.html')
+      .then(res => res.ok ? res.text() : '')
+      .then(text => { comparatoriContent = text || ''; })
+      .catch(() => { comparatoriContent = ''; });
 
-      function getText(id){
-        return document.getElementById(id)?.textContent?.trim() || "";
-      }
+    function getText(id){
+      return document.getElementById(id)?.textContent?.trim() || "";
+    }
 
-      function addMsg(text, who){
-        const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
-        const wrapper = document.createElement('div');
-        wrapper.className = 'ai-msg ' + (who === 'user' ? 'ai-msg-user' : 'ai-msg-ai');
-        wrapper.dataset.id = id;
-        const bubble = document.createElement('div');
-        bubble.className = 'ai-msg-bubble';
-        bubble.textContent = text;
-        wrapper.appendChild(bubble);
-        messagesEl.appendChild(wrapper);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-        return id;
-      }
+    function resetChatHard(msg){
+      messagesEl.innerHTML = '';
+      delete messagesEl.dataset.started;
+      if (msg) addMsg(msg, 'ai');
+    }
 
-      function updateMsg(id, text){
-        const el = messagesEl.querySelector('[data-id="' + id + '"] .ai-msg-bubble');
-        if (el) el.textContent = text;
-      }
+    function addMsg(text, who){
+      const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'ai-msg ' + (who === 'user' ? 'ai-msg-user' : 'ai-msg-ai');
+      wrapper.dataset.id = id;
 
-      chatButton.addEventListener('click', () => {
-        chatBox.classList.remove('hidden');
-        chatBox.classList.remove('minimized');
-        input.focus();
-        if (!messagesEl.dataset.started) {
-          addMsg('Ciao! Sono il tuo assistente AI. Posso rispondere sui tuoi dati (entrate, spese, risparmio) e sui comparatori.', 'ai');
-          messagesEl.dataset.started = 'true';
+      const bubble = document.createElement('div');
+      bubble.className = 'ai-msg-bubble';
+      bubble.textContent = text;
+
+      wrapper.appendChild(bubble);
+      messagesEl.appendChild(wrapper);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return id;
+    }
+
+    function updateMsg(id, text){
+      const el = messagesEl.querySelector('[data-id="' + id + '"] .ai-msg-bubble');
+      if (el) el.textContent = text;
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function mustBeLogged(){
+      // currentUser è la variabile globale del tuo script principale (auth state)
+      return (window.currentUser && window.currentUser.uid);
+    }
+
+    // 🔒 disabilita input se non loggato
+    function setChatEnabled(enabled){
+      input.disabled = !enabled;
+      form.querySelector('button[type="submit"]').disabled = !enabled;
+      input.placeholder = enabled
+        ? "Chiedimi qualcosa ci penso io!"
+        : "Fai login per usare l’Assistente AI";
+    }
+
+    // apertura chat
+    chatButton.addEventListener('click', () => {
+      chatBox.classList.remove('hidden');
+      chatBox.classList.remove('minimized');
+
+      const ok = mustBeLogged();
+      setChatEnabled(ok);
+
+      if (!messagesEl.dataset.started) {
+        if (!ok) {
+          addMsg('Devi fare login con Google per usare l’assistente.', 'ai');
+        } else {
+          addMsg('Ciao! Rispondo SOLO in base ai dati che vedo ORA nella pagina del tuo account.', 'ai');
         }
-      });
+        messagesEl.dataset.started = 'true';
+      }
+      input.focus();
+    });
 
-      closeBtn.addEventListener('click', () => {
-        chatBox.classList.add('hidden');
-        messagesEl.innerHTML = '';
-        delete messagesEl.dataset.started;
-      });
+    closeBtn.addEventListener('click', () => {
+      chatBox.classList.add('hidden');
+      resetChatHard();
+    });
 
-      minimizeBtn.addEventListener('click', () => {
-        chatBox.classList.toggle('minimized');
-      });
+    minimizeBtn.addEventListener('click', () => {
+      chatBox.classList.toggle('minimized');
+    });
 
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const text = input.value.trim();
-        if (!text) return;
+    // ✅ HARD RULES: il backend deve usare solo questo (e non memoria di altri)
+    function buildHardRules(){
+      return [
+        "Regole OBBLIGATORIE:",
+        "1) Rispondi SOLO usando i valori presenti in budget e nel DOM corrente (strings già calcolate).",
+        "2) NON usare memoria di chat precedenti di altri utenti o altre sessioni.",
+        "3) Se manca un dato, di' che non è disponibile in questa pagina.",
+        "4) Non inventare numeri, non fare riferimento a dati di altri account.",
+      ].join("\n");
+    }
 
-        addMsg(text, 'user');
-        input.value = '';
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
 
-        const typingId = addMsg('Sto pensando…', 'ai');
+      // BLOCCO TOTALE se non loggato
+      const ok = mustBeLogged();
+      if (!ok) {
+        addMsg('Devi fare login per usare l’assistente.', 'ai');
+        setChatEnabled(false);
+        return;
+      }
 
-        const budgetContext = {
-          uid: (currentUser && currentUser.uid) ? currentUser.uid : "",
-          month: (window.localStorage.getItem("budgetMonth") || ""),
-          entrate: getText("summary-entrate"),
-          spese: getText("summary-spese"),
-          risparmio: getText("summary-balance"),
-          obiettivo_risparmio: "€250,00",
-          risparmiato: getText("saved-amount"),
-          mancano: getText("remaining-amount"),
-          food_speso: getText("total-food-spent"),
-          food_rimasto: getText("total-food-remaining")
-        };
+      addMsg(text, 'user');
+      input.value = '';
 
-        fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            question: text,
-            context_html: comparatoriContent,
-            budget: budgetContext
-          })
+      const typingId = addMsg('Sto pensando…', 'ai');
+
+      // ✅ PRENDE SOLO QUELLO CHE È NEL DOM (utente corrente)
+      const budgetContext = {
+        month: (window.localStorage.getItem("budgetMonth") || ""),
+        entrate: getText("summary-entrate"),
+        spese: getText("summary-spese"),
+        risparmio: getText("summary-balance"),
+        obiettivo_risparmio: "€250,00",
+        risparmiato: getText("saved-amount"),
+        mancano: getText("remaining-amount"),
+        food_speso: getText("total-food-spent"),
+        food_rimasto: getText("total-food-remaining")
+      };
+
+      // ✅ sessione per utente: fondamentale per evitare mixing sul backend
+      const sessionId = "uid:" + window.currentUser.uid;
+
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,          // <-- AGGIUNTO
+          hard_rules: buildHardRules(),    // <-- AGGIUNTO
+          question: text,
+          // ⚠️ NON inviamo niente che possa contenere dati di altri utenti
+          context_html: comparatoriContent,
+          budget: budgetContext
         })
-        .then(res => res.ok ? res.json() : Promise.reject())
-        .then(data => updateMsg(typingId, data.answer || 'Non sono riuscito a rispondere, riprova.'))
-        .catch(err => {
-          console.error(err);
-          updateMsg(typingId, 'Errore nel contattare l’AI. Riprova più tardi.');
-        });
+      })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => updateMsg(typingId, data.answer || 'Non sono riuscito a rispondere, riprova.'))
+      .catch(err => {
+        console.error(err);
+        updateMsg(typingId, 'Errore nel contattare l’AI. Riprova più tardi.');
       });
-    })();
+    });
+
+    // 🔁 Hook: quando cambia utente (login/logout) RESETTIAMO TUTTO
+    // Il tuo script principale setta currentUser in onAuthStateChanged.
+    // Qui osserviamo periodicamente e se cambia uid, resettiamo.
+    let lastUid = null;
+    setInterval(() => {
+      const uid = (window.currentUser && window.currentUser.uid) ? window.currentUser.uid : null;
+      if (uid !== lastUid) {
+        lastUid = uid;
+        resetChatHard(uid
+          ? "✅ Sessione aggiornata. Risponderò solo ai dati del tuo account."
+          : "🔒 Sei uscito. Fai login per usare l’assistente."
+        );
+        setChatEnabled(!!uid);
+      }
+    }, 400);
+  })();
+</script>
+
 
     // ===== INIT + AUTH =====
     window.addEventListener('load', ()=>{
