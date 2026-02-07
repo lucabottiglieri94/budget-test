@@ -1143,7 +1143,6 @@ function updateSpesePerCategoriaChart() {
             }]
         },
         options: {
-            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'bottom',
@@ -1321,25 +1320,6 @@ function updateSpesePerCategoriaChart() {
         }
     }
     setTimeout(updateSavingsGoal, 500);
-        // ===== AUTO SAVE + AUTO UPDATE OGNI 300ms =====
-let lastSnapshot = '';
-
-setInterval(() => {
-  try {
-    updateBudgetTotals();
-    updateFoodTotals();
-
-    const snapshot = JSON.stringify(collectCurrentData());
-
-    if (snapshot !== lastSnapshot) {
-      lastSnapshot = snapshot;
-      saveMonthData();
-    }
-  } catch (e) {
-    console.warn('Autosync error:', e);
-  }
-}, 300);
-
 // ===== HEADER AUTO HIDE — UNIVERSALE =====
 const headerEl = document.querySelector('header');
 const contentEl = document.querySelector('.content');
@@ -1557,16 +1537,6 @@ if (contentEl) {
       transform: translateX(50%);
     }
   }
-    /* Riduci il grafico a torta SOLO su PC */
-@media (min-width: 1024px) {
-  #spese-per-categoria-chart {
-    width: 420px !important;
-    height: 420px !important;
-    display: block;
-    margin: 0 auto;
-  }
-}
-
 </style>
 
 <script>
