@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Budget Mensile - Gestione Familiare</title>
 
+  <!-- Chart.js (serve per il grafico a torta) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+
   <style>
     :root {
       --color-primary: #2196F3;
@@ -16,328 +19,323 @@
       --color-border: #ddd;
     }
 
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body{
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height:100vh;
-      padding:0;
-      margin:0;
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
       color: var(--color-dark);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      width:100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
     }
 
-    /* LOGIN SCREEN */
+    /* ===== LOGIN SCREEN ===== */
     #login-screen{
-      position:fixed; inset:0; z-index:999999;
-      display:flex; align-items:center; justify-content:center;
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: linear-gradient(135deg,#667eea 0%, #764ba2 100%);
-      padding:20px;
+      padding: 20px;
     }
     #login-card{
-      width:min(520px, 92vw);
+      width: min(520px, 92vw);
       background: rgba(255,255,255,0.14);
       border: 1px solid rgba(255,255,255,0.22);
       border-radius: 18px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.28);
       backdrop-filter: blur(10px);
       padding: 22px;
-      color:#fff;
-      text-align:center;
+      color: #fff;
+      text-align: center;
     }
-    #login-card h1{ font-size:34px; font-weight:900; margin-bottom:8px; }
-    #login-card p{ opacity:.95; font-weight:600; margin-bottom:18px; }
+    #login-card h1{ font-size: 34px; font-weight: 900; margin-bottom: 8px; }
+    #login-card p{ opacity: .95; font-weight: 600; margin-bottom: 18px; }
     #login-screen-btn{
-      width:100%;
-      padding:12px 16px;
-      border:none;
-      border-radius:12px;
-      font-weight:900;
-      cursor:pointer;
-      background:#fff;
-      color:#111827;
-      box-shadow:0 10px 22px rgba(0,0,0,0.18);
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      background: #fff;
+      color: #111827;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.18);
     }
-    #login-screen small{ display:block; margin-top:12px; font-size:12px; opacity:.9; }
+    #login-screen small{ display:block; margin-top: 12px; font-size: 12px; opacity: .9; }
 
-    /* APP (nascosta finché non logghi) */
-    #app { display:none; width:100%; }
+    /* APP nascosta finché non logghi */
+    #app{ display:none; width:100%; }
 
-    .container{
-      width:100vw;
-      max-width:100vw;
-      background:white;
-      border-radius:0;
-      box-shadow:0 20px 60px rgba(0,0,0,0.3);
-      overflow:hidden;
-      margin:0;
-      height:100vh;
-      max-height:100vh;
-      display:flex;
-      flex-direction:column;
+    .container {
+      width: 100vw;
+      max-width: 100vw;
+      background: white;
+      border-radius: 0;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      margin: 0;
+      height: 100vh;
+      max-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    header{
+    header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color:white;
-      padding:25px 20px;
-      text-align:center;
+      color: white;
+      padding: 25px 20px;
+      text-align: center;
 
       position: fixed;
-      top:0; left:0; right:0;
-      z-index:1000;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
 
       transition: transform 0.3s ease, opacity 0.3s ease;
     }
-    header.header-hidden{ transform: translateY(-100%); opacity:0; }
+    header.header-hidden { transform: translateY(-100%); opacity: 0; }
 
-    header h1{
-      font-size:1.8em;
-      margin-bottom:5px;
-      font-weight:700;
-    }
-    header p{
-      font-size:0.85em;
-      opacity:0.95;
-      font-weight:300;
-    }
+    header h1 { font-size: 1.8em; margin-bottom: 5px; font-weight: 700; }
+    header p { font-size: 0.85em; opacity: 0.95; font-weight: 300; }
 
-    .content{
-      flex:1;
-      overflow-y:auto;
-      padding:20px;
-      padding-top:200px;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      padding-top: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
 
-    .section{
+    .section {
       background: var(--color-light);
-      padding:20px;
-      border-radius:15px;
-      border-left:5px solid var(--color-primary);
+      padding: 20px;
+      border-radius: 15px;
+      border-left: 5px solid var(--color-primary);
     }
-    .section.entrate{ border-left-color: var(--color-success); }
-    .section.spese{ border-left-color: var(--color-danger); }
+    .section.entrate { border-left-color: var(--color-success); }
+    .section.spese { border-left-color: var(--color-danger); }
 
-    .section h2{
+    .section h2 {
       color: var(--color-dark);
-      margin-bottom:15px;
-      font-size:1.25em;
-      font-weight:600;
-      display:flex;
-      align-items:center;
-      gap:8px;
+      margin-bottom: 15px;
+      font-size: 1.25em;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .entry-items{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-bottom:12px;
+    .entry-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
     }
 
-    .entry-item{
-      background:white;
-      padding:12px;
-      border-radius:10px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      border:1px solid var(--color-border);
+    .entry-item {
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--color-border);
       transition: all 0.2s ease;
     }
 
     .item-label-input,
-    .item-amount-input{
-      padding:8px;
-      border:1px solid;
-      border-radius:8px;
-      font-size:0.95em;
+    .item-amount-input {
+      padding: 8px;
+      border: 1px solid;
+      border-radius: 8px;
+      font-size: 0.95em;
       font-family: inherit;
     }
-    .item-label-input{ flex:1; font-weight:600; }
-    .item-amount-input{ width:90px; text-align:right; font-weight:600; }
 
-    .entrata-input{ border-color: var(--color-success); }
-    .spesa-input{ border-color: var(--color-danger); }
+    .item-label-input { flex: 1; font-weight: 600; }
+    .item-amount-input { width: 90px; text-align: right; font-weight: 600; }
 
-    .btn-remove{
+    .entrata-input { border-color: var(--color-success); }
+    .spesa-input { border-color: var(--color-danger); }
+
+    .btn-remove {
       background: var(--color-danger);
-      color:white;
-      border:none;
-      padding:8px 10px;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:0.9em;
-      min-width:35px;
-      font-weight:600;
+      color: white;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      min-width: 35px;
+      font-weight: 600;
       transition: all 0.2s ease;
-      flex-shrink:0;
+      flex-shrink: 0;
     }
 
-    .btn-add{
-      width:100%;
-      padding:12px;
-      border:none;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:600;
-      font-size:0.95em;
-      margin-bottom:12px;
+    .btn-add {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95em;
+      margin-bottom: 12px;
       transition: all 0.2s ease;
-      color:white;
+      color: white;
     }
-    .btn-add-entrate{ background: var(--color-success); }
-    .btn-add-spese{ background: var(--color-danger); }
+    .btn-add-entrate { background: var(--color-success); }
+    .btn-add-spese { background: var(--color-danger); }
 
-    .total-row{
-      background:white;
-      padding:15px;
-      border-radius:10px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border:2px solid var(--color-primary);
-      font-size:1.15em;
-      font-weight:700;
-      margin-top:8px;
+    .total-row {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 2px solid var(--color-primary);
+      font-size: 1.15em;
+      font-weight: 700;
+      margin-top: 8px;
     }
-    .total-amount.entrata{ color: var(--color-success); }
-    .total-amount.spesa{ color: var(--color-danger); }
 
-    .summary{
+    .total-amount.entrata { color: var(--color-success); }
+    .total-amount.spesa { color: var(--color-danger); }
+
+    .summary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color:white;
-      padding:20px;
-      border-radius:15px;
-      display:grid;
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap:12px;
-      text-align:center;
+      gap: 12px;
+      text-align: center;
     }
-    .summary-card{
-      background: rgba(255,255,255,0.15);
-      padding:15px;
-      border-radius:12px;
+    .summary-card {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 15px;
+      border-radius: 12px;
       backdrop-filter: blur(10px);
     }
-    .summary-label{
-      font-size:0.8em;
-      opacity:0.9;
-      margin-bottom:6px;
+    .summary-label {
+      font-size: 0.8em;
+      opacity: 0.9;
+      margin-bottom: 6px;
       text-transform: uppercase;
-      letter-spacing:0.5px;
-      font-weight:600;
+      letter-spacing: 0.5px;
+      font-weight: 600;
     }
-    .summary-value{
-      font-size:1.5em;
-      font-weight:700;
-    }
+    .summary-value { font-size: 1.5em; font-weight: 700; }
 
-    .balance-positive{ color:#4CAF50; }
-    .balance-negative{ color:#FF6B6B; }
+    .balance-positive { color: #4CAF50; }
+    .balance-negative { color: #FF6B6B; }
 
-    /* Obiettivo Risparmio */
-    .savings-goal{ margin-top:20px; }
-    .goal-card{
-      background:white;
-      border-radius:15px;
-      padding:25px;
-      box-shadow:0 4px 6px rgba(0,0,0,0.1);
+    /* Obiettivo di Risparmio */
+    .savings-goal { margin-top: 20px; }
+    .goal-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    .goal-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:20px;
+    .goal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
     }
-    .goal-label{ font-size:1.1em; color:#666; }
-    .goal-amount{ font-size:1.5em; font-weight:bold; color: var(--color-primary); }
-    .progress-bar-container{
-      width:100%;
-      height:40px;
-      background:#f0f0f0;
-      border-radius:20px;
-      overflow:hidden;
-      position:relative;
-      margin-bottom:15px;
+    .goal-label { font-size: 1.1em; color: #666; }
+    .goal-amount { font-size: 1.5em; font-weight: bold; color: var(--color-primary); }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 40px;
+      background: #f0f0f0;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 15px;
     }
-    .progress-bar{
-      height:100%;
+    .progress-bar {
+      height: 100%;
       background: linear-gradient(90deg, var(--color-success) 0%, #45a049 100%);
-      border-radius:20px;
-      width:0%;
-      transition: width 0.5s ease;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
+      border-radius: 20px;
+      width: 0%;
+      transition: width 0.2s linear;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
     }
-    .progress-text{
-      position:absolute;
-      width:100%;
-      text-align:center;
-      font-weight:bold;
-      color:white;
-      text-shadow:1px 1px 2px rgba(0,0,0,0.3);
-      font-size:1.1em;
+    .progress-text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      font-size: 1.1em;
     }
-    .goal-footer{
-      display:flex;
-      justify-content:space-between;
-      font-size:0.95em;
-      color:#666;
+    .goal-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95em;
+      color: #666;
     }
-    .goal-footer strong{ color: var(--color-dark); }
+    .goal-footer strong { color: var(--color-dark); }
 
     /* Pulsanti fissi */
-    #risparmi-btn{
-      position:fixed;
-      bottom:20px;
-      left:20px;
-      padding:10px 18px;
-      border-radius:999px;
-      border:none;
-      background:#ff9800;
-      color:#fff;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow:0 4px 12px rgba(0,0,0,0.2);
-      z-index:1500;
+    #risparmi-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: #ff9800;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1500;
     }
-    #comparatori-btn{
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      padding:10px 18px;
-      border-radius:999px;
-      border:none;
-      background:#4CAF50;
-      color:#fff;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow:0 4px 12px rgba(0,0,0,0.2);
-      z-index:1500;
+    #comparatori-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: #4CAF50;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1500;
     }
-
-    /* Widget AI (rimane nel file come tuo) */
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
-
 </head>
 
 <body>
+
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <div id="login-card">
       <h1>💰 Budget Mensile</h1>
-      <p>Accedi con Google per vedere e salvare i tuoi dati personali.</p>
+      <p>Accedi con Google per vedere e salvare i tuoi dati.</p>
       <button id="login-screen-btn">Accedi con Google</button>
       <small>Ogni account vede solo i propri dati.</small>
     </div>
@@ -350,9 +348,11 @@
         <h1>💰 Budget Mensile</h1>
         <p>Gestione entrate e spese familiari (sincronizzato)</p>
 
-        <div style="margin-top:15px;">
+        <div style="margin-top: 15px;">
           <select id="month-selector"
-            style="padding:10px 20px;border-radius:8px;border:2px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.95);color:#333;font-size:1.05em;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);"
+            style="padding: 10px 20px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.5);
+                   background: rgba(255,255,255,0.95); color: #333; font-size: 1.05em; font-weight: 700;
+                   cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
             onchange="changeMonth()">
             <option value="2026-02">Febbraio 2026</option>
             <option value="2026-03">Marzo 2026</option>
@@ -369,14 +369,18 @@
           </select>
         </div>
 
-        <div id="sync-status" style="margin-top:10px;font-size:0.8em;opacity:0.9;">
+        <div id="sync-status" style="margin-top: 10px; font-size: 0.8em; opacity: 0.9;">
           🔄 Stato sincronizzazione: <span id="sync-label">In attesa...</span>
         </div>
 
-        <div style="margin-top:10px;">
+        <div style="margin-top: 10px;">
           <button id="login-btn"
                   style="padding:8px 16px;border-radius:8px;border:none;font-weight:800;cursor:pointer;">
             Accedi con Google
+          </button>
+          <button id="logout-btn"
+                  style="padding:8px 16px;border-radius:8px;border:none;font-weight:800;cursor:pointer;display:none;margin-left:8px;">
+            Esci
           </button>
           <span id="user-info" style="font-size:0.8em;margin-left:8px;"></span>
         </div>
@@ -412,30 +416,30 @@
         <div class="summary">
           <div class="summary-card">
             <div class="summary-label">📥 Entrate</div>
-            <div class="summary-value" style="color:#4CAF50;" id="summary-entrate">€ 0,00</div>
+            <div class="summary-value" style="color: #4CAF50;" id="summary-entrate">€ 0,00</div>
           </div>
           <div class="summary-card">
             <div class="summary-label">📤 Spese</div>
-            <div class="summary-value" style="color:#F44336;" id="summary-spese">€ 0,00</div>
+            <div class="summary-value" style="color: #F44336;" id="summary-spese">€ 0,00</div>
           </div>
           <div class="summary-card">
             <div class="summary-label">💾 Risparmio</div>
             <div class="summary-value balance-positive" id="summary-balance">€ 0,00</div>
           </div>
         </div>
-        <!-- GRAFICO A TORTA (auto aggiornante) -->
-<div class="section" id="pie-section" style="border-left-color:#2196F3;">
-  <h2>🥧 Ripartizione (Entrate + Spese)</h2>
-  <div style="background:white;border:1px solid #e5e7eb;border-radius:14px;padding:14px;box-shadow:0 10px 22px rgba(0,0,0,0.08);">
-    <div style="position:relative;height:320px;">
-      <canvas id="budgetPie"></canvas>
-    </div>
-    <div style="margin-top:10px;color:#6b7280;font-size:0.9em;font-weight:700;">
-      Si aggiorna automaticamente quando modifichi le voci.
-    </div>
-  </div>
-</div>
 
+        <!-- ✅ GRAFICO A TORTA (AUTO) - SOPRA OBIETTIVO -->
+        <div class="section" id="pie-section" style="border-left-color:#2196F3;">
+          <h2>🥧 Ripartizione Entrate/Spese</h2>
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:14px;padding:14px;box-shadow:0 10px 22px rgba(0,0,0,0.08);">
+            <div style="position:relative;height:320px;">
+              <canvas id="budgetPie"></canvas>
+            </div>
+            <div style="margin-top:10px;color:#6b7280;font-size:0.9em;font-weight:700;">
+              Si aggiorna automaticamente quando modifichi le voci.
+            </div>
+          </div>
+        </div>
 
         <!-- OBIETTIVO DI RISPARMIO -->
         <div class="section savings-goal">
@@ -457,135 +461,118 @@
           </div>
         </div>
 
-        <!-- LISTA SPESA SETTIMANALE (come nel tuo file) -->
-        <div class="section" style="border-left-color:#FF9800;">
+        <!-- LISTA DELLA SPESA SETTIMANALE -->
+        <div class="section" style="border-left-color: #FF9800;">
           <h2>🛒 Spese Alimentari Settimanali</h2>
-          <p style="color:#666;margin-bottom:15px;font-size:0.9em;">Budget: <strong>€500/mese (€125/settimana)</strong></p>
+          <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">Budget: <strong>€500/mese (€125/settimana)</strong></p>
 
-          <div id="weeks-container" style="display:flex;flex-direction:column;gap:15px;">
+          <div id="weeks-container" style="display: flex; flex-direction: column; gap: 15px;">
             <!-- Settimana 1 -->
-            <div style="background:white;border-radius:10px;padding:15px;border:2px solid #FF9800;">
-              <div style="font-size:1.1em;font-weight:700;color:#FF9800;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #FF9800;">📅 Settimana 1</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+            <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
+              <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 1</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
+                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
+                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
+                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
+                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
               </div>
-              <div class="total-row" style="border-color:#FF9800;margin-top:12px;">
+              <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
                 <span>Totale Settimana:</span>
-                <div style="display:flex;gap:10px;align-items:center;">
-                  <span id="total-week1" style="color:#FF9800;font-weight:700;">€ 0,00</span>
-                  <span class="budget-status ok" id="status-week1" style="font-size:0.8em;padding:4px 8px;">✓ OK</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <span id="total-week1" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
+                  <span class="budget-status ok" id="status-week1" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
                 </div>
               </div>
             </div>
 
             <!-- Settimana 2 -->
-            <div style="background:white;border-radius:10px;padding:15px;border:2px solid #FF9800;">
-              <div style="font-size:1.1em;font-weight:700;color:#FF9800;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #FF9800;">📅 Settimana 2</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+            <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
+              <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 2</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
+                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
+                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
+                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
+                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
               </div>
-              <div class="total-row" style="border-color:#FF9800;margin-top:12px;">
+              <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
                 <span>Totale Settimana:</span>
-                <div style="display:flex;gap:10px;align-items:center;">
-                  <span id="total-week2" style="color:#FF9800;font-weight:700;">€ 0,00</span>
-                  <span class="budget-status ok" id="status-week2" style="font-size:0.8em;padding:4px 8px;">✓ OK</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <span id="total-week2" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
+                  <span class="budget-status ok" id="status-week2" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
                 </div>
               </div>
             </div>
 
             <!-- Settimana 3 -->
-            <div style="background:white;border-radius:10px;padding:15px;border:2px solid #FF9800;">
-              <div style="font-size:1.1em;font-weight:700;color:#FF9800;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #FF9800;">📅 Settimana 3</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+            <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
+              <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 3</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
+                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
+                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
+                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
+                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
               </div>
-              <div class="total-row" style="border-color:#FF9800;margin-top:12px;">
+              <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
                 <span>Totale Settimana:</span>
-                <div style="display:flex;gap:10px;align-items:center;">
-                  <span id="total-week3" style="color:#FF9800;font-weight:700;">€ 0,00</span>
-                  <span class="budget-status ok" id="status-week3" style="font-size:0.8em;padding:4px 8px;">✓ OK</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <span id="total-week3" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
+                  <span class="budget-status ok" id="status-week3" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
                 </div>
               </div>
             </div>
 
             <!-- Settimana 4 -->
-            <div style="background:white;border-radius:10px;padding:15px;border:2px solid #FF9800;">
-              <div style="font-size:1.1em;font-weight:700;color:#FF9800;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #FF9800;">📅 Settimana 4</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+            <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
+              <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 4</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
+                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
+                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
+                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
-                <div><label style="font-size:0.85em;color:#666;margin-bottom:4px;display:block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
-                         style="width:100%;border-color:#FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
+                <div><label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
+                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" style="width: 100%; border-color: #FF9800;" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
                 </div>
               </div>
-              <div class="total-row" style="border-color:#FF9800;margin-top:12px;">
+              <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
                 <span>Totale Settimana:</span>
-                <div style="display:flex;gap:10px;align-items:center;">
-                  <span id="total-week4" style="color:#FF9800;font-weight:700;">€ 0,00</span>
-                  <span class="budget-status ok" id="status-week4" style="font-size:0.8em;padding:4px 8px;">✓ OK</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <span id="total-week4" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
+                  <span class="budget-status ok" id="status-week4" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- RIEPILOGO ALIMENTARE -->
-          <div class="summary" style="margin-top:20px;">
+          <div class="summary" style="margin-top: 20px;">
             <div class="summary-card">
               <div class="summary-label">Budget</div>
               <div class="summary-value">€ 500</div>
@@ -600,72 +587,15 @@
             </div>
           </div>
         </div>
-
       </div><!-- content -->
     </div><!-- container -->
-
-    <!-- AI CHAT WIDGET (rimane come tuo, MA dentro #app così non appare prima del login) -->
-    <div id="ai-chat-widget">
-      <button id="ai-chat-button" aria-label="Apri chat AI">
-        <img src="https://image2url.com/r2/default/images/1770371281075-bf035a1c-704a-476c-a3c3-fa76d3b13bc5.png" alt="AI">
-      </button>
-
-      <div id="ai-chat-box" class="hidden">
-        <div class="ai-chat-header">
-          <div class="ai-chat-title"><span>Assistente AI</span></div>
-          <div class="ai-chat-actions">
-            <button id="ai-chat-minimize" title="Minimizza">−</button>
-            <button id="ai-chat-close" title="Chiudi">×</button>
-          </div>
-        </div>
-
-        <div id="ai-chat-messages"></div>
-
-        <form id="ai-chat-form">
-          <input type="text" id="ai-chat-input" placeholder="Fai una domanda..." autocomplete="off" />
-          <button type="submit">Invia</button>
-        </form>
-      </div>
-    </div>
-
-    <style>
-      #ai-chat-widget{position:fixed;bottom:20px;right:20px;z-index:9999;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-      #ai-chat-button{width:64px;height:64px;border-radius:50%;border:none;background:transparent;box-shadow:0 4px 10px rgba(0,0,0,0.25);cursor:pointer;padding:0;overflow:hidden;}
-      #ai-chat-button img{width:100%;height:100%;object-fit:cover;display:block;}
-      #ai-chat-box{position:absolute;bottom:80px;right:0;width:360px;max-height:480px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.3);display:flex;flex-direction:column;overflow:hidden;}
-      #ai-chat-box.hidden{display:none;}
-      .ai-chat-header{display:flex;align-items:center;justify-content:space-between;background:#111827;color:#f9fafb;padding:8px 10px;}
-      .ai-chat-title span{font-size:14px;font-weight:600;}
-      .ai-chat-actions button{background:transparent;border:none;color:#e5e7eb;font-size:18px;margin-left:4px;cursor:pointer;line-height:1;}
-      .ai-chat-actions button:hover{color:#fff;}
-      #ai-chat-messages{padding:10px;overflow-y:auto;flex:1;background:#f3f4f6;font-size:13px;}
-      .ai-msg{margin-bottom:8px;display:flex;}
-      .ai-msg-user{justify-content:flex-end;}
-      .ai-msg-ai{justify-content:flex-start;}
-      .ai-msg-bubble{max-width:80%;padding:8px 10px;border-radius:10px;line-height:1.4;word-wrap:break-word;white-space:pre-wrap;}
-      .ai-msg-user .ai-msg-bubble{background:#2563eb;color:#fff;border-bottom-right-radius:2px;}
-      .ai-msg-ai .ai-msg-bubble{background:#e5e7eb;color:#111827;border-bottom-left-radius:2px;}
-      #ai-chat-form{display:flex;border-top:1px solid #e5e7eb;}
-      #ai-chat-input{flex:1;border:none;padding:8px 10px;font-size:13px;outline:none;}
-      #ai-chat-form button[type="submit"]{border:none;background:#2563eb;color:#fff;padding:0 14px;font-size:13px;cursor:pointer;}
-      #ai-chat-form button[type="submit"]:hover{background:#1d4ed8;}
-      #ai-chat-box.minimized{height:auto;}
-      #ai-chat-box.minimized #ai-chat-messages,#ai-chat-box.minimized #ai-chat-form{display:none;}
-      @media (max-width:480px){
-        #ai-chat-box{width:90vw;right:50%;transform:translateX(50%);}
-      }
-    </style>
   </div><!-- app -->
-
 
   <!-- Firebase + Firestore + Auth -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-    import {
-      getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut,
-      setPersistence, browserSessionPersistence
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
@@ -680,10 +610,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
-    // ✅ sessione NON persistente
-    await setPersistence(auth, browserSessionPersistence);
-
     const provider = new GoogleAuthProvider();
 
     // expose per script non-module
@@ -691,31 +617,34 @@
     window._doc = doc;
     window._setDoc = setDoc;
     window._onSnapshot = onSnapshot;
+
     window._auth = auth;
     window._provider = provider;
     window._signInWithPopup = signInWithPopup;
     window._signOut = signOut;
     window._onAuthStateChanged = onAuthStateChanged;
+
     window._firebaseReady = true;
-    console.log("✅ Firebase ready");
+    console.log("✅ Firebase + Auth pronti");
   </script>
 
   <script>
-    // ====== STATE ======
+    // ===== STATE =====
     let currentMonth = localStorage.getItem("budgetMonth") || "2026-02";
     localStorage.setItem("budgetMonth", currentMonth);
 
     let isSaving = false;
     let syncLabel = null;
     let unsubscribe = null;
-
     let currentUser = null;
-    let loginBtn = null;
-    let userInfo = null;
 
     const loginScreen = document.getElementById("login-screen");
     const loginScreenBtn = document.getElementById("login-screen-btn");
     const appEl = document.getElementById("app");
+
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const userInfo = document.getElementById("user-info");
     const monthSelector = document.getElementById("month-selector");
 
     if (monthSelector) monthSelector.value = currentMonth;
@@ -737,14 +666,101 @@
       appEl.style.display = "block";
     }
 
+    async function doLogin(){
+      try{
+        await window._signInWithPopup(window._auth, window._provider);
+      }catch(e){
+        console.error("Login error:", e);
+        alert("Login Google non riuscito. Se il popup è bloccato, abilitalo e riprova.");
+      }
+    }
+
+    async function doLogout(){
+      try{
+        if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+        await window._signOut(window._auth);
+        // reset UI
+        currentUser = null;
+        userInfo.textContent = "";
+        logoutBtn.style.display = "none";
+        setSyncStatus("Devi accedere per sincronizzare", "#ffc107");
+        resetUIEmpty();
+        showLoginOnly();
+      }catch(e){
+        console.error("Logout error:", e);
+        alert("Logout non riuscito.");
+      }
+    }
+
+    if (loginScreenBtn) loginScreenBtn.addEventListener("click", doLogin);
+    if (loginBtn) loginBtn.addEventListener("click", doLogin);
+    if (logoutBtn) logoutBtn.addEventListener("click", doLogout);
+
     function changeMonth(){
-      const selector = document.getElementById("month-selector");
-      currentMonth = selector.value;
+      currentMonth = monthSelector.value;
       localStorage.setItem("budgetMonth", currentMonth);
       attachRealtimeListener();
     }
 
-    // ====== DATA COLLECTION ======
+    // ===== PIE CHART (auto) =====
+    let pieChart = null;
+
+    function euro(v){
+      return "€ " + (Number(v || 0)).toFixed(2).replace(".", ",");
+    }
+
+    function parseAmount(x){
+      return parseFloat((x ?? "").toString().replace(",", ".")) || 0;
+    }
+
+    function updatePieChart(){
+      const canvas = document.getElementById("budgetPie");
+      if (!canvas || typeof Chart === "undefined") return;
+
+      let sumEntrate = 0;
+      document.querySelectorAll('#entrate-items .item-amount-input').forEach(input=>{
+        sumEntrate += parseAmount(input.value);
+      });
+
+      let sumSpese = 0;
+      document.querySelectorAll('#spese-items .item-amount-input').forEach(input=>{
+        sumSpese += parseAmount(input.value);
+      });
+
+      // placeholder se tutto 0
+      const labels = (sumEntrate > 0 || sumSpese > 0) ? ["Entrate", "Spese"] : ["Nessun dato"];
+      const values = (sumEntrate > 0 || sumSpese > 0) ? [sumEntrate, sumSpese] : [1];
+      const colors = (sumEntrate > 0 || sumSpese > 0)
+        ? ["rgba(76,175,80,0.85)", "rgba(244,67,54,0.85)"]
+        : ["rgba(156,163,175,0.35)"];
+
+      if (!pieChart){
+        pieChart = new Chart(canvas, {
+          type: "doughnut",
+          data: {
+            labels,
+            datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+              legend: { position: "bottom", labels: { boxWidth: 12, boxHeight: 12, padding: 12 } },
+              tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${euro(ctx.parsed)}` } }
+            },
+            cutout: "55%"
+          }
+        });
+      } else {
+        pieChart.data.labels = labels;
+        pieChart.data.datasets[0].data = values;
+        pieChart.data.datasets[0].backgroundColor = colors;
+        pieChart.update();
+      }
+    }
+
+    // ===== DATA =====
     function collectCurrentData(){
       const data = {
         month: currentMonth,
@@ -775,33 +791,30 @@
       return data;
     }
 
-    // ====== SAVE (PER-USER PATH) ======
     async function saveMonthData(){
       if (!window._firebaseReady || !window._db || !currentUser) return;
-
       try{
         isSaving = true;
-        setSyncStatus("Salvataggio in corso...", "#ffeb3b");
+        setSyncStatus("Salvataggio...", "#ffeb3b");
 
         const data = collectCurrentData();
         const ref = window._doc(window._db, "users", currentUser.uid, "budgets", currentMonth);
         await window._setDoc(ref, data, { merge:true });
 
-        setSyncStatus("Salvato e sincronizzato ✅", "#8bc34a");
+        setSyncStatus("Salvato ✅", "#8bc34a");
       }catch(e){
-        console.error("Errore salvataggio:", e);
-        setSyncStatus("Errore salvataggio ❌", "#ff5252");
+        console.error("Save error:", e);
+        setSyncStatus("Errore ❌", "#ff5252");
       }finally{
         setTimeout(()=>{ isSaving = false; }, 250);
       }
     }
 
-    // ====== UI RESET (NUOVO UTENTE = CASELLE VUOTE) ======
     function resetUIEmpty(){
       const entrateContainer = document.getElementById('entrate-items');
       const speseContainer = document.getElementById('spese-items');
-      if (entrateContainer) entrateContainer.innerHTML = '';
-      if (speseContainer) speseContainer.innerHTML = '';
+      entrateContainer.innerHTML = '';
+      speseContainer.innerHTML = '';
 
       for (let week=1; week<=4; week++){
         document.querySelectorAll(`.week${week}-shopping`).forEach(input => input.value = '');
@@ -810,13 +823,12 @@
       updateBudgetTotals();
       updateFoodTotals();
       setTimeout(updateSavingsGoal, 120);
+      updatePieChart();
     }
 
-    // ====== POPULATE UI ======
     function populateUIFromData(data){
       const entrateContainer = document.getElementById('entrate-items');
       const speseContainer = document.getElementById('spese-items');
-      updatePieChart();
 
       entrateContainer.innerHTML = '';
       (data.entrate || []).forEach(item=>{
@@ -855,15 +867,15 @@
       updateBudgetTotals();
       updateFoodTotals();
       setTimeout(updateSavingsGoal, 120);
+      updatePieChart();
     }
 
-    // ====== REALTIME LISTENER (PER-USER PATH) ======
     function attachRealtimeListener(){
       if (!window._firebaseReady || !window._db || !currentUser) return;
 
       if (unsubscribe){ unsubscribe(); unsubscribe = null; }
 
-      setSyncStatus("Caricamento dati...", "#ffeb3b");
+      setSyncStatus("Caricamento...", "#ffeb3b");
 
       const ref = window._doc(window._db, "users", currentUser.uid, "budgets", currentMonth);
 
@@ -874,19 +886,15 @@
           populateUIFromData(snap.data());
           setSyncStatus("Sincronizzato ✅", "#8bc34a");
         } else {
-          // ✅ nuovo utente o mese nuovo: TUTTO VUOTO
-          resetUIEmpty();
-          updatePieChart();
-
-          setSyncStatus("Nessun dato (vuoto) ✅", "#ffffff");
+          resetUIEmpty(); // nuovo utente/mese vuoto
+          setSyncStatus("Vuoto ✅", "#ffffff");
         }
       }, (err)=>{
-        console.error("Errore listener:", err);
-        setSyncStatus("Errore connessione ❌", "#ff5252");
+        console.error("Snapshot error:", err);
+        setSyncStatus("Errore ❌", "#ff5252");
       });
     }
 
-    // ====== CRUD ======
     function addEntryItem(type){
       const container = document.getElementById(type === 'entrate' ? 'entrate-items' : 'spese-items');
       const newItem = document.createElement('div');
@@ -901,6 +909,7 @@
       `;
       container.appendChild(newItem);
       updateBudgetTotals();
+      updatePieChart();
       setTimeout(updateSavingsGoal, 120);
     }
 
@@ -909,6 +918,7 @@
       if (item){
         item.remove();
         updateBudgetTotals();
+        updatePieChart();
         saveMonthData();
         setTimeout(updateSavingsGoal, 120);
       }
@@ -921,14 +931,12 @@
     function updateBudgetTotals(){
       let totalEntrate = 0;
       document.querySelectorAll('#entrate-items .item-amount-input').forEach(input=>{
-        const val = parseFloat((input.value || "").replace(',', '.')) || 0;
-        totalEntrate += val;
+        totalEntrate += parseAmount(input.value);
       });
 
       let totalSpese = 0;
       document.querySelectorAll('#spese-items .item-amount-input').forEach(input=>{
-        const val = parseFloat((input.value || "").replace(',', '.')) || 0;
-        totalSpese += val;
+        totalSpese += parseAmount(input.value);
       });
 
       const balance = totalEntrate - totalSpese;
@@ -942,8 +950,10 @@
       balanceEl.textContent = formatCurrency(balance);
       balanceEl.classList.toggle('balance-positive', balance >= 0);
       balanceEl.classList.toggle('balance-negative', balance < 0);
+
+      updatePieChart();
     }
-updatePieChart(); // ✅ aggiorna torta
+
     function updateFoodTotals(){
       const weeklyBudget = 125;
       let monthlyTotal = 0;
@@ -951,8 +961,7 @@ updatePieChart(); // ✅ aggiorna torta
       for (let week=1; week<=4; week++){
         let weekTotal = 0;
         document.querySelectorAll(`.week${week}-shopping`).forEach(input=>{
-          const val = parseFloat((input.value || "").replace(',', '.')) || 0;
-          weekTotal += val;
+          weekTotal += parseAmount(input.value);
         });
         monthlyTotal += weekTotal;
 
@@ -983,7 +992,6 @@ updatePieChart(); // ✅ aggiorna torta
       remainingEl.classList.toggle('balance-negative', remainingMonthly < 0);
     }
 
-    // ====== Savings Goal ======
     function updateSavingsGoal(){
       const goalAmount = 250;
 
@@ -1011,66 +1019,45 @@ updatePieChart(); // ✅ aggiorna torta
       }
     }
 
-    // ====== INIT + AUTH ======
+    // ===== INIT + AUTH =====
     window.addEventListener('load', ()=>{
       const check = setInterval(()=>{
         if (!window._firebaseReady) return;
         clearInterval(check);
 
-        syncLabel = document.getElementById('sync-label');
-        loginBtn = document.getElementById('login-btn');
-        userInfo = document.getElementById('user-info');
+        // set month
+        monthSelector.value = currentMonth;
 
-        function updateUIForAuth(){
-          if (!currentUser){
-            showLoginOnly();
-            if (loginBtn) loginBtn.textContent = "Accedi con Google";
-            if (userInfo) userInfo.textContent = "";
-            setSyncStatus("Devi accedere per sincronizzare", "#ffc107");
-
-            if (unsubscribe){ unsubscribe(); unsubscribe = null; }
-            resetUIEmpty();
-          } else {
-            showApp();
-            if (loginBtn) loginBtn.textContent = "Esci";
-            if (userInfo) userInfo.textContent = currentUser.email;
-
-            attachRealtimeListener();
-          }
-        }
-
-        // login button in header: login/logout
-        if (loginBtn){
-          loginBtn.addEventListener('click', async ()=>{
-            if (!window._auth) return;
-            if (!currentUser){
-              try { await window._signInWithPopup(window._auth, window._provider); }
-              catch(e){ console.error("Login error:", e); }
-            } else {
-              await window._signOut(window._auth);
-            }
-          });
-        }
-
-        // login button on login screen
-        if (loginScreenBtn){
-          loginScreenBtn.addEventListener('click', async ()=>{
-            try { await window._signInWithPopup(window._auth, window._provider); }
-            catch(e){ console.error("Login error:", e); }
-          });
-        }
-
+        // auth state
         window._onAuthStateChanged(window._auth, (user)=>{
           currentUser = user || null;
-          updateUIForAuth();
+
+          if (!currentUser){
+            userInfo.textContent = "";
+            logoutBtn.style.display = "none";
+            showLoginOnly();
+            setSyncStatus("Login richiesto", "#ffc107");
+            resetUIEmpty();
+            return;
+          }
+
+          // logged
+          showApp();
+          logoutBtn.style.display = "inline-block";
+          userInfo.textContent = currentUser.email || "";
+          setSyncStatus("Pronto ✅", "#ffffff");
+
+          attachRealtimeListener();
+          // dopo primo render
+          setTimeout(()=>{ updatePieChart(); updateSavingsGoal(); }, 150);
         });
 
-        // start state
-        updateUIForAuth();
-      }, 120);
+        // first draw
+        setTimeout(()=>{ updatePieChart(); }, 200);
+      }, 80);
     });
 
-    // HEADER AUTO HIDE
+    // header auto hide
     const headerEl = document.querySelector('header');
     const contentEl = document.querySelector('.content');
     function handleHeaderScroll(scrollValue){
@@ -1078,254 +1065,18 @@ updatePieChart(); // ✅ aggiorna torta
       else headerEl.classList.remove('header-hidden');
     }
     window.addEventListener('scroll', ()=>handleHeaderScroll(window.scrollY || window.pageYOffset));
-    if (contentEl){
-      contentEl.addEventListener('scroll', ()=>handleHeaderScroll(contentEl.scrollTop));
+    if (contentEl) contentEl.addEventListener('scroll', ()=>handleHeaderScroll(contentEl.scrollTop));
+  </script>
+
+  <!-- FIRESTORE RULES (METTILE SU FIREBASE)
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /users/{userId}/budgets/{monthId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
-    // ====== PIE CHART (AUTO) ======
-let pieChart = null;
-
-function getPalette(n, type){
-  // palette semplice: verdi per entrate, rossi per spese
-  const greens = [
-    "rgba(76,175,80,0.85)","rgba(67,160,71,0.85)","rgba(56,142,60,0.85)",
-    "rgba(102,187,106,0.85)","rgba(129,199,132,0.85)"
-  ];
-  const reds = [
-    "rgba(244,67,54,0.85)","rgba(229,57,53,0.85)","rgba(211,47,47,0.85)",
-    "rgba(239,83,80,0.85)","rgba(229,115,115,0.85)"
-  ];
-  const src = type === "entrate" ? greens : reds;
-  const out = [];
-  for (let i=0;i<n;i++) out.push(src[i % src.length]);
-  return out;
-}
-
-function buildPieData(){
-  // prende label+amount dagli input e costruisce la torta
-  const labels = [];
-  const values = [];
-  const colors = [];
-
-  // ENTRATE
-  const entrateItems = Array.from(document.querySelectorAll("#entrate-items .entry-item"));
-  const entrateData = entrateItems
-    .map(item => {
-      const label = (item.querySelector(".item-label-input")?.value || "").trim() || "Entrata";
-      const amount = parseFloat((item.querySelector(".item-amount-input")?.value || "0").replace(",", ".")) || 0;
-      return { label, amount };
-    })
-    .filter(x => x.amount > 0);
-
-  // SPESE
-  const speseItems = Array.from(document.querySelectorAll("#spese-items .entry-item"));
-  const speseData = speseItems
-    .map(item => {
-      const label = (item.querySelector(".item-label-input")?.value || "").trim() || "Spesa";
-      const amount = parseFloat((item.querySelector(".item-amount-input")?.value || "0").replace(",", ".")) || 0;
-      return { label, amount };
-    })
-    .filter(x => x.amount > 0);
-
-  // push entrate
-  const eColors = getPalette(entrateData.length, "entrate");
-  entrateData.forEach((x, i) => {
-    labels.push("📥 " + x.label);
-    values.push(x.amount);
-    colors.push(eColors[i]);
-  });
-
-  // push spese
-  const sColors = getPalette(speseData.length, "spese");
-  speseData.forEach((x, i) => {
-    labels.push("📤 " + x.label);
-    values.push(x.amount);
-    colors.push(sColors[i]);
-  });
-
-  return { labels, values, colors };
-}
-
-function formatEuro(v){
-  return "€ " + (Number(v||0)).toFixed(2).replace(".", ",");
-}
-
-function updatePieChart(){
-  const canvas = document.getElementById("budgetPie");
-  if (!canvas || typeof Chart === "undefined") return;
-
-  const { labels, values, colors } = buildPieData();
-
-  // se non c'è nulla, mostra un placeholder
-  const safeLabels = labels.length ? labels : ["Nessun dato"];
-  const safeValues = values.length ? values : [1];
-  const safeColors = colors.length ? colors : ["rgba(156,163,175,0.35)"];
-
-  if (!pieChart){
-    pieChart = new Chart(canvas, {
-      type: "doughnut",
-      data: {
-        labels: safeLabels,
-        datasets: [{
-          data: safeValues,
-          backgroundColor: safeColors,
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-            labels: { boxWidth: 12, boxHeight: 12, padding: 12 }
-          },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => ` ${ctx.label}: ${formatEuro(ctx.parsed)}`
-            }
-          }
-        },
-        cutout: "55%"
-      }
-    });
-    return;
   }
-
-  pieChart.data.labels = safeLabels;
-  pieChart.data.datasets[0].data = safeValues;
-  pieChart.data.datasets[0].backgroundColor = safeColors;
-  pieChart.update();
-}
-
-  </script>
-
-  <!-- AI CHAT SCRIPT (usa dati del DOM = utente loggato) -->
-  <script>
-    (function () {
-      const chatButton = document.getElementById('ai-chat-button');
-      const chatBox = document.getElementById('ai-chat-box');
-      const closeBtn = document.getElementById('ai-chat-close');
-      const minimizeBtn = document.getElementById('ai-chat-minimize');
-      const messagesEl = document.getElementById('ai-chat-messages');
-      const form = document.getElementById('ai-chat-form');
-      const input = document.getElementById('ai-chat-input');
-
-      const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/';
-
-      let comparatoriContent = '';
-
-      fetch('comparatori1.html')
-        .then(res => res.ok ? res.text() : '')
-        .then(text => { comparatoriContent = text; })
-        .catch(() => { comparatoriContent = ''; });
-
-      if (chatButton){
-        chatButton.addEventListener('click', () => {
-          chatBox.classList.remove('hidden');
-          chatBox.classList.remove('minimized');
-          input.focus();
-          if (!messagesEl.dataset.started) {
-            addAiMessage('Ciao! Sono il tuo assistente AI. Posso rispondere usando i dati che hai inserito nel budget.');
-            messagesEl.dataset.started = 'true';
-          }
-        });
-      }
-
-      if (closeBtn){
-        closeBtn.addEventListener('click', () => {
-          chatBox.classList.add('hidden');
-          messagesEl.innerHTML = '';
-          delete messagesEl.dataset.started;
-        });
-      }
-
-      if (minimizeBtn){
-        minimizeBtn.addEventListener('click', () => {
-          chatBox.classList.toggle('minimized');
-        });
-      }
-
-      if (form){
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
-          const text = input.value.trim();
-          if (!text) return;
-
-          addUserMessage(text);
-          input.value = '';
-          scrollBottom();
-
-          const typingId = addAiMessage('Sto analizzando i tuoi dati, un attimo...');
-
-          function getText(id){ return document.getElementById(id)?.textContent || ""; }
-
-          const budgetContext = {
-            entrate: getText("summary-entrate"),
-            spese: getText("summary-spese"),
-            saldo: getText("summary-balance"),
-            totaleSpese: getText("total-spese"),
-            totaleEntrate: getText("total-entrate")
-          };
-
-          fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              question: text,
-              context_html: comparatoriContent,
-              budget: budgetContext
-            })
-          })
-          .then(res => res.ok ? res.json() : Promise.reject())
-          .then(data => {
-            updateAiMessage(typingId, data.answer || 'Non sono riuscito a generare una risposta, riprova.');
-            scrollBottom();
-          })
-          .catch(() => {
-            updateAiMessage(typingId, 'Errore nel contattare l’AI. Riprova più tardi.');
-          });
-        });
-      }
-
-      function addUserMessage(text) {
-        const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
-        const wrapper = document.createElement('div');
-        wrapper.className = 'ai-msg ai-msg-user';
-        wrapper.dataset.id = id;
-        const bubble = document.createElement('div');
-        bubble.className = 'ai-msg-bubble';
-        bubble.textContent = text;
-        wrapper.appendChild(bubble);
-        messagesEl.appendChild(wrapper);
-        return id;
-      }
-
-      function addAiMessage(text) {
-        const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
-        const wrapper = document.createElement('div');
-        wrapper.className = 'ai-msg ai-msg-ai';
-        wrapper.dataset.id = id;
-        const bubble = document.createElement('div');
-        bubble.className = 'ai-msg-bubble';
-        bubble.textContent = text;
-        wrapper.appendChild(bubble);
-        messagesEl.appendChild(wrapper);
-        return id;
-      }
-
-      function updateAiMessage(id, newText) {
-        const msg = messagesEl.querySelector('[data-id="' + id + '"] .ai-msg-bubble');
-        if (msg) msg.textContent = newText;
-        else addAiMessage(newText);
-      }
-
-      function scrollBottom() {
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-      }
-    })();
-  </script>
-
-
+  -->
 </body>
 </html>
