@@ -186,7 +186,7 @@
     .chart-holder{
       position:relative;
       width:100%;
-      height:420px;
+      height:440px;
     }
 
     .note{
@@ -210,7 +210,7 @@
     @media (max-width:860px){
       .summary{grid-template-columns:1fr}
       header h1{font-size:1.55em}
-      .content{padding-top:250px}
+      .content{padding-top:260px}
     }
   </style>
 </head>
@@ -220,7 +220,7 @@
 
     <header>
       <h1>📈 Risparmi Mensili</h1>
-      <p>Entrate (verde) vs Spese (rosso) — dati separati per ogni account Google</p>
+      <p>Entrate (verde) • Spese (rosso) • Delta (blu) — barre aggiunte solo quando entri nel mese</p>
 
       <div class="top-controls">
         <span id="status-pill" class="pill">🔄 Inizializzo…</span>
@@ -241,27 +241,27 @@
 
       <div class="summary">
         <div class="summary-card">
-          <div class="summary-label">📥 Entrate anno</div>
+          <div class="summary-label">📥 Entrate (anno selezionato)</div>
           <div class="summary-value" id="kpi-income">€ 0,00</div>
         </div>
         <div class="summary-card">
-          <div class="summary-label">📤 Spese anno</div>
+          <div class="summary-label">📤 Spese (anno selezionato)</div>
           <div class="summary-value" id="kpi-expense">€ 0,00</div>
         </div>
         <div class="summary-card">
-          <div class="summary-label">💾 Risparmio anno</div>
+          <div class="summary-label">💾 Delta (anno selezionato)</div>
           <div class="summary-value balance-positive" id="kpi-savings">€ 0,00</div>
         </div>
       </div>
 
       <div class="section">
-        <h2>📊 Entrate vs Spese (per mese)</h2>
+        <h2>📊 Entrate vs Spese vs Delta (solo mesi “raggiunti”)</h2>
         <div class="chart-wrap">
           <div class="chart-holder">
             <canvas id="incomeExpenseChart"></canvas>
           </div>
           <div class="note">
-            Quando cambia mese su <strong>index.html</strong>, comparirà automaticamente anche il nuovo mese qui (con valori 0 finché non inserisci dati).
+            Vedrai solo i mesi fino a quello corrente (es. Feb: Gen+Feb). Quando entrerai in Marzo su index.html, qui si aggiungerà automaticamente Marzo.
           </div>
         </div>
       </div>
@@ -293,10 +293,9 @@
 
     // ✅ non resta loggato dopo chiusura TAB
     await setPersistence(auth, browserSessionPersistence);
-
     const provider = new GoogleAuthProvider();
 
-    // UI refs
+    // UI
     const statusPill = document.getElementById("status-pill");
     const loginBtn = document.getElementById("login-btn");
     const logoutBtn = document.getElementById("logout-btn");
@@ -312,8 +311,10 @@
     let unsub = null;
     let chart = null;
 
-    // cache dati: year -> month(1..12) -> {income, expense}
+    // cache: year -> month(1..12) -> {income, expense}
     let dataByYear = {};
+
+    const MONTHS = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
 
     function setStatus(t){ statusPill.textContent = t; }
     function showInfo(on){ bannerInfo.classList.toggle("show", !!on); }
@@ -331,7 +332,25 @@
       return parseFloat((x ?? "").toString().replace(",", ".")) || 0;
     }
 
-    const MONTHS = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
+    function getCurrentMonthKey(){
+      // prende il mese corrente usato da index.html se presente
+      const m = localStorage.getItem("budgetMonth"); // es "2026-02"
+      if (/^\d{4}-\d{2}$/.test(m || "")) return m;
+      // fallback: mese reale di oggi
+      const d = new Date();
+      const y = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      return `${y}-${mm}`;
+    }
+
+    function monthLimitForYear(year){
+      // se anno selezionato == anno mese corrente (da localStorage), mostra solo fino a quel mese
+      const current = getCurrentMonthKey(); // "YYYY-MM"
+      const [cy, cm] = current.split("-");
+      const y = String(year);
+      if (y !== cy) return 12; // anni passati/futuri: mostra tutti i mesi che esistono (vedi sotto)
+      return Math.max(1, Math.min(12, parseInt(cm, 10) || 1));
+    }
 
     function ensureChart(){
       const canvas = document.getElementById("incomeExpenseChart");
@@ -341,10 +360,26 @@
       chart = new Chart(canvas, {
         type: "bar",
         data: {
-          labels: MONTHS,
+          labels: [],
           datasets: [
-            { label: "Entrate", data: Array(12).fill(0), backgroundColor: "rgba(76,175,80,0.85)", borderRadius: 10 },
-            { label: "Spese", data: Array(12).fill(0), backgroundColor: "rgba(244,67,54,0.85)", borderRadius: 10 }
+            {
+              label: "Entrate",
+              data: [],
+              backgroundColor: "rgba(76,175,80,0.85)",
+              borderRadius: 10
+            },
+            {
+              label: "Spese",
+              data: [],
+              backgroundColor: "rgba(244,67,54,0.85)",
+              borderRadius: 10
+            },
+            {
+              label: "Delta",
+              data: [],
+              backgroundColor: "rgba(33,150,243,0.85)",
+              borderRadius: 10
+            }
           ]
         },
         options: {
@@ -353,9 +388,7 @@
           animation: false,
           plugins: {
             legend: { position: "bottom", labels: { boxWidth: 14, boxHeight: 14, padding: 14 } },
-            tooltip: {
-              callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${euro(ctx.parsed.y || 0)}` }
-            }
+            tooltip: { callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${euro(ctx.parsed.y || 0)}` } }
           },
           scales: {
             x: { grid: { color: "rgba(0,0,0,0.06)" }, ticks: { color: "#111827", font: { weight: 800 } } },
@@ -379,9 +412,8 @@
 
       const c = ensureChart();
       if (c){
-        c.data.labels = MONTHS;
-        c.data.datasets[0].data = Array(12).fill(0);
-        c.data.datasets[1].data = Array(12).fill(0);
+        c.data.labels = [];
+        c.data.datasets.forEach(ds => ds.data = []);
         c.update();
       }
     }
@@ -397,36 +429,69 @@
       const years = Object.keys(dataByYear).sort();
       yearSelector.innerHTML = `<option value="">Anno…</option>` + years.map(y => `<option value="${y}">${y}</option>`).join("");
 
-      // default: ultimo anno disponibile, altrimenti anno corrente
       if (!yearSelector.value){
-        if (years.length){
-          yearSelector.value = years[years.length - 1];
-        } else {
-          yearSelector.value = String(new Date().getFullYear());
-        }
+        const [cy] = getCurrentMonthKey().split("-");
+        if (years.includes(cy)) yearSelector.value = cy;
+        else if (years.length) yearSelector.value = years[years.length - 1];
+        else yearSelector.value = cy;
       }
     }
 
     function getSelectedYear(){
-      return yearSelector.value || String(new Date().getFullYear());
+      const y = yearSelector.value;
+      if (y && /^\d{4}$/.test(y)) return y;
+      return getCurrentMonthKey().split("-")[0];
     }
 
     function updateYearView(year){
       const y = String(year);
-      const months = dataByYear[y] || {};
+      const monthsObj = dataByYear[y] || {};
 
-      // vogliamo SEMPRE 12 mesi (così “quando passa il mese” lo vedi già nel grafico)
-      const incomeArr = [];
-      const expenseArr = [];
+      // ✅ MOSTRA SOLO FINO AL MESE CORRENTE (se stesso anno del mese corrente)
+      // per anni diversi: mostri SOLO i mesi che esistono nei dati
+      const limit = monthLimitForYear(y);
+
+      let labels = [];
+      let incomeArr = [];
+      let expenseArr = [];
+      let deltaArr = [];
+
       let totalInc = 0;
       let totalExp = 0;
 
-      for (let m = 1; m <= 12; m++){
-        const rec = months[m] || { income:0, expense:0 };
-        incomeArr.push(rec.income || 0);
-        expenseArr.push(rec.expense || 0);
-        totalInc += rec.income || 0;
-        totalExp += rec.expense || 0;
+      if (y === getCurrentMonthKey().split("-")[0]) {
+        // anno corrente: da Gen fino al mese corrente (limit)
+        for (let m = 1; m <= limit; m++){
+          const rec = monthsObj[m] || { income:0, expense:0 };
+          const inc = rec.income || 0;
+          const exp = rec.expense || 0;
+          const delta = inc - exp;
+
+          labels.push(MONTHS[m-1]);
+          incomeArr.push(inc);
+          expenseArr.push(exp);
+          deltaArr.push(delta);
+
+          totalInc += inc;
+          totalExp += exp;
+        }
+      } else {
+        // altri anni: mostra solo i mesi presenti, in ordine
+        const presentMonths = Object.keys(monthsObj).map(n=>parseInt(n,10)).filter(n=>n>=1 && n<=12).sort((a,b)=>a-b);
+        for (const m of presentMonths){
+          const rec = monthsObj[m] || { income:0, expense:0 };
+          const inc = rec.income || 0;
+          const exp = rec.expense || 0;
+          const delta = inc - exp;
+
+          labels.push(MONTHS[m-1]);
+          incomeArr.push(inc);
+          expenseArr.push(exp);
+          deltaArr.push(delta);
+
+          totalInc += inc;
+          totalExp += exp;
+        }
       }
 
       const savings = totalInc - totalExp;
@@ -439,17 +504,18 @@
 
       const c = ensureChart();
       if (!c) return;
-      c.data.labels = MONTHS;
+
+      c.data.labels = labels;
       c.data.datasets[0].data = incomeArr;
       c.data.datasets[1].data = expenseArr;
+      c.data.datasets[2].data = deltaArr;
       c.update();
     }
 
     function attachUserListener(){
       if (!currentUser) return;
 
-      // ✅ dati separati per utente:
-      // users/{uid}/budgets/{month}
+      // ✅ percorso per utente
       const colRef = collection(db, "users", currentUser.uid, "budgets");
 
       if (unsub) { unsub(); unsub = null; }
@@ -466,7 +532,7 @@
           if (!m) return;
 
           const year = m[1];
-          const monthNum = parseInt(m[2], 10); // 1..12
+          const monthNum = parseInt(m[2], 10);
           if (!monthNum || monthNum < 1 || monthNum > 12) return;
 
           const { inc, exp } = calcIncomeExpense(docSnap.data() || {});
@@ -476,12 +542,11 @@
 
         buildYearsSelector();
         updateYearView(getSelectedYear());
-
         setStatus("✅ Sincronizzato");
       }, (err) => {
         console.error(err);
         setStatus("❌ Errore");
-        showError("Errore nel caricamento dei dati. Probabile: Firestore Rules per users/{uid}/budgets.");
+        showError("Errore nel caricamento dei dati. Controlla le Firestore Rules per users/{uid}/budgets.");
       });
     }
 
@@ -549,15 +614,6 @@
     window.addEventListener('scroll', () => handleHeaderScroll(window.scrollY || window.pageYOffset));
   </script>
 
-  <!-- FIRESTORE RULES (mettile su Firebase)
-  rules_version = '2';
-  service cloud.firestore {
-    match /databases/{database}/documents {
-      match /users/{userId}/budgets/{monthId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
-    }
-  }
-  -->
+
 </body>
 </html>
