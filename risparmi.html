@@ -69,3 +69,359 @@
       gap:8px;
       white-space:nowrap;
     }
+    .btn:active{transform:scale(0.98)}
+    .btn.primary{background:#ffffff;color:#1f2937}
+    .btn.danger{background:var(--danger);color:white}
+    .btn.ghost{background:rgba(255,255,255,0.18);color:white;border:1px solid rgba(255,255,255,0.25)}
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(0,0,0,0.25);
+      color:var(--muted);
+      font-weight:800;
+      box-shadow:0 10px 22px rgba(0,0,0,0.18);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+      margin-top:12px;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius:22px;
+      padding:16px;
+      box-shadow:0 18px 50px rgba(0,0,0,0.22);
+      backdrop-filter: blur(10px);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width:760px){
+      .row{grid-template-columns:1fr}
+      .actions{justify-content:flex-start}
+    }
+
+    .kpi{
+      background: var(--card2);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius:18px;
+      padding:14px;
+    }
+    .kpi .label{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:0.8px;
+      opacity:0.9;
+      margin-bottom:6px;
+      font-weight:900;
+    }
+    .kpi .value{
+      font-size:22px;
+      font-weight:900;
+    }
+
+    .chartBox{
+      height: 380px;
+      position:relative;
+    }
+
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+      opacity:0.95;
+    }
+
+    .errorBanner{
+      display:none;
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:16px;
+      background: rgba(255, 107, 107, 0.22);
+      border: 1px solid rgba(255, 107, 107, 0.35);
+      font-weight:800;
+    }
+    .errorBanner.show{display:block}
+
+    .loginBox{
+      display:none;
+      margin-top:14px;
+      padding:14px;
+      border-radius:18px;
+      background: rgba(255,255,255,0.14);
+      border:1px solid rgba(255,255,255,0.18);
+      font-weight:800;
+      color:var(--muted);
+    }
+    .loginBox.show{display:block}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h1>Risparmi Mensili</h1>
+
+      <div class="actions">
+        <span id="status-pill" class="pill">🔄 Inizializzo…</span>
+        <button id="back-btn" class="btn ghost" onclick="location.href='index.html'">← Torna al Budget</button>
+        <button id="login-btn" class="btn primary">Accedi Google</button>
+        <button id="logout-btn" class="btn danger" style="display:none;">Logout</button>
+      </div>
+    </div>
+
+    <div id="loginBox" class="loginBox">
+      Devi fare login per vedere i tuoi risparmi.
+    </div>
+
+    <div id="errorBanner" class="errorBanner">Errore nel caricamento dei dati.</div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="row">
+          <div class="kpi">
+            <div class="label">Totale anno</div>
+            <div class="value" id="kpi-year">€ 0,00</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Questo mese</div>
+            <div class="value" id="kpi-month">€ 0,00</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Mesi con dati</div>
+            <div class="value" id="kpi-count">0</div>
+          </div>
+        </div>
+
+        <div class="hint">Il grafico si aggiorna in tempo reale quando modifichi entrate/spese su <strong>index.html</strong>.</div>
+      </div>
+
+      <div class="card">
+        <div class="chartBox">
+          <canvas id="savingsChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase + Firestore + Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import {
+      getFirestore, collection, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import {
+      getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut,
+      setPersistence, browserSessionPersistence
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
+      authDomain: "budget-luca.firebaseapp.com",
+      projectId: "budget-luca",
+      storageBucket: "budget-luca.firebasestorage.app",
+      messagingSenderId: "67496424698",
+      appId: "1:67496424698:web:b1822e04ef4efc07408543",
+      measurementId: "G-7LEYRZE9QN"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // ✅ NON resta loggato “per sempre” (solo sessione tab)
+    await setPersistence(auth, browserSessionPersistence);
+
+    const provider = new GoogleAuthProvider();
+
+    // ---- UI refs
+    const statusPill = document.getElementById("status-pill");
+    const loginBtn = document.getElementById("login-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const errorBanner = document.getElementById("errorBanner");
+    const loginBox = document.getElementById("loginBox");
+
+    const kpiYear = document.getElementById("kpi-year");
+    const kpiMonth = document.getElementById("kpi-month");
+    const kpiCount = document.getElementById("kpi-count");
+
+    let currentUser = null;
+    let unsub = null;
+    let chart = null;
+
+    function setStatus(text){
+      statusPill.textContent = text;
+    }
+    function showError(msg){
+      errorBanner.textContent = msg || "Errore nel caricamento dei dati.";
+      errorBanner.classList.add("show");
+    }
+    function hideError(){
+      errorBanner.classList.remove("show");
+    }
+    function euro(v){
+      return "€ " + (Number(v || 0)).toFixed(2).replace(".", ",");
+    }
+    function parseAmount(x){
+      return parseFloat((x ?? "").toString().replace(",", ".")) || 0;
+    }
+
+    function monthName(yyyyMm){
+      const [y,m] = (yyyyMm || "").split("-");
+      const mesi = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
+      const idx = Math.max(1, Math.min(12, parseInt(m,10))) - 1;
+      return (mesi[idx] || yyyyMm) + " " + (y || "");
+    }
+
+    function calcSavings(docData){
+      // docData: { entrate:[{amount}], spese:[{amount}] }
+      let inc = 0, exp = 0;
+      (docData.entrate || []).forEach(i => inc += parseAmount(i.amount));
+      (docData.spese || []).forEach(i => exp += parseAmount(i.amount));
+      return inc - exp;
+    }
+
+    function ensureChart(){
+      const canvas = document.getElementById("savingsChart");
+      if (!canvas || typeof Chart === "undefined") return null;
+      if (chart) return chart;
+
+      chart = new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels: [],
+          datasets: [{
+            label: "Risparmio mensile",
+            data: [],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => euro(ctx.parsed.y || 0)
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { color: "#ffffff" }, grid: { color: "rgba(255,255,255,0.15)" } },
+            y: { ticks: { color: "#ffffff", callback: (v) => euro(v) }, grid: { color: "rgba(255,255,255,0.15)" } }
+          }
+        }
+      });
+
+      return chart;
+    }
+
+    function updateUIFromMonths(monthMap){
+      // monthMap: { "2026-02": savingsNumber, ... }
+      const months = Object.keys(monthMap).sort(); // yyyy-mm order
+      const values = months.map(m => monthMap[m]);
+
+      const totalYear = values.reduce((a,b)=>a+b,0);
+      const lastMonth = months.length ? months[months.length - 1] : null;
+      const lastVal = lastMonth ? monthMap[lastMonth] : 0;
+
+      kpiYear.textContent = euro(totalYear);
+      kpiMonth.textContent = euro(lastVal);
+      kpiCount.textContent = String(months.length);
+
+      const c = ensureChart();
+      if (!c) return;
+
+      c.data.labels = months.map(monthName);
+      c.data.datasets[0].data = values;
+      c.update();
+    }
+
+    function attachUserListener(){
+      if (!currentUser) return;
+
+      // ✅ PERCORSO PER UTENTE:
+      // users/{uid}/budgets/{month}
+      const colRef = collection(db, "users", currentUser.uid, "budgets");
+
+      if (unsub) { unsub(); unsub = null; }
+
+      setStatus("📡 Carico i tuoi dati…");
+      hideError();
+
+      unsub = onSnapshot(colRef, (snap) => {
+        const map = {};
+        snap.forEach(docSnap => {
+          const monthId = docSnap.id; // es. 2026-02
+          const data = docSnap.data() || {};
+          map[monthId] = calcSavings(data);
+        });
+
+        updateUIFromMonths(map);
+        setStatus("✅ Sincronizzato");
+      }, (err) => {
+        console.error(err);
+        setStatus("❌ Errore");
+        showError("Errore nel caricamento dei dati. Controlla regole Firestore e percorso per utente.");
+      });
+    }
+
+    loginBtn.addEventListener("click", async () => {
+      try{
+        await signInWithPopup(auth, provider);
+      }catch(e){
+        console.error(e);
+        showError("Login non riuscito.");
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try{
+        await signOut(auth);
+
+        // pulizia UI
+        if (unsub) { unsub(); unsub = null; }
+        updateUIFromMonths({});
+        setStatus("👋 Disconnesso");
+        hideError();
+      }catch(e){
+        console.error(e);
+        showError("Logout non riuscito.");
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user || null;
+
+      if (!currentUser){
+        loginBtn.style.display = "inline-flex";
+        logoutBtn.style.display = "none";
+        loginBox.classList.add("show");
+
+        if (unsub) { unsub(); unsub = null; }
+        updateUIFromMonths({});
+        setStatus("🔒 Login richiesto");
+        return;
+      }
+
+      loginBtn.style.display = "none";
+      logoutBtn.style.display = "inline-flex";
+      loginBox.classList.remove("show");
+
+      attachUserListener();
+    });
+
+    setStatus("🔄 Pronto");
+  </script>
+</body>
+</html>
