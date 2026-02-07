@@ -2,275 +2,70 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Risparmi Mensili - Web 3.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Risparmi Mensili</title>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+
   <style>
-    /* ----- Reset e base ----- */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #2b2a4b, #4c5c96); /* blu/viola Web3 */
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 30px;
+    :root{
+      --bg1:#667eea; --bg2:#764ba2;
+      --card:rgba(255,255,255,0.14);
+      --card2:rgba(255,255,255,0.10);
+      --text:#fff;
+      --muted:rgba(255,255,255,0.85);
+      --danger:#ff6b6b;
+      --ok:#4CAF50;
+      --warn:#ffeb3b;
     }
 
-    h1 { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; margin-bottom: 20px; text-align: center; }
-    h2 { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
-
-    button {
-      padding: 12px 25px;
-      margin: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      min-height:100vh;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--text);
+      display:flex;
+      justify-content:center;
+      padding:30px 14px;
     }
 
-    #loginButton { background: #4285F4; color: #fff; }
-    #loginButton:hover { background: #357ae8; transform: translateY(-2px); }
-    #logoutButton { background: #e74c3c; color: #fff; }
-    #logoutButton:hover { background: #c0392b; transform: translateY(-2px); }
-
-    #yearTotal {
-      background: rgba(255,255,255,0.1);
-      padding: 15px 25px;
-      border-radius: 25px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      backdrop-filter: blur(5px);
-      margin-bottom: 30px;
-      font-size: 1.3rem;
-      text-align: center;
+    .wrap{
+      width:min(980px, 100%);
     }
 
-    #chartContainer {
-      background: rgba(255,255,255,0.05);
-      padding: 20px;
-      border-radius: 25px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-      max-width: 900px;
-      width: 100%;
-      margin-bottom: 30px;
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
     }
 
-    canvas { border-radius: 20px; }
-
-    #piggyContainer {
-      position: relative;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      margin-top: 20px;
+    h1{
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing:0.3px;
+      font-weight:900;
     }
 
-    #piggyImage {
-      width: 100%;
-      max-width: 200px;
-      margin-bottom: 10px;
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
     }
 
-    #savingsBar {
-      height: 25px;
-      width: 100%;
-      background: rgba(255,255,255,0.2);
-      border-radius: 15px;
-      overflow: hidden;
-      margin-top: 10px;
-      box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:800;
+      box-shadow:0 10px 22px rgba(0,0,0,0.18);
+      transition: transform .08s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
     }
-
-    #savingsFill {
-      height: 100%;
-      width: 0%;
-      background: #4CAF50;
-      text-align: right;
-      padding-right: 10px;
-      line-height: 25px;
-      color: #fff;
-      font-weight: bold;
-      border-radius: 15px 0 0 15px;
-      transition: width 1s ease;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      h1 { font-size: 2rem; }
-      h2 { font-size: 1.2rem; }
-    }
-  </style>
-</head>
-<body>
-
-  <h1>Risparmi Mensili</h1>
-  <div>
-    <button id="loginButton">Login con Google</button>
-    <button id="logoutButton" style="display:none;">Logout</button>
-  </div>
-  <h2 id="yearTotal">Accedi per vedere i dati...</h2>
-
-  <div id="chartContainer">
-    <canvas id="savingsChart"></canvas>
-  </div>
-
-  <div id="piggyContainer">
-    <img id="piggyImage" src="https://cdn.phototourl.com/uploads/2026-02-05-a887f718-06b4-4582-b770-4e2bc67e7efa.png" alt="Salvadanaio">
-    <div id="savingsBar">
-      <div id="savingsFill">0 €</div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
-      authDomain: "budget-luca.firebaseapp.com",
-      projectId: "budget-luca",
-      storageBucket: "budget-luca.firebasestorage.app",
-      messagingSenderId: "67496424698",
-      appId: "1:67496424698:web:b1822e04ef4efc07408543",
-      measurementId: "G-7LEYRZE9QN"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    const mesi = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
-    let risparmi = [];
-
-    const loginButton = document.getElementById("loginButton");
-    const logoutButton = document.getElementById("logoutButton");
-    const yearTotalEl = document.getElementById("yearTotal");
-    const canvasEl = document.getElementById("savingsChart");
-    const savingsFill = document.getElementById("savingsFill");
-
-    loginButton.addEventListener("click", async () => {
-      try { await signInWithPopup(auth, provider); } 
-      catch (err) { console.error(err); alert("Login fallito"); }
-    });
-
-    logoutButton.addEventListener("click", async () => {
-      try { await signOut(auth); } 
-      catch (err) { console.error(err); }
-    });
-
-    onAuthStateChanged(auth, user => {
-      if(user){
-        loginButton.style.display = "none";
-        logoutButton.style.display = "inline-block";
-        yearTotalEl.innerText = "Caricamento dati...";
-        caricaDatiAnno();
-      } else {
-        loginButton.style.display = "inline-block";
-        logoutButton.style.display = "none";
-        yearTotalEl.innerText = "Accedi con Google per vedere i dati.";
-        if(canvasEl.chartInstance) canvasEl.chartInstance.destroy();
-        savingsFill.style.width = "0%";
-        savingsFill.innerText = "0 €";
-      }
-    });
-
-    async function caricaDatiAnno(){
-      try{
-        const oggi = new Date();
-        const anno = oggi.getFullYear();
-        const meseCorrente = oggi.getMonth();
-
-        risparmi = Array(12).fill(0);
-        const colori = Array(12).fill("#999");
-
-        const budgetsRef = collection(db, "budgets");
-        const snap = await getDocs(budgetsRef);
-
-        snap.forEach(docSnap=>{
-          const id = docSnap.id;
-          const [annoDoc, meseDoc] = id.split("-").map(Number);
-          if(annoDoc!==anno) return;
-
-          const d = docSnap.data();
-          let totEntrate = 0;
-          (d.entrate||[]).forEach(e=>{ const v=parseFloat((e.amount||"0").toString().replace(",", ".")); if(!isNaN(v)) totEntrate+=v; });
-          let totSpese=0;
-          (d.spese||[]).forEach(s=>{ const v=parseFloat((s.amount||"0").toString().replace(",", ".")); if(!isNaN(v)) totSpese+=v; });
-          const risparmio = totEntrate - totSpese;
-          risparmi[meseDoc-1] = risparmio;
-          colori[meseDoc-1] = risparmio>=0?"#4CAF50":"#e74c3c";
-        });
-
-        aggiornaTesto(meseCorrente, anno);
-        disegnaGraficoAnno(risparmi, colori, anno, meseCorrente);
-        aggiornaSalvadanaio(risparmi);
-
-      } catch(err){
-        console.error(err);
-        yearTotalEl.innerText = "Errore nel caricamento dei dati.";
-      }
-    }
-
-    function aggiornaTesto(meseIndex, anno){
-      yearTotalEl.innerText = `Risparmio ${mesi[meseIndex]} ${anno}: ${risparmi[meseIndex].toFixed(2)} €`;
-    }
-
-    function disegnaGraficoAnno(risparmi, colori, anno, meseCorrente){
-      if(!canvasEl) return;
-      if(canvasEl.chartInstance) canvasEl.chartInstance.destroy();
-
-      const ctx = canvasEl.getContext('2d');
-      const chart = new Chart(ctx,{
-        type:"bar",
-        data:{
-          labels:mesi,
-          datasets:[{
-            label:"Risparmio mese €",
-            data:risparmi,
-            backgroundColor: colori.map((c,i)=> i===meseCorrente?"#FFD700":c), // mese corrente in giallo
-            borderRadius:10,
-            barThickness:40
-          }]
-        },
-        options:{
-          responsive:true,
-          scales:{ 
-            y:{ beginAtZero:true, ticks:{ color:"#ffffff" }, grid:{ color:'rgba(255,255,255,0.3)' } },
-            x:{ ticks:{ color:"#ffffff" }, grid:{ display:false } }
-          },
-          plugins:{ 
-            legend:{ labels:{ color:"#ffffff" } },
-            tooltip:{ callbacks:{ label:(c)=>`${c.dataset.label}: ${c.raw.toFixed(2)} €` } } 
-          },
-          onClick:(evt,elements)=>{
-            if(elements.length>0){
-              const index = elements[0].index;
-              aggiornaTesto(index, anno);
-            }
-          }
-        }
-      });
-      canvasEl.chartInstance = chart;
-    }
-
-    function aggiornaSalvadanaio(risparmi){
-      const totale = risparmi.reduce((a,b)=>a+b,0);
-      const maxTotale = 10000; // valore massimo di riferimento, puoi regolare
-      const percent = Math.min(100, (totale/maxTotale)*100);
-      savingsFill.style.width = percent + "%";
-      savingsFill.innerText = `${totale.toFixed(2)} €`;
-    }
-
-  </script>
-
-</body>
-</html>
-
