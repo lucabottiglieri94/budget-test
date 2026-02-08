@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1220" />
@@ -40,7 +44,8 @@
     *{ box-sizing:border-box; margin:0; padding:0 }
     html, body{ height:100% }
     body{
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+
       background: radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.25), transparent 55%),
                   radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.18), transparent 55%),
                   linear-gradient(180deg, var(--bg0), var(--bg1));
@@ -554,92 +559,186 @@
 }
 
 
-    #ai-chat-box{
-      position:absolute;
-      right:0;
-      bottom: 74px;
-      width: min(380px, calc(100vw - 28px));
-      max-height: min(560px, 72vh);
-      border-radius: 18px;
-      background: rgba(15,23,42,.92);
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      backdrop-filter: blur(10px);
-    }
-    #ai-chat-box.hidden{ display:none; }
-    .ai-chat-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding: 10px 10px;
-      background: rgba(255,255,255,.06);
-      border-bottom: 1px solid rgba(255,255,255,.10);
-    }
-    .ai-chat-title{ font-weight: 950; font-size: 14px; }
-    .ai-chat-actions button{
-      border:none;
-      cursor:pointer;
-      border-radius: 12px;
-      padding: 8px 10px;
-      font-weight: 950;
-      color: rgba(229,231,235,.92);
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.10);
-    }
-    #ai-chat-messages{
-      padding: 10px;
-      overflow-y:auto;
-      flex:1;
-      background: rgba(255,255,255,.04);
-      font-size: 13px;
-    }
-    .ai-msg{ display:flex; margin-bottom: 8px; }
-    .ai-msg-user{ justify-content:flex-end; }
-    .ai-msg-ai{ justify-content:flex-start; }
-    .ai-msg-bubble{
-      max-width: 86%;
-      padding: 10px 10px;
-      border-radius: 14px;
-      line-height: 1.35;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-weight: 800;
-      border: 1px solid rgba(255,255,255,.10);
-    }
-    .ai-msg-user .ai-msg-bubble{
-      background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(56,189,248,.95));
-      color:#061019;
-      border-bottom-right-radius: 6px;
-    }
-    .ai-msg-ai .ai-msg-bubble{
-      background: rgba(255,255,255,.06);
-      color: rgba(229,231,235,.92);
-      border-bottom-left-radius: 6px;
-    }
-    #ai-chat-form{ display:flex; border-top: 1px solid rgba(255,255,255,.10); }
-    #ai-chat-input{
-      flex:1;
-      border:none;
-      background: transparent;
-      color: rgba(229,231,235,.92);
-      padding: 12px 10px;
-      font-size: 16px; /* no zoom iPhone */
-      outline:none;
-    }
-    #ai-chat-form button{
-      border:none;
-      cursor:pointer;
-      padding: 0 14px;
-      font-weight: 950;
-      color:#061019;
-      background: linear-gradient(135deg, rgba(34,197,94,1), rgba(56,189,248,1));
-    }
-    #ai-chat-box.minimized #ai-chat-messages,
-    #ai-chat-box.minimized #ai-chat-form{ display:none; }
+/* ================= AI CHAT – PREMIUM UI ================= */
+
+/* Box */
+#ai-chat-box{
+  position:absolute;
+  right:0;
+  bottom: 96px; /* un filo più su, più comodo col widget grande */
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(620px, 74vh);
+  border-radius: 22px;
+  overflow:hidden;
+
+  background: linear-gradient(180deg, rgba(15,23,42,.94), rgba(10,16,30,.92));
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 28px 90px rgba(0,0,0,.55);
+  backdrop-filter: blur(12px);
+
+  display:flex;
+  flex-direction:column;
+}
+
+/* Header più pulita */
+.ai-chat-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding: 12px 12px;
+
+  background: rgba(255,255,255,.06);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+}
+
+.ai-chat-title{
+  font-weight: 950;
+  font-size: 13px;
+  letter-spacing: .3px;
+  color: rgba(229,231,235,.95);
+}
+
+.ai-chat-actions button{
+  border:none;
+  cursor:pointer;
+  border-radius: 14px;
+  padding: 8px 10px;
+  font-weight: 950;
+
+  color: rgba(229,231,235,.92);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  transition: transform .08s ease, background .12s ease;
+}
+.ai-chat-actions button:hover{ background: rgba(255,255,255,.12) }
+.ai-chat-actions button:active{ transform: scale(.99) }
+
+/* Area messaggi */
+#ai-chat-messages{
+  padding: 14px;
+  overflow-y:auto;
+  flex:1;
+
+  background:
+    radial-gradient(900px 500px at 20% 0%, rgba(124,58,237,.12), transparent 60%),
+    radial-gradient(700px 450px at 80% 20%, rgba(56,189,248,.10), transparent 55%),
+    rgba(255,255,255,.03);
+
+  font-size: 14px;
+  line-height: 1.55;
+
+  /* font più “quality” */
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Scrollbar (Chrome/Edge) */
+#ai-chat-messages::-webkit-scrollbar{ width: 10px; }
+#ai-chat-messages::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.14);
+  border: 2px solid rgba(0,0,0,0);
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+#ai-chat-messages::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,.20);
+  border: 2px solid rgba(0,0,0,0);
+  background-clip: padding-box;
+}
+
+/* Messaggi */
+.ai-msg{
+  display:flex;
+  margin-bottom: 10px;
+}
+
+.ai-msg-user{ justify-content:flex-end; }
+.ai-msg-ai{ justify-content:flex-start; }
+
+/* BOLLE PREMIUM */
+.ai-msg-bubble{
+  max-width: 86%;
+  padding: 12px 12px;
+  border-radius: 18px;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  font-weight: 800;
+  letter-spacing: .1px;
+
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+}
+
+/* User bubble: più “glass + gradiente” */
+.ai-msg-user .ai-msg-bubble{
+  background: linear-gradient(135deg, rgba(124,58,237,.98), rgba(56,189,248,.96));
+  color: #061019;
+  border-color: rgba(255,255,255,.10);
+  border-bottom-right-radius: 8px;
+}
+
+/* AI bubble: più leggibile */
+.ai-msg-ai .ai-msg-bubble{
+  background: rgba(255,255,255,.07);
+  color: rgba(229,231,235,.96);
+  border-bottom-left-radius: 8px;
+}
+
+/* Barra input: più contrasto + “pill” */
+#ai-chat-form{
+  display:flex;
+  gap:10px;
+  padding: 10px;
+  background: rgba(7,11,20,.60);
+  border-top: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(10px);
+}
+
+/* Input super leggibile */
+#ai-chat-input{
+  flex:1;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(229,231,235,.96);
+
+  padding: 12px 12px;
+  border-radius: 16px;
+
+  font-size: 15px; /* no zoom iPhone */
+  font-weight: 850;
+  outline:none;
+}
+
+#ai-chat-input::placeholder{
+  color: rgba(229,231,235,.55);
+  font-weight: 800;
+}
+
+/* Bottone invio più “premium” */
+#ai-chat-form button{
+  border:none;
+  cursor:pointer;
+
+  padding: 0 16px;
+  border-radius: 16px;
+
+  font-weight: 950;
+  letter-spacing: .2px;
+  color:#061019;
+
+  background: linear-gradient(135deg, rgba(34,197,94,1), rgba(56,189,248,1));
+  box-shadow: 0 14px 34px rgba(0,0,0,.35);
+
+  transition: transform .08s ease, filter .12s ease;
+}
+#ai-chat-form button:hover{ filter: brightness(1.04); }
+#ai-chat-form button:active{ transform: scale(.99); }
+
+/* Minimized */
+#ai-chat-box.minimized #ai-chat-messages,
+#ai-chat-box.minimized #ai-chat-form{ display:none; }
+
 
     /* keyboard helper */
     body.kbd-open #ai-chat-widget{ bottom: calc(300px + var(--safe-bottom)); }
