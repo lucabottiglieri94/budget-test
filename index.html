@@ -641,6 +641,34 @@
       .topbar-right{ justify-content:flex-start; }
       #user-info{ max-width: 90vw; }
     }
+    /* === AI ORB BUTTON === */
+#ai-chat-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.ai-orb-img {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+
+  filter: drop-shadow(0 0 16px rgba(120, 100, 255, 0.55));
+  animation: aiFloat 4s ease-in-out infinite;
+  transition: transform .25s ease;
+}
+
+.ai-orb-img:hover {
+  transform: scale(1.05);
+}
+
+@keyframes aiFloat {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
   </style>
 </head>
 
@@ -851,10 +879,16 @@
       </div>
     </div>
 
-    <!-- AI CHAT -->
-    <div id="ai-chat-widget">
-      <button id="ai-chat-button" aria-label="Apri chat AI" type="button">
-        <img src="https://image2url.com/r2/default/images/1770371281075-bf035a1c-704a-476c-a3c3-fa76d3b13bc5.png" alt="AI">
+  <!-- AI CHAT -->
+<div id="ai-chat-widget">
+  <button id="ai-chat-button" aria-label="Apri chat AI" type="button">
+    <img
+      src="https://image2url.com/r2/default/images/1770554545375-45357bf1-9e2f-4a1e-9305-4afcce9a82e5.png"
+      alt="AI Assistant"
+      class="ai-orb-img"
+      draggable="false"
+    >
+
       </button>
 
       <div id="ai-chat-box" class="hidden">
