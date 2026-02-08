@@ -734,6 +734,146 @@
                 <button id="ai-chat-close" title="Chiudi">×</button>
               </div>
             </div>
+            <script>
+  // ===== AI CHAT (usa SOLO dati del DOM corrente) =====
+  (function(){
+    const chatButton = document.getElementById('ai-chat-button');
+    const chatBox = document.getElementById('ai-chat-box');
+    const closeBtn = document.getElementById('ai-chat-close');
+    const minimizeBtn = document.getElementById('ai-chat-minimize');
+    const messagesEl = document.getElementById('ai-chat-messages');
+    const form = document.getElementById('ai-chat-form');
+    const input = document.getElementById('ai-chat-input');
+
+    const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/'; // <-- se il tuo endpoint è diverso, cambia qui
+
+    let comparatoriContent = '';
+    fetch('comparatori1.html')
+      .then(r => r.ok ? r.text() : '')
+      .then(t => comparatoriContent = t || '')
+      .catch(() => comparatoriContent = '');
+
+    function addMsg(text, who){
+      const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+      const wrap = document.createElement('div');
+      wrap.className = 'ai-msg ' + (who === 'user' ? 'ai-msg-user' : 'ai-msg-ai');
+      wrap.dataset.id = id;
+      const bubble = document.createElement('div');
+      bubble.className = 'ai-msg-bubble';
+      bubble.textContent = text;
+      wrap.appendChild(bubble);
+      messagesEl.appendChild(wrap);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return id;
+    }
+    function updateMsg(id, text){
+      const el = messagesEl.querySelector(`[data-id="${id}"] .ai-msg-bubble`);
+      if (el) el.textContent = text;
+      else addMsg(text, 'ai');
+    }
+
+    function readRows(containerId){
+      const rows = [];
+      document.querySelectorAll(`#${containerId} .entry-item`).forEach((row) => {
+        const label = (row.querySelector(".item-label-input")?.value || "").trim();
+        const amount = (row.querySelector(".item-amount-input")?.value || "").trim();
+        if (label || amount) rows.push({ label, amount });
+      });
+      return rows;
+    }
+
+    function buildListText(title, arr){
+      if (!arr.length) return `${title}: (vuoto)`;
+      return `${title}:\n` + arr.map((x,i)=> `- ${i+1}) ${x.label || "(senza nome)"} = ${x.amount || "0"}`).join("\n");
+    }
+
+    function getText(id){
+      return document.getElementById(id)?.textContent?.trim() || "";
+    }
+
+    chatButton?.addEventListener('click', ()=>{
+      chatBox.classList.remove('hidden');
+      chatBox.classList.remove('minimized');
+      input.focus();
+      if (!messagesEl.dataset.started){
+        addMsg("Ciao! Rispondo SOLO usando i dati che vedo ORA nella tua pagina (il tuo account). Dimmi cosa vuoi analizzare 💪", 'ai');
+        messagesEl.dataset.started = 'true';
+      }
+    });
+    closeBtn?.addEventListener('click', ()=>{
+      chatBox.classList.add('hidden');
+      messagesEl.innerHTML = '';
+      delete messagesEl.dataset.started;
+    });
+    minimizeBtn?.addEventListener('click', ()=> chatBox.classList.toggle('minimized'));
+
+    form?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const q = input.value.trim();
+      if (!q) return;
+
+      addMsg(q, 'user');
+      input.value = '';
+
+      const typingId = addMsg("Sto analizzando…", 'ai');
+
+      // ✅ Legge TUTTE le voci attuali dalla pagina (DOM)
+      const entrate_items = readRows("entrate-items");
+      const spese_items = readRows("spese-items");
+
+      // Testo “super chiaro” per far capire tutte le voci all’AI
+      const listText =
+        buildListText("ENTRATE (lista completa)", entrate_items) + "\n\n" +
+        buildListText("SPESE (lista completa)", spese_items) + "\n\n" +
+        `RIEPILOGO: entrate=${getText("summary-entrate")}, spese=${getText("summary-spese")}, risparmio=${getText("summary-balance")}\n` +
+        `OBIETTIVO: obiettivo=€250,00, risparmiato=${getText("saved-amount")}, mancano=${getText("remaining-amount")}\n` +
+        `MESE: ${localStorage.getItem("budgetMonth") || ""}`;
+
+      const budgetContext = {
+        month: localStorage.getItem("budgetMonth") || "",
+        summary: {
+          entrate: getText("summary-entrate"),
+          spese: getText("summary-spese"),
+          risparmio: getText("summary-balance")
+        },
+        obiettivo: {
+          obiettivo_mensile: "€250,00",
+          risparmiato: getText("saved-amount"),
+          mancano: getText("remaining-amount")
+        },
+        entrate_items,
+        spese_items,
+        listText, // 👈 super importante
+      };
+
+      try{
+        const res = await fetch(API_URL, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({
+            question: q,
+            context_html: comparatoriContent,
+            budget: budgetContext
+          })
+        });
+
+        if (!res.ok){
+          const t = await res.text().catch(()=> "");
+          updateMsg(typingId, `Errore AI (HTTP ${res.status}).\nDettaglio: ${t.slice(0,200) || "nessun dettaglio"}`);
+          return;
+        }
+
+        const data = await res.json();
+        updateMsg(typingId, data.answer || "Non sono riuscito a rispondere, riprova.");
+      }catch(err){
+        console.error(err);
+        updateMsg(typingId, "Errore nel contattare l’AI. Controlla:\n- API_URL\n- CORS su Vercel\n- endpoint /api/ai-chat\n- console (F12).");
+      }
+
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    });
+  })();
+</script>
 
             <div id="ai-chat-messages"></div>
 
