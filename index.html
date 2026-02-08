@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1220" />
@@ -20,7 +16,6 @@
       --bg2:#101B32;
 
       --card:#0F172A;
-      --card2:#111C33;
       --text:#E5E7EB;
       --muted:#9CA3AF;
       --line: rgba(255,255,255,.10);
@@ -44,8 +39,7 @@
     *{ box-sizing:border-box; margin:0; padding:0 }
     html, body{ height:100% }
     body{
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       background: radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.25), transparent 55%),
                   radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.18), transparent 55%),
                   linear-gradient(180deg, var(--bg0), var(--bg1));
@@ -117,9 +111,6 @@
       color:#061019;
       box-shadow: 0 14px 35px rgba(0,0,0,.35);
       transition: transform .08s ease;
-      position: relative;
-      z-index: 99999999;
-      pointer-events: auto;
     }
     #login-screen-btn:active{ transform: scale(.99) }
     #login-screen small{
@@ -141,7 +132,6 @@
       padding: calc(16px + var(--safe-top)) 16px calc(90px + var(--safe-bottom)) 16px;
     }
 
-    /* Sidebar (desktop) */
     .sidebar{
       position: sticky;
       top: calc(16px + var(--safe-top));
@@ -207,7 +197,6 @@
       color: rgba(229,231,235,.75);
     }
 
-    /* Main */
     .main{
       display:flex;
       flex-direction:column;
@@ -281,16 +270,6 @@
       transition: transform .08s ease;
     }
     .btn:active{ transform: scale(.99) }
-    .btn.primary{
-      background: linear-gradient(135deg, rgba(124,58,237,1), rgba(56,189,248,1));
-      color:#061019;
-      box-shadow: 0 14px 35px rgba(0,0,0,.35);
-    }
-    .btn.danger{
-      background: linear-gradient(135deg, rgba(239,68,68,1), rgba(245,158,11,1));
-      color:#061019;
-      box-shadow: 0 14px 35px rgba(0,0,0,.35);
-    }
     .btn.ghost{
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
@@ -313,7 +292,6 @@
     }
     #sync-label{ font-weight: 950; }
 
-    /* Grid cards */
     .grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -360,14 +338,12 @@
       background: rgba(255,255,255,.06);
       color: rgba(229,231,235,.92);
       padding: 10px;
-      font-size: 16px; /* evita zoom iPhone */
+      font-size: 16px; /* no zoom iPhone */
       font-weight: 900;
       outline:none;
     }
     .item-label-input{ flex:1; min-width:0; }
     .item-amount-input{ width: 118px; text-align:right; }
-
-    .entry-item input::placeholder{ color: rgba(229,231,235,.55); }
 
     .btn-remove{
       border:none;
@@ -404,9 +380,7 @@
       border: 1px solid rgba(255,255,255,.10);
       font-weight: 950;
     }
-    .total-row span:last-child{ font-size: 16px; }
 
-    /* Summary row */
     .summary{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -436,10 +410,8 @@
     .pos{ color: rgba(34,197,94,1); }
     .neg{ color: rgba(239,68,68,1); }
 
-    /* Pie card */
     .pie-wrap{ position:relative; height: 260px; }
 
-    /* Goal */
     .goal-line{
       display:flex;
       align-items:center;
@@ -480,7 +452,6 @@
       font-size: 12px;
     }
 
-    /* Food */
     .week-grid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -495,7 +466,6 @@
       margin-bottom: 4px;
     }
 
-    /* Bottom nav (mobile) */
     .bottom-nav{
       position: fixed;
       left: 0; right: 0;
@@ -524,330 +494,190 @@
     .bottom-nav .b1{ background: linear-gradient(135deg, rgba(245,158,11,1), rgba(239,68,68,1)); }
     .bottom-nav .b2{ background: linear-gradient(135deg, rgba(34,197,94,1), rgba(56,189,248,1)); }
 
-/* ================= AI ORB – FINAL SIZE ================= */
+    /* ================= AI ORB + CHAT ================= */
 
-#ai-chat-widget{
-  position: fixed;
-  bottom: 22px;
-  right: 22px;
-  width: 90px;
-  height: 90px;
-  z-index: 9999;
-}
+    #ai-chat-widget{
+      position: fixed;
+      right: 16px;
+      bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+      width: 92px;
+      height: 92px;
+      z-index: 99999;
+      /* iPhone: impedisci scroll/gesture mentre trascini */
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
 
-#ai-chat-button{
-  width: 90px;
-  height: 90px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
+    #ai-chat-button{
+      width: 92px;
+      height: 92px;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      touch-action: none;
+    }
 
-.ai-orb-img{
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  filter: none;            /* niente cerchio grigio */
-  animation: aiFloat 4s ease-in-out infinite;
-}
+    .ai-orb-img{
+      width: 92px;
+      height: 92px;
+      border-radius: 28%;
+      animation: aiFloat 4s ease-in-out infinite;
+      transition: transform .2s ease;
+      touch-action: none;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+    .ai-orb-img:hover{ transform: scale(1.05); }
 
-@keyframes aiFloat {
-  0%   { transform: translateY(0); }
-  50%  { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
-}
+    @keyframes aiFloat {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
 
+    #ai-chat-box{
+      position:absolute;
+      right:0;
+      bottom: 106px;
+      width: min(420px, calc(100vw - 24px));
+      max-height: min(620px, 74vh);
+      border-radius: 22px;
+      background: rgba(15,23,42,.92);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      backdrop-filter: blur(12px);
+    }
+    #ai-chat-box.hidden{ display:none !important; }
 
-/* ================= AI CHAT – PREMIUM UI ================= */
+    .ai-chat-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px 12px;
+      background: rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .ai-chat-title{ font-weight: 950; font-size: 13px; letter-spacing:.2px; }
+    .ai-chat-actions button{
+      border:none;
+      cursor:pointer;
+      border-radius: 14px;
+      padding: 8px 10px;
+      font-weight: 950;
+      color: rgba(229,231,235,.92);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+    }
 
-/* Box */
-#ai-chat-box{
-  position:absolute;
-  right:0;
-  bottom: 96px; /* un filo più su, più comodo col widget grande */
-  width: min(420px, calc(100vw - 24px));
-  max-height: min(620px, 74vh);
-  border-radius: 22px;
-  overflow:hidden;
+    #ai-chat-messages{
+      padding: 12px;
+      overflow-y:auto;
+      flex:1;
+      background: rgba(255,255,255,.03);
+      font-size: 14px;
+      line-height: 1.55;
+      font-weight: 750;
+    }
 
-  background: linear-gradient(180deg, rgba(15,23,42,.94), rgba(10,16,30,.92));
-  border: 1px solid rgba(255,255,255,.16);
-  box-shadow: 0 28px 90px rgba(0,0,0,.55);
-  backdrop-filter: blur(12px);
+    .ai-msg{ display:flex; margin-bottom: 10px; }
+    .ai-msg-user{ justify-content:flex-end; }
+    .ai-msg-ai{ justify-content:flex-start; }
 
-  display:flex;
-  flex-direction:column;
-}
+    /* Apple-style bubbles */
+    .ai-msg-bubble{
+      max-width: 86%;
+      padding: 12px 12px;
+      border-radius: 18px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 8px 22px rgba(0,0,0,.25);
+      font-weight: 800;
+      letter-spacing: .1px;
+    }
+    .ai-msg-user .ai-msg-bubble{
+      background: rgba(255,255,255,.14);
+      color: #F9FAFB;
+      border: 1px solid rgba(255,255,255,.20);
+      border-bottom-right-radius: 8px;
+      box-shadow:
+        0 8px 22px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .ai-msg-ai .ai-msg-bubble{
+      background: rgba(255,255,255,.07);
+      color: #E5E7EB;
+      border: 1px solid rgba(255,255,255,.12);
+      border-bottom-left-radius: 8px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.28);
+    }
 
-/* Header più pulita */
-.ai-chat-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding: 12px 12px;
+    #ai-chat-form{
+      display:flex;
+      gap:10px;
+      padding: 10px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      background: rgba(7,11,20,.60);
+      backdrop-filter: blur(10px);
+    }
+    #ai-chat-input{
+      flex:1;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(229,231,235,.96);
+      padding: 12px 12px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 850;
+      outline:none;
+    }
+    #ai-chat-form button{
+      border:none;
+      cursor:pointer;
+      padding: 0 16px;
+      border-radius: 16px;
+      font-weight: 950;
+      color:#061019;
+      background: linear-gradient(135deg, rgba(34,197,94,1), rgba(56,189,248,1));
+      box-shadow: 0 14px 34px rgba(0,0,0,.35);
+    }
 
-  background: rgba(255,255,255,.06);
-  border-bottom: 1px solid rgba(255,255,255,.10);
-}
-
-.ai-chat-title{
-  font-weight: 950;
-  font-size: 13px;
-  letter-spacing: .3px;
-  color: rgba(229,231,235,.95);
-}
-
-.ai-chat-actions button{
-  border:none;
-  cursor:pointer;
-  border-radius: 14px;
-  padding: 8px 10px;
-  font-weight: 950;
-
-  color: rgba(229,231,235,.92);
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.12);
-  transition: transform .08s ease, background .12s ease;
-}
-.ai-chat-actions button:hover{ background: rgba(255,255,255,.12) }
-.ai-chat-actions button:active{ transform: scale(.99) }
-
-/* Area messaggi */
-#ai-chat-messages{
-  padding: 14px;
-  overflow-y:auto;
-  flex:1;
-
-  background:
-    radial-gradient(900px 500px at 20% 0%, rgba(124,58,237,.12), transparent 60%),
-    radial-gradient(700px 450px at 80% 20%, rgba(56,189,248,.10), transparent 55%),
-    rgba(255,255,255,.03);
-
-  font-size: 14px;
-  line-height: 1.55;
-
-  /* font più “quality” */
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-/* Scrollbar (Chrome/Edge) */
-#ai-chat-messages::-webkit-scrollbar{ width: 10px; }
-#ai-chat-messages::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,.14);
-  border: 2px solid rgba(0,0,0,0);
-  background-clip: padding-box;
-  border-radius: 999px;
-}
-#ai-chat-messages::-webkit-scrollbar-thumb:hover{
-  background: rgba(255,255,255,.20);
-  border: 2px solid rgba(0,0,0,0);
-  background-clip: padding-box;
-}
-
-/* Messaggi */
-.ai-msg{
-  display:flex;
-  margin-bottom: 10px;
-}
-
-.ai-msg-user{ justify-content:flex-end; }
-.ai-msg-ai{ justify-content:flex-start; }
-
-/* BOLLE PREMIUM */
-.ai-msg-bubble{
-  max-width: 86%;
-  padding: 12px 12px;
-  border-radius: 18px;
-  white-space: pre-wrap;
-  word-break: break-word;
-
-  font-weight: 800;
-  letter-spacing: .1px;
-
-  border: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 10px 24px rgba(0,0,0,.25);
-}
-
-/* User bubble: più “glass + gradiente” */
-.ai-msg-user .ai-msg-bubble{
-  background: linear-gradient(135deg, rgba(124,58,237,.98), rgba(56,189,248,.96));
-  color: #061019;
-  border-color: rgba(255,255,255,.10);
-  border-bottom-right-radius: 8px;
-}
-
-/* AI bubble: più leggibile */
-.ai-msg-ai .ai-msg-bubble{
-  background: rgba(255,255,255,.07);
-  color: rgba(229,231,235,.96);
-  border-bottom-left-radius: 8px;
-}
-
-/* Barra input: più contrasto + “pill” */
-#ai-chat-form{
-  display:flex;
-  gap:10px;
-  padding: 10px;
-  background: rgba(7,11,20,.60);
-  border-top: 1px solid rgba(255,255,255,.10);
-  backdrop-filter: blur(10px);
-}
-
-/* Input super leggibile */
-#ai-chat-input{
-  flex:1;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(229,231,235,.96);
-
-  padding: 12px 12px;
-  border-radius: 16px;
-
-  font-size: 15px; /* no zoom iPhone */
-  font-weight: 850;
-  outline:none;
-}
-
-#ai-chat-input::placeholder{
-  color: rgba(229,231,235,.55);
-  font-weight: 800;
-}
-
-/* Bottone invio più “premium” */
-#ai-chat-form button{
-  border:none;
-  cursor:pointer;
-
-  padding: 0 16px;
-  border-radius: 16px;
-
-  font-weight: 950;
-  letter-spacing: .2px;
-  color:#061019;
-
-  background: linear-gradient(135deg, rgba(34,197,94,1), rgba(56,189,248,1));
-  box-shadow: 0 14px 34px rgba(0,0,0,.35);
-
-  transition: transform .08s ease, filter .12s ease;
-}
-#ai-chat-form button:hover{ filter: brightness(1.04); }
-#ai-chat-form button:active{ transform: scale(.99); }
-
-/* Minimized */
-#ai-chat-box.minimized #ai-chat-messages,
-#ai-chat-box.minimized #ai-chat-form{ display:none; }
-
+    /* FIX: minimized nasconde input */
+    #ai-chat-box.minimized #ai-chat-messages,
+    #ai-chat-box.minimized #ai-chat-form{ display:none !important; }
 
     /* keyboard helper */
-    body.kbd-open #ai-chat-widget{ bottom: calc(300px + var(--safe-bottom)); }
+    body.kbd-open #ai-chat-widget{ bottom: calc(300px + env(safe-area-inset-bottom, 0px)); }
 
     /* Responsive */
     @media (max-width: 980px){
       .shell{ grid-template-columns: 1fr; }
       .sidebar{ display:none; }
       .bottom-nav{ display:block; }
-#ai-chat-widget{
-  right: 16px !important;
-  bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
-  z-index: 99999 !important;
-}
-
       .summary{ grid-template-columns: 1fr; }
       .grid{ grid-template-columns: 1fr; }
       .select{ min-width: 0; width: 100%; }
       .topbar-right{ justify-content:flex-start; }
       #user-info{ max-width: 90vw; }
+
+      /* orb sempre sopra bottom-nav */
+      #ai-chat-widget{
+        right: 16px !important;
+        bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+        z-index: 99999 !important;
+      }
     }
-    /* === AI ORB BUTTON === */
-#ai-chat-button {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-}
-
-.ai-orb-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 30%;
-  filter: none; /* niente grigio */
-  animation: aiFloat 4s ease-in-out infinite;
-  transition: transform .25s ease;
-}
-
-.ai-orb-img:hover {
-  transform: scale(1.05);
-}
-
-
-@keyframes aiFloat {
-  0%   { transform: translateY(0); }
-  50%  { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
-}
-    /* ================= CHAT APPLE STYLE ================= */
-
-/* UTENTE – bubble dark, pulita, neutra */
-.ai-msg-user .ai-msg-bubble{
-  background: rgba(255,255,255,.14);
-  color: #F9FAFB;
-
-  border: 1px solid rgba(255,255,255,.20);
-  border-bottom-right-radius: 8px;
-
-  font-weight: 800;
-  letter-spacing: .1px;
-
-  box-shadow:
-    0 8px 22px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.12);
-}
-/* UTENTE – bubble stile Apple dark */
-.ai-msg-user .ai-msg-bubble{
-  background: rgba(255,255,255,.14);
-  color: #F9FAFB;
-
-  border: 1px solid rgba(255,255,255,.20);
-  border-bottom-right-radius: 8px;
-
-  font-weight: 800;
-  letter-spacing: .1px;
-
-  box-shadow:
-    0 8px 22px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.12);
-}
-
-/* AI – bubble leggermente più soft */
-.ai-msg-ai .ai-msg-bubble{
-  background: rgba(255,255,255,.07);
-  color: #E5E7EB;
-
-  border: 1px solid rgba(255,255,255,.12);
-  border-bottom-left-radius: 8px;
-
-  font-weight: 800;
-  letter-spacing: .1px;
-
-  box-shadow: 0 6px 18px rgba(0,0,0,.28);
-}
-
-/* FIX: quando minimized sparisce anche input */
-#ai-chat-box.minimized #ai-chat-form{
-  display: none !important;
-}
-#ai-chat-box.hidden{
-  display: none !important;
-}
-
-
   </style>
 </head>
 
 <body>
-
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <div id="login-card">
@@ -920,14 +750,12 @@
         </div>
 
         <div class="grid">
-          <!-- Entrate -->
           <section class="card">
             <h2>📥 Entrate <span class="muted">totale: <span id="total-entrate">€ 0,00</span></span></h2>
             <div class="entry-items" id="entrate-items"></div>
             <button class="btn-add income" type="button" onclick="addEntryItem('entrate')">+ Aggiungi Entrata</button>
           </section>
 
-          <!-- Spese -->
           <section class="card">
             <h2>📤 Spese <span class="muted">totale: <span id="total-spese">€ 0,00</span></span></h2>
             <div class="entry-items" id="spese-items"></div>
@@ -936,18 +764,14 @@
         </div>
 
         <div class="grid">
-          <!-- Pie -->
           <section class="card">
             <h2>🥧 Ripartizione Entrate/Spese <span class="muted">auto</span></h2>
             <div class="pie-wrap">
               <canvas id="budgetPie"></canvas>
             </div>
-            <div class="muted" style="margin-top:10px;">
-              Si aggiorna automaticamente quando modifichi le voci.
-            </div>
+            <div class="muted" style="margin-top:10px;">Si aggiorna automaticamente quando modifichi le voci.</div>
           </section>
 
-          <!-- Goal -->
           <section class="card">
             <h2>🎯 Obiettivo Risparmio <span class="muted">coach mode</span></h2>
             <div class="goal-line">
@@ -965,7 +789,6 @@
           </section>
         </div>
 
-        <!-- Food -->
         <section class="card">
           <h2>🛒 Spese Alimentari <span class="muted">€500/mese • €125/settimana</span></h2>
 
@@ -978,10 +801,7 @@
                 <div><label>Spesa 3</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
                 <div><label>Spesa 4</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
               </div>
-              <div class="total-row">
-                <span>Totale</span>
-                <span id="total-week1">€ 0,00</span>
-              </div>
+              <div class="total-row"><span>Totale</span><span id="total-week1">€ 0,00</span></div>
             </div>
 
             <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
@@ -992,10 +812,7 @@
                 <div><label>Spesa 3</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
                 <div><label>Spesa 4</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
               </div>
-              <div class="total-row">
-                <span>Totale</span>
-                <span id="total-week2">€ 0,00</span>
-              </div>
+              <div class="total-row"><span>Totale</span><span id="total-week2">€ 0,00</span></div>
             </div>
 
             <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
@@ -1006,10 +823,7 @@
                 <div><label>Spesa 3</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
                 <div><label>Spesa 4</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
               </div>
-              <div class="total-row">
-                <span>Totale</span>
-                <span id="total-week3">€ 0,00</span>
-              </div>
+              <div class="total-row"><span>Totale</span><span id="total-week3">€ 0,00</span></div>
             </div>
 
             <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
@@ -1020,32 +834,19 @@
                 <div><label>Spesa 3</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
                 <div><label>Spesa 4</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
               </div>
-              <div class="total-row">
-                <span>Totale</span>
-                <span id="total-week4">€ 0,00</span>
-              </div>
+              <div class="total-row"><span>Totale</span><span id="total-week4">€ 0,00</span></div>
             </div>
           </div>
 
           <div class="summary" style="margin-top:14px;">
-            <div class="sum">
-              <div class="label">Budget</div>
-              <div class="value">€ 500</div>
-            </div>
-            <div class="sum">
-              <div class="label">Speso</div>
-              <div class="value" id="total-food-spent">€ 0,00</div>
-            </div>
-            <div class="sum">
-              <div class="label">Rimasto</div>
-              <div class="value pos" id="total-food-remaining">€ 500,00</div>
-            </div>
+            <div class="sum"><div class="label">Budget</div><div class="value">€ 500</div></div>
+            <div class="sum"><div class="label">Speso</div><div class="value" id="total-food-spent">€ 0,00</div></div>
+            <div class="sum"><div class="label">Rimasto</div><div class="value pos" id="total-food-remaining">€ 500,00</div></div>
           </div>
         </section>
       </main>
     </div>
 
-    <!-- Bottom nav mobile -->
     <div class="bottom-nav">
       <div class="row">
         <button class="b1" type="button" onclick="location.href='risparmi.html'">📈 Risparmi</button>
@@ -1053,16 +854,15 @@
       </div>
     </div>
 
-  <!-- AI CHAT -->
-<div id="ai-chat-widget">
-  <button id="ai-chat-button" aria-label="Apri chat AI" type="button">
-    <img
-      src="https://image2url.com/r2/default/images/1770554545375-45357bf1-9e2f-4a1e-9305-4afcce9a82e5.png"
-      alt="AI Assistant"
-      class="ai-orb-img"
-      draggable="false"
-    >
-
+    <!-- AI CHAT -->
+    <div id="ai-chat-widget">
+      <button id="ai-chat-button" aria-label="Apri chat AI" type="button">
+        <img
+          src="https://image2url.com/r2/default/images/1770554545375-45357bf1-9e2f-4a1e-9305-4afcce9a82e5.png"
+          alt="AI Assistant"
+          class="ai-orb-img"
+          draggable="false"
+        >
       </button>
 
       <div id="ai-chat-box" class="hidden">
@@ -1107,13 +907,11 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // session-only
     await setPersistence(auth, browserSessionPersistence);
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    // expose per script non-module
     window._db = db;
     window._doc = doc;
     window._setDoc = setDoc;
@@ -1170,15 +968,11 @@
     const loginScreen = document.getElementById("login-screen");
     const loginScreenBtn = document.getElementById("login-screen-btn");
     const appEl = document.getElementById("app");
-
     const monthSelector = document.getElementById("month-selector");
-
     const loginBtnSidebar = document.getElementById("login-btn");
     const logoutBtnSidebar = document.getElementById("logout-btn");
-
     const loginBtnTop = document.getElementById("top-login");
     const logoutBtnTop = document.getElementById("top-logout");
-
     const userInfo = document.getElementById("user-info");
 
     buildMonthOptions(monthSelector);
@@ -1240,11 +1034,9 @@
       }
     }
 
-    // bind login buttons
     loginScreenBtn.addEventListener("click", doLogin);
     loginBtnSidebar.addEventListener("click", doLogin);
     loginBtnTop.addEventListener("click", doLogin);
-
     logoutBtnSidebar.addEventListener("click", doLogout);
     logoutBtnTop.addEventListener("click", doLogout);
 
@@ -1254,7 +1046,6 @@
       attachRealtimeListener();
     });
 
-    // ===== Helpers =====
     function parseAmount(x){ return parseFloat((x ?? "").toString().replace(",", ".")) || 0; }
     function formatCurrency(v){ return "€ " + (Number(v||0)).toFixed(2).replace(".", ","); }
     function escapeAttr(s){ return (s ?? "").toString().replaceAll('"','&quot;'); }
@@ -1267,15 +1058,12 @@
 
       let sumEntrate = 0;
       document.querySelectorAll('#entrate-items .item-amount-input').forEach(i => sumEntrate += parseAmount(i.value));
-
       let sumSpese = 0;
       document.querySelectorAll('#spese-items .item-amount-input').forEach(i => sumSpese += parseAmount(i.value));
 
       const has = (sumEntrate > 0 || sumSpese > 0);
       const labels = has ? ["Entrate", "Spese"] : ["Nessun dato"];
       const values = has ? [sumEntrate, sumSpese] : [1];
-
-      // palette coerente col tema
       const colors = has ? ["rgba(34,197,94,0.85)", "rgba(239,68,68,0.85)"] : ["rgba(156,163,175,0.35)"];
 
       if (!pieChart){
@@ -1291,9 +1079,7 @@
                 position: "bottom",
                 labels: { color: "rgba(229,231,235,.85)", boxWidth: 12, boxHeight: 12, padding: 12, font:{weight:"700"} }
               },
-              tooltip: {
-                callbacks: { label: (ctx) => ` ${ctx.label}: ${formatCurrency(ctx.parsed)}` }
-              }
+              tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${formatCurrency(ctx.parsed)}` } }
             },
             cutout: "58%"
           }
@@ -1310,7 +1096,6 @@
     function updateBudgetTotals(){
       let totalEntrate = 0;
       document.querySelectorAll('#entrate-items .item-amount-input').forEach(i => totalEntrate += parseAmount(i.value));
-
       let totalSpese = 0;
       document.querySelectorAll('#spese-items .item-amount-input').forEach(i => totalSpese += parseAmount(i.value));
 
@@ -1334,11 +1119,8 @@
       const goalAmount = 250;
       document.getElementById("goal-amount").textContent = goalAmount.toFixed(2).replace(".", ",");
 
-      const incomeText = document.getElementById('summary-entrate')?.textContent || "€ 0,00";
-      const expenseText = document.getElementById('total-spese')?.textContent || "€ 0,00";
-
-      const totalIncome = parseFloat(incomeText.replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
-      const totalExpense = parseFloat(expenseText.replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
+      const totalIncome = parseFloat((document.getElementById('summary-entrate')?.textContent || "€ 0,00").replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
+      const totalExpense = parseFloat((document.getElementById('total-spese')?.textContent || "€ 0,00").replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
 
       const savedAmount = totalIncome - totalExpense;
 
@@ -1354,16 +1136,13 @@
 
     // ===== Food =====
     function updateFoodTotals(){
-      const weeklyBudget = 125;
       let monthlyTotal = 0;
-
       for (let week=1; week<=4; week++){
         let weekTotal = 0;
         document.querySelectorAll(`.week${week}-shopping`).forEach(i => weekTotal += parseAmount(i.value));
         monthlyTotal += weekTotal;
         document.getElementById(`total-week${week}`).textContent = formatCurrency(weekTotal);
       }
-
       const monthlyBudget = 500;
       const remainingMonthly = monthlyBudget - monthlyTotal;
 
@@ -1375,7 +1154,6 @@
       remEl.classList.toggle('neg', remainingMonthly < 0);
     }
 
-    // autosave hooks (oninput)
     document.addEventListener("input", (e)=>{
       const t = e.target;
       if (!t) return;
@@ -1543,8 +1321,6 @@
         saveMonthData();
       }
     }
-
-    // expose add/remove
     window.addEntryItem = addEntryItem;
     window.removeEntry = removeEntry;
 
@@ -1581,7 +1357,7 @@
       }, 60);
     });
 
-    // ===== AI CHAT (solo DOM + token) =====
+    // ===== AI CHAT =====
     (function(){
       const chatButton = document.getElementById('ai-chat-button');
       const chatBox = document.getElementById('ai-chat-box');
@@ -1591,7 +1367,6 @@
       const form = document.getElementById('ai-chat-form');
       const input = document.getElementById('ai-chat-input');
 
-      // ✅ senza slash finale
       const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat';
 
       let comparatoriContent = '';
@@ -1633,6 +1408,9 @@
       }
 
       chatButton.addEventListener('click', ()=>{
+        // click bloccato se stiamo trascinando (vedi script orb)
+        if (window.__orbDragging) return;
+
         if (!currentUser){
           alert("Devi fare login prima di usare l'assistente AI.");
           return;
@@ -1735,6 +1513,122 @@
         messagesEl.scrollTop = messagesEl.scrollHeight;
       });
     })();
+
+    // ================= ORB DRAG (PC + iPhone) =================
+    // ✅ no scroll su iPhone mentre trascini
+    // ✅ spostabile su PC
+    // ✅ al rilascio torna SEMPRE alla posizione definita (bottom-right)
+    (function(){
+      const widget = document.getElementById('ai-chat-widget');
+      const btn = document.getElementById('ai-chat-button');
+      if(!widget || !btn) return;
+
+      // flag usato per non aprire chat mentre stai trascinando
+      window.__orbDragging = false;
+
+      let isDragging = false;
+      let moved = false;
+      let offsetX = 0, offsetY = 0;
+
+      // posizione "definita" (default)
+      function resetToDefault(){
+        widget.style.left = 'auto';
+        widget.style.top = 'auto';
+        widget.style.right = '16px';
+        widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
+      }
+
+      // inizializza sempre in posizione definita
+      resetToDefault();
+
+      function pointFromEvent(e){
+        if (e.touches && e.touches[0]) return e.touches[0];
+        return e;
+      }
+
+      function startDrag(e){
+        // solo click sinistro
+        if (e.button !== undefined && e.button !== 0) return;
+
+        // IMPORTANTISSIMO: blocca lo scroll su iPhone
+        if (e.cancelable) e.preventDefault();
+
+        const p = pointFromEvent(e);
+        const rect = widget.getBoundingClientRect();
+        offsetX = p.clientX - rect.left;
+        offsetY = p.clientY - rect.top;
+
+        isDragging = true;
+        moved = false;
+        window.__orbDragging = true;
+
+        // ferma animazione float durante drag
+        const img = widget.querySelector('img');
+        if (img) img.style.animation = 'none';
+      }
+
+      function onMove(e){
+        if(!isDragging) return;
+
+        // blocca scroll su iPhone mentre trascini
+        if (e.cancelable) e.preventDefault();
+
+        const p = pointFromEvent(e);
+        moved = true;
+
+        const w = widget.offsetWidth;
+        const h = widget.offsetHeight;
+
+        let x = p.clientX - offsetX;
+        let y = p.clientY - offsetY;
+
+        x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+        y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
+
+        widget.style.left = x + 'px';
+        widget.style.top = y + 'px';
+        widget.style.right = 'auto';
+        widget.style.bottom = 'auto';
+      }
+
+      function endDrag(){
+        if(!isDragging) return;
+        isDragging = false;
+
+        // riattiva animazione float
+        const img = widget.querySelector('img');
+        if (img) img.style.animation = '';
+
+        // ✅ torna sempre alla posizione definita
+        resetToDefault();
+
+        // dopo pochissimo, permetti i click
+        setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 120);
+      }
+
+      // Mouse (PC)
+      btn.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', endDrag);
+
+      // Touch (iPhone) - PASSIVE FALSE per poter preventDefault
+      btn.addEventListener('touchstart', startDrag, { passive:false });
+      document.addEventListener('touchmove', onMove, { passive:false });
+      document.addEventListener('touchend', endDrag, { passive:true });
+      document.addEventListener('touchcancel', endDrag, { passive:true });
+
+      // evita “tap” che apre chat se hai trascinato
+      btn.addEventListener('click', (e)=>{
+        if(window.__orbDragging){
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      // se ruoti iPhone, rimetti in posizione definita
+      window.addEventListener('orientationchange', ()=> setTimeout(resetToDefault, 120));
+      window.addEventListener('resize', ()=> setTimeout(resetToDefault, 60));
+    })();
   </script>
 
   <!-- FIRESTORE RULES (Firebase Console -> Firestore Rules)
@@ -1747,144 +1641,5 @@
     }
   }
   -->
-  <script>
-(function(){
-  const widget = document.getElementById('ai-chat-widget');
-  const btn = document.getElementById('ai-chat-button');
-  if(!widget || !btn) return;
-
-  // --- ripristina posizione salvata ---
-  const saved = localStorage.getItem('aiWidgetPos');
-  if (saved) {
-    try {
-      const p = JSON.parse(saved);
-      widget.style.left = p.left;
-      widget.style.top = p.top;
-      widget.style.right = 'auto';
-      widget.style.bottom = 'auto';
-    } catch(e){}
-  }
-  // ✅ FIX iPhone: se la posizione salvata finisce fuori schermo, reset/clamp
-  function clampWidgetIntoViewport(){
-    const rect = widget.getBoundingClientRect();
-    const pad = 8;
-
-    // se completamente fuori viewport → reset in basso a destra
-    const out =
-      rect.right < pad ||
-      rect.left > window.innerWidth - pad ||
-      rect.bottom < pad ||
-      rect.top > window.innerHeight - pad;
-
-    if (out){
-      widget.style.left = 'auto';
-      widget.style.top = 'auto';
-      widget.style.right = '16px';
-      widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
-      localStorage.removeItem('aiWidgetPos');
-      return;
-    }
-
-    // se parzialmente fuori → clamp dentro viewport
-    const w = rect.width, h = rect.height;
-    let x = rect.left, y = rect.top;
-
-    x = Math.max(pad, Math.min(window.innerWidth - w - pad, x));
-    y = Math.max(pad, Math.min(window.innerHeight - h - pad, y));
-
-    widget.style.left = x + 'px';
-    widget.style.top = y + 'px';
-    widget.style.right = 'auto';
-    widget.style.bottom = 'auto';
-  }
-
-  // esegui dopo restore e su rotate/resize
-  setTimeout(clampWidgetIntoViewport, 60);
-  window.addEventListener('resize', ()=> setTimeout(clampWidgetIntoViewport, 60));
-  window.addEventListener('orientationchange', ()=> setTimeout(clampWidgetIntoViewport, 120));
-
-  let isDragging = false;
-  let moved = false;
-  let offsetX = 0, offsetY = 0;
-
-  function startDrag(e){
-    // click destro no
-    if (e.button !== undefined && e.button !== 0) return;
-
-    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
-
-    const rect = widget.getBoundingClientRect();
-    offsetX = p.clientX - rect.left;
-    offsetY = p.clientY - rect.top;
-
-    isDragging = true;
-    moved = false;
-    widget.classList.add('dragging');
-
-    // disattiva animazione fluttuante mentre trascini (se la usi sull'immagine)
-    const img = widget.querySelector('img');
-    if (img) img.style.animation = 'none';
-  }
-
-  function onMove(e){
-    if(!isDragging) return;
-
-    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
-    moved = true;
-
-    // limita dentro lo schermo
-    const w = widget.offsetWidth;
-    const h = widget.offsetHeight;
-
-    let x = p.clientX - offsetX;
-    let y = p.clientY - offsetY;
-
-    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
-    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
-
-    widget.style.left = x + 'px';
-    widget.style.top = y + 'px';
-    widget.style.right = 'auto';
-    widget.style.bottom = 'auto';
-  }
-
-  function endDrag(){
-    if(!isDragging) return;
-    isDragging = false;
-    widget.classList.remove('dragging');
-
-    // riattiva animazione
-    const img = widget.querySelector('img');
-    if (img) img.style.animation = '';
-
-    // salva posizione
-    const rect = widget.getBoundingClientRect();
-    localStorage.setItem('aiWidgetPos', JSON.stringify({
-      left: rect.left + 'px',
-      top: rect.top + 'px'
-    }));
-  }
-
-  // Mouse
-  btn.addEventListener('mousedown', startDrag);
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', endDrag);
-
-  // Touch (mobile)
-  btn.addEventListener('touchstart', startDrag, {passive:true});
-  document.addEventListener('touchmove', onMove, {passive:true});
-  document.addEventListener('touchend', endDrag);
-
-  // Evita che un drag apra la chat (blocca il click se hai trascinato)
-  btn.addEventListener('click', (e) => {
-    if(moved){
-      e.preventDefault();
-      e.stopPropagation();
-      moved = false;
-    }
-  }, true);
-})();
-</script>
-
 </body>
 </html>
