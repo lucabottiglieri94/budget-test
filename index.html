@@ -842,6 +842,13 @@
   display: none !important;
 }
 
+/* iPhone: evita scroll pagina mentre trascini l'orb */
+#ai-chat-widget, #ai-chat-button, .ai-orb-img{
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
 
   </style>
 </head>
@@ -1809,28 +1816,27 @@
 
   function startDrag(e){
     // click destro no
-    if (e.button !== undefined && e.button !== 0) return;
+    function startDrag(e){
+  if (e.button !== undefined && e.button !== 0) return;
 
-    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
+  // ✅ blocca lo scroll quando inizi a trascinare (iPhone)
+  if (e.cancelable) e.preventDefault();
 
-    const rect = widget.getBoundingClientRect();
-    offsetX = p.clientX - rect.left;
-    offsetY = p.clientY - rect.top;
+  const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
+  ...
+}
 
-    isDragging = true;
-    moved = false;
-    widget.classList.add('dragging');
+function onMove(e){
+  if(!isDragging) return;
 
-    // disattiva animazione fluttuante mentre trascini (se la usi sull'immagine)
-    const img = widget.querySelector('img');
-    if (img) img.style.animation = 'none';
-  }
+  // ✅ blocca scroll pagina mentre trascini
+  if (e.cancelable) e.preventDefault();
 
-  function onMove(e){
-    if(!isDragging) return;
+  const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
+  moved = true;
+  ...
+}
 
-    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
-    moved = true;
 
     // limita dentro lo schermo
     const w = widget.offsetWidth;
@@ -1871,9 +1877,11 @@
   document.addEventListener('mouseup', endDrag);
 
   // Touch (mobile)
-  btn.addEventListener('touchstart', startDrag, {passive:true});
-  document.addEventListener('touchmove', onMove, {passive:true});
-  document.addEventListener('touchend', endDrag);
+btn.addEventListener('touchstart', startDrag, { passive: false });
+document.addEventListener('touchmove', onMove, { passive: false });
+document.addEventListener('touchend', endDrag, { passive: true });
+document.addEventListener('touchcancel', endDrag, { passive: true });
+
 
   // Evita che un drag apra la chat (blocca il click se hai trascinato)
   btn.addEventListener('click', (e) => {
