@@ -747,25 +747,19 @@
     const auth = getAuth(app);
 
     // session-only (non resta loggato per sempre)
-    await setPersistence(auth, browserSessionPersistence);
-
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" }); // scegli account ogni volta
-
-    // expose per script non-module
-    window._db = db;
-    window._doc = doc;
-    window._setDoc = setDoc;
-    window._onSnapshot = onSnapshot;
-
-    window._auth = auth;
-    window._provider = provider;
-    window._signInWithPopup = signInWithPopup;
-    window._signOut = signOut;
-    window._onAuthStateChanged = onAuthStateChanged;
-
+// ✅ niente top-level await (Safari iPhone)
+setPersistence(auth, browserSessionPersistence)
+  .then(() => {
     window._firebaseReady = true;
-    console.log("✅ Firebase pronto");
+    console.log("✅ Firebase pronto + persistence OK");
+  })
+  .catch((e) => {
+    console.error("❌ setPersistence error:", e);
+    // anche se fallisce, almeno abilitiamo il login
+    window._firebaseReady = true;
+    console.log("⚠️ Firebase pronto ma persistence fallita");
+  });
+  
   </script>
 
   <script>
@@ -1338,49 +1332,33 @@
   // 🔐 token sicuro dell’utente loggato (refresh forzato)
   const idToken = await currentUser.getIdToken(true);
 
+
   const res = await fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer " + idToken   // ✅ OBBLIGATORIO
+      "Authorization": "Bearer " + idToken
     },
     body: JSON.stringify({
       question: q,
-      context_html: comparatoriContent,   // opzionale
-      budget: budgetContext,              // dati DOM dell’utente corrente
-      month: budgetContext.month          // ✅ OBBLIGATORIO
+      context_html: comparatoriContent,
+      budget: budgetContext,
+      month: budgetContext.month
     })
   });
 
   if (!res.ok){
     const t = await res.text().catch(()=> "");
-    throw new Error(`HTTP ${res.status}: ${t}`);
+    updateMsg(typingId, `Errore AI (HTTP ${res.status}).\n${t.slice(0,200)}`);
+    return;
   }
 
-  const data = await res.json();
-  updateMsg(typingId, data.answer || "Nessuna risposta dall’AI.");
-}
-catch(err){
+  const data = await res.json().catch(()=> ({}));
+  updateMsg(typingId, data.answer || "Non sono riuscito a rispondere, riprova.");
+}catch(err){
   console.error(err);
-  updateMsg(typingId, "Errore AI. Riprova tra qualche secondo.");
+  updateMsg(typingId, "Errore nel contattare l’AI. Controlla:\n- API_URL\n- CORS su Vercel\n- endpoint /api/ai-chat");
 }
-
-          if (!res.ok){
-            const t = await res.text().catch(()=> "");
-            updateMsg(typingId, `Errore AI (HTTP ${res.status}).\n${t.slice(0,200)}`);
-            return;
-          }
-
-          const data = await res.json().catch(()=> ({}));
-          updateMsg(typingId, data.answer || "Non sono riuscito a rispondere, riprova.");
-        }catch(err){
-          console.error(err);
-          updateMsg(typingId, "Errore nel contattare l’AI. Controlla:\n- API_URL\n- CORS su Vercel\n- endpoint /api/ai-chat");
-        }
-
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-      });
-    })();
   </script>
 
   <!-- FIRESTORE RULES (DA METTERE SU FIREBASE)
