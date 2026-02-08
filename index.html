@@ -13,22 +13,12 @@
     :root{
       --bg0:#070B14;
       --bg1:#0B1220;
-      --bg2:#101B32;
-
-      --card:#0F172A;
+      --card: rgba(15,23,42,.72);
       --text:#E5E7EB;
       --muted:#9CA3AF;
-      --line: rgba(255,255,255,.10);
-
-      --accent:#7C3AED;
-      --accent2:#22C55E;
-      --danger:#EF4444;
-      --warn:#F59E0B;
-      --info:#38BDF8;
-
-      --radius:18px;
-      --shadow: 0 22px 70px rgba(0,0,0,.45);
       --shadow2: 0 14px 40px rgba(0,0,0,.30);
+      --shadow: 0 22px 70px rgba(0,0,0,.45);
+      --radius:18px;
 
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -37,14 +27,15 @@
     }
 
     *{ box-sizing:border-box; margin:0; padding:0 }
-    html, body{ height:100% }
+    html,body{ height:100% }
     body{
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.25), transparent 55%),
-                  radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.18), transparent 55%),
-                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.18), transparent 55%),
+        radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
       color: var(--text);
-      overflow-x: hidden;
+      overflow-x:hidden;
     }
 
     /* ===== LOGIN SCREEN ===== */
@@ -57,35 +48,20 @@
       justify-content:center;
       padding: calc(18px + var(--safe-top)) calc(18px + var(--safe-left))
                calc(18px + var(--safe-bottom)) calc(18px + var(--safe-right));
-      background: radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.30), transparent 55%),
-                  radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.22), transparent 55%),
-                  linear-gradient(180deg, var(--bg0), var(--bg1));
-      pointer-events: auto;
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.22), transparent 55%),
+        radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
     }
     #login-card{
       width: min(560px, 94vw);
       border-radius: 22px;
-      background: rgba(15,23,42,.68);
+      background: rgba(15,23,42,.70);
       border: 1px solid rgba(255,255,255,.14);
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
       padding: 22px 18px;
       text-align:center;
-      pointer-events: auto;
-      position: relative;
-      z-index: 9999999;
-    }
-    #login-card h1{
-      font-size: clamp(26px, 5vw, 38px);
-      font-weight: 950;
-      letter-spacing: .2px;
-      margin-bottom: 8px;
-    }
-    #login-card p{
-      color: rgba(229,231,235,.92);
-      font-weight: 700;
-      line-height: 1.35;
-      margin-bottom: 16px;
     }
     .pill{
       display:inline-flex;
@@ -100,6 +76,18 @@
       margin-bottom: 14px;
       font-size: 12px;
     }
+    #login-card h1{
+      font-size: clamp(26px, 5vw, 38px);
+      font-weight: 950;
+      margin-bottom: 8px;
+      letter-spacing: .2px;
+    }
+    #login-card p{
+      color: rgba(229,231,235,.90);
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 16px;
+    }
     #login-screen-btn{
       width:100%;
       padding: 14px 16px;
@@ -107,7 +95,7 @@
       border-radius: 14px;
       font-weight: 950;
       cursor: pointer;
-      background: linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,1));
+      background: linear-gradient(135deg, rgba(124,58,237,1), rgba(56,189,248,1));
       color:#061019;
       box-shadow: 0 14px 35px rgba(0,0,0,.35);
       transition: transform .08s ease;
@@ -121,7 +109,7 @@
       font-weight: 700;
     }
 
-    /* ===== APP LAYOUT ===== */
+    /* ===== APP ===== */
     #app{ display:none; min-height:100vh; }
 
     .shell{
@@ -137,7 +125,7 @@
       top: calc(16px + var(--safe-top));
       align-self: start;
       border-radius: var(--radius);
-      background: rgba(15,23,42,.72);
+      background: var(--card);
       border: 1px solid rgba(255,255,255,.12);
       box-shadow: var(--shadow2);
       padding: 16px;
@@ -155,7 +143,6 @@
       font-size: 16px;
       font-weight: 950;
       letter-spacing: .2px;
-      line-height: 1.1;
     }
     .brand .badge{
       font-size: 11px;
@@ -171,7 +158,7 @@
       display:flex;
       flex-direction:column;
       gap:10px;
-      margin-top: 8px;
+      margin-top: 12px;
     }
     .navbtn{
       width:100%;
@@ -205,7 +192,7 @@
 
     .topbar{
       border-radius: var(--radius);
-      background: rgba(15,23,42,.72);
+      background: var(--card);
       border: 1px solid rgba(255,255,255,.12);
       box-shadow: var(--shadow2);
       padding: 14px;
@@ -216,23 +203,9 @@
       gap:12px;
       flex-wrap:wrap;
     }
-    .topbar-left{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width: 240px;
-    }
-    .topbar-title{
-      font-weight: 950;
-      font-size: 18px;
-      letter-spacing:.2px;
-    }
-    .topbar-sub{
-      color: rgba(229,231,235,.78);
-      font-weight: 700;
-      font-size: 12px;
-      line-height: 1.25;
-    }
+    .topbar-left{ display:flex; flex-direction:column; gap:6px; min-width:240px; }
+    .topbar-title{ font-weight: 950; font-size: 18px; letter-spacing:.2px; }
+    .topbar-sub{ color: rgba(229,231,235,.78); font-weight:700; font-size:12px; }
 
     .topbar-right{
       display:flex;
@@ -242,7 +215,6 @@
       justify-content:flex-end;
       flex: 1;
     }
-
     .select{
       flex: 1;
       min-width: 220px;
@@ -254,9 +226,8 @@
       font-size: 15px;
       font-weight: 900;
       outline:none;
-      appearance: none;
+      appearance:none;
     }
-
     .btn{
       border:none;
       cursor:pointer;
@@ -268,13 +239,11 @@
       gap:8px;
       white-space:nowrap;
       transition: transform .08s ease;
-    }
-    .btn:active{ transform: scale(.99) }
-    .btn.ghost{
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
       color: rgba(229,231,235,.92);
     }
+    .btn:active{ transform: scale(.99) }
 
     #user-info{
       font-size: 12px;
@@ -289,8 +258,38 @@
       font-size: 12px;
       font-weight: 900;
       color: rgba(229,231,235,.85);
+      margin-top: 8px;
     }
     #sync-label{ font-weight: 950; }
+
+    .summary{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+    .sum{
+      border-radius: var(--radius);
+      padding: 14px;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+    }
+    .sum .label{
+      font-size: 12px;
+      font-weight: 950;
+      color: rgba(229,231,235,.75);
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .sum .value{
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing:.2px;
+    }
+    .pos{ color: rgba(34,197,94,1); }
+    .neg{ color: rgba(239,68,68,1); }
 
     .grid{
       display:grid;
@@ -299,7 +298,7 @@
     }
     .card{
       border-radius: var(--radius);
-      background: rgba(15,23,42,.72);
+      background: var(--card);
       border: 1px solid rgba(255,255,255,.12);
       box-shadow: var(--shadow2);
       padding: 14px;
@@ -315,11 +314,7 @@
       justify-content:space-between;
       gap:10px;
     }
-    .card .muted{
-      color: rgba(229,231,235,.70);
-      font-weight: 800;
-      font-size: 12px;
-    }
+    .card .muted{ color: rgba(229,231,235,.70); font-weight:800; font-size:12px; }
 
     .entry-items{ display:flex; flex-direction:column; gap:10px; margin-bottom: 12px; }
     .entry-item{
@@ -331,7 +326,6 @@
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.10);
     }
-
     .item-label-input, .item-amount-input{
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,.14);
@@ -355,7 +349,6 @@
       background: linear-gradient(135deg, rgba(239,68,68,1), rgba(245,158,11,1));
       box-shadow: 0 10px 26px rgba(0,0,0,.35);
     }
-
     .btn-add{
       width:100%;
       border:none;
@@ -369,59 +362,14 @@
     .btn-add.income{ background: linear-gradient(135deg, rgba(34,197,94,1), rgba(56,189,248,1)); }
     .btn-add.cost{ background: linear-gradient(135deg, rgba(239,68,68,1), rgba(124,58,237,1)); }
 
-    .total-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      border-radius: 16px;
-      padding: 12px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      font-weight: 950;
-    }
-
-    .summary{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-    }
-    .sum{
-      border-radius: var(--radius);
-      padding: 14px;
-      background: rgba(15,23,42,.72);
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: var(--shadow2);
-      backdrop-filter: blur(10px);
-    }
-    .sum .label{
-      font-size: 12px;
-      font-weight: 950;
-      color: rgba(229,231,235,.75);
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .sum .value{
-      font-size: 20px;
-      font-weight: 950;
-      letter-spacing:.2px;
-    }
-    .pos{ color: rgba(34,197,94,1); }
-    .neg{ color: rgba(239,68,68,1); }
-
     .pie-wrap{ position:relative; height: 260px; }
 
     .goal-line{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap;
       margin-bottom: 10px;
       font-weight: 950;
     }
-    .goal-line .muted{ font-weight: 900; }
     .bar{
       height: 38px;
       border-radius: 999px;
@@ -452,20 +400,7 @@
       font-size: 12px;
     }
 
-    .week-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-bottom: 10px;
-    }
-    .week-grid label{
-      display:block;
-      font-size: 12px;
-      color: rgba(229,231,235,.70);
-      font-weight: 900;
-      margin-bottom: 4px;
-    }
-
+    /* ===== Bottom nav (mobile) ===== */
     .bottom-nav{
       position: fixed;
       left: 0; right: 0;
@@ -477,10 +412,7 @@
       display:none;
       z-index: 5000;
     }
-    .bottom-nav .row{
-      display:flex;
-      gap:10px;
-    }
+    .bottom-nav .row{ display:flex; gap:10px; }
     .bottom-nav button{
       flex:1;
       border:none;
@@ -503,13 +435,13 @@
       width: 92px;
       height: 92px;
       z-index: 99999;
-      /* iPhone: impedisci scroll/gesture mentre trascini */
+
+      /* iPhone: evita scroll/gesture mentre trascini */
       touch-action: none;
       -webkit-user-select: none;
       user-select: none;
       -webkit-touch-callout: none;
     }
-
     #ai-chat-button{
       width: 92px;
       height: 92px;
@@ -519,22 +451,20 @@
       cursor: pointer;
       touch-action: none;
     }
-
     .ai-orb-img{
       width: 92px;
       height: 92px;
       border-radius: 28%;
       animation: aiFloat 4s ease-in-out infinite;
       transition: transform .2s ease;
-      touch-action: none;
       -webkit-user-drag: none;
       user-select: none;
+      touch-action: none;
     }
     .ai-orb-img:hover{ transform: scale(1.05); }
-
     @keyframes aiFloat {
-      0%   { transform: translateY(0); }
-      50%  { transform: translateY(-10px); }
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
       100% { transform: translateY(0); }
     }
 
@@ -585,7 +515,6 @@
       line-height: 1.55;
       font-weight: 750;
     }
-
     .ai-msg{ display:flex; margin-bottom: 10px; }
     .ai-msg-user{ justify-content:flex-end; }
     .ai-msg-ai{ justify-content:flex-start; }
@@ -649,10 +578,6 @@
       box-shadow: 0 14px 34px rgba(0,0,0,.35);
     }
 
-    /* FIX: minimized nasconde input */
-    #ai-chat-box.minimized #ai-chat-messages,
-    #ai-chat-box.minimized #ai-chat-form{ display:none !important; }
-
     /* keyboard helper */
     body.kbd-open #ai-chat-widget{ bottom: calc(300px + env(safe-area-inset-bottom, 0px)); }
 
@@ -667,24 +592,17 @@
       .topbar-right{ justify-content:flex-start; }
       #user-info{ max-width: 90vw; }
 
-      /* orb sempre sopra bottom-nav */
       #ai-chat-widget{
         right: 16px !important;
         bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
         z-index: 99999 !important;
       }
     }
-    #ai-chat-widget, #ai-chat-button, .ai-orb-img{
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
-
   </style>
 </head>
 
 <body>
+
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <div id="login-card">
@@ -692,7 +610,7 @@
       <h1>💰 Budget Mensile</h1>
       <p>Accedi con Google per vedere e salvare <b>solo i tuoi dati</b>.</p>
       <button id="login-screen-btn" type="button">Accedi con Google</button>
-      <small>Se non clicca: controlla popup bloccati o prova un altro browser.</small>
+      <small>Se non clicca: controlla popup bloccati (Safari/Chrome) o prova un altro browser.</small>
     </div>
   </div>
 
@@ -700,7 +618,6 @@
   <div id="app">
     <div class="shell">
 
-      <!-- Sidebar desktop -->
       <aside class="sidebar">
         <div class="brand">
           <h1>Budget Dashboard</h1>
@@ -711,7 +628,7 @@
         <div style="height:10px"></div>
         <div id="user-info"></div>
 
-        <div class="menu" style="margin-top:14px;">
+        <div class="menu">
           <button class="navbtn" type="button" onclick="location.href='risparmi.html'">
             <span>📈 Grafico Risparmi</span><span class="hint">Apri</span>
           </button>
@@ -727,7 +644,6 @@
         </div>
       </aside>
 
-      <!-- Main -->
       <main class="main">
         <div class="topbar">
           <div class="topbar-left">
@@ -736,24 +652,15 @@
           </div>
           <div class="topbar-right">
             <select id="month-selector" class="select"></select>
-            <button id="top-login" class="btn ghost" type="button">Accedi</button>
-            <button id="top-logout" class="btn ghost" type="button" style="display:none;">Esci</button>
+            <button id="top-login" class="btn" type="button">Accedi</button>
+            <button id="top-logout" class="btn" type="button" style="display:none;">Esci</button>
           </div>
         </div>
 
         <div class="summary">
-          <div class="sum">
-            <div class="label">Entrate</div>
-            <div class="value" id="summary-entrate">€ 0,00</div>
-          </div>
-          <div class="sum">
-            <div class="label">Spese</div>
-            <div class="value" id="summary-spese">€ 0,00</div>
-          </div>
-          <div class="sum">
-            <div class="label">Risparmio</div>
-            <div class="value pos" id="summary-balance">€ 0,00</div>
-          </div>
+          <div class="sum"><div class="label">Entrate</div><div class="value" id="summary-entrate">€ 0,00</div></div>
+          <div class="sum"><div class="label">Spese</div><div class="value" id="summary-spese">€ 0,00</div></div>
+          <div class="sum"><div class="label">Risparmio</div><div class="value pos" id="summary-balance">€ 0,00</div></div>
         </div>
 
         <div class="grid">
@@ -773,9 +680,7 @@
         <div class="grid">
           <section class="card">
             <h2>🥧 Ripartizione Entrate/Spese <span class="muted">auto</span></h2>
-            <div class="pie-wrap">
-              <canvas id="budgetPie"></canvas>
-            </div>
+            <div class="pie-wrap"><canvas id="budgetPie"></canvas></div>
             <div class="muted" style="margin-top:10px;">Si aggiorna automaticamente quando modifichi le voci.</div>
           </section>
 
@@ -795,62 +700,6 @@
             </div>
           </section>
         </div>
-
-        <section class="card">
-          <h2>🛒 Spese Alimentari <span class="muted">€500/mese • €125/settimana</span></h2>
-
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
-            <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
-              <div style="font-weight:950; margin-bottom:10px;">📅 Settimana 1</div>
-              <div class="week-grid">
-                <div><label>Spesa 1</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 2</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 3</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 4</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-              </div>
-              <div class="total-row"><span>Totale</span><span id="total-week1">€ 0,00</span></div>
-            </div>
-
-            <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
-              <div style="font-weight:950; margin-bottom:10px;">📅 Settimana 2</div>
-              <div class="week-grid">
-                <div><label>Spesa 1</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 2</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 3</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 4</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-              </div>
-              <div class="total-row"><span>Totale</span><span id="total-week2">€ 0,00</span></div>
-            </div>
-
-            <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
-              <div style="font-weight:950; margin-bottom:10px;">📅 Settimana 3</div>
-              <div class="week-grid">
-                <div><label>Spesa 1</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 2</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 3</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 4</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-              </div>
-              <div class="total-row"><span>Totale</span><span id="total-week3">€ 0,00</span></div>
-            </div>
-
-            <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
-              <div style="font-weight:950; margin-bottom:10px;">📅 Settimana 4</div>
-              <div class="week-grid">
-                <div><label>Spesa 1</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 2</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 3</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-                <div><label>Spesa 4</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" oninput="updateFoodTotals()"></div>
-              </div>
-              <div class="total-row"><span>Totale</span><span id="total-week4">€ 0,00</span></div>
-            </div>
-          </div>
-
-          <div class="summary" style="margin-top:14px;">
-            <div class="sum"><div class="label">Budget</div><div class="value">€ 500</div></div>
-            <div class="sum"><div class="label">Speso</div><div class="value" id="total-food-spent">€ 0,00</div></div>
-            <div class="sum"><div class="label">Rimasto</div><div class="value pos" id="total-food-remaining">€ 500,00</div></div>
-          </div>
-        </section>
       </main>
     </div>
 
@@ -889,15 +738,16 @@
         </form>
       </div>
     </div>
-  </div><!-- /app -->
+  </div>
 
-  <!-- Firebase + Firestore + Auth (module) -->
+  <!-- ============ FIREBASE (MODULE) ============ -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
     import {
       getAuth, onAuthStateChanged, GoogleAuthProvider,
-      signInWithPopup, signOut, setPersistence, browserSessionPersistence
+      signInWithPopup, signOut,
+      setPersistence, browserSessionPersistence
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -914,28 +764,20 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    // Sessione solo finché il tab è aperto (evita problemi su iPhone)
     await setPersistence(auth, browserSessionPersistence);
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    window._db = db;
-    window._doc = doc;
-    window._setDoc = setDoc;
-    window._onSnapshot = onSnapshot;
-
-    window._auth = auth;
-    window._provider = provider;
-    window._signInWithPopup = signInWithPopup;
-    window._signOut = signOut;
-    window._onAuthStateChanged = onAuthStateChanged;
-
+    // export per gli script normali
+    window._firebase = { db, auth, provider, doc, setDoc, onSnapshot, signInWithPopup, signOut, onAuthStateChanged };
     window._firebaseReady = true;
-    console.log("✅ Firebase pronto");
   </script>
 
+  <!-- ============ APP + CHAT + ORB (NO MODULE) ============ -->
   <script>
-    // ===== keyboard helper =====
+    // ===== Keyboard helper =====
     document.addEventListener("focusin", (e) => {
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) document.body.classList.add("kbd-open");
@@ -944,7 +786,7 @@
       setTimeout(() => document.body.classList.remove("kbd-open"), 120);
     });
 
-    // ===== Month options =====
+    // ===== Utils =====
     function pad2(n){ return String(n).padStart(2,"0"); }
     function monthLabel(y,m){
       const mesi = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
@@ -964,24 +806,36 @@
       }
       selectEl.innerHTML = opts.map(o=>`<option value="${o.val}">${o.text}</option>`).join("");
     }
+    function parseAmount(x){ return parseFloat((x ?? "").toString().replace(",", ".")) || 0; }
+    function formatCurrency(v){ return "€ " + (Number(v||0)).toFixed(2).replace(".", ","); }
+    function escapeAttr(s){ return (s ?? "").toString().replaceAll('"','&quot;'); }
 
-    // ===== State =====
-    let currentMonth = localStorage.getItem("budgetMonth") || "";
-    let isSaving = false;
-    let unsubscribe = null;
-    let currentUser = null;
-    let syncLabel = null;
-
+    // ===== DOM =====
     const loginScreen = document.getElementById("login-screen");
     const loginScreenBtn = document.getElementById("login-screen-btn");
     const appEl = document.getElementById("app");
+
     const monthSelector = document.getElementById("month-selector");
     const loginBtnSidebar = document.getElementById("login-btn");
     const logoutBtnSidebar = document.getElementById("logout-btn");
     const loginBtnTop = document.getElementById("top-login");
     const logoutBtnTop = document.getElementById("top-logout");
     const userInfo = document.getElementById("user-info");
+    const syncLabel = document.getElementById("sync-label");
 
+    let currentMonth = localStorage.getItem("budgetMonth") || "";
+    let currentUser = null;
+    let unsubscribe = null;
+    let isSaving = false;
+
+    function setSyncStatus(text, color="rgba(229,231,235,.85)"){
+      syncLabel.textContent = text;
+      syncLabel.style.color = color;
+    }
+    function showLoginOnly(){ loginScreen.style.display = "flex"; appEl.style.display = "none"; }
+    function showApp(){ loginScreen.style.display = "none"; appEl.style.display = "block"; }
+
+    // ===== Month init =====
     buildMonthOptions(monthSelector);
     if (!currentMonth){
       currentMonth = monthSelector.value;
@@ -997,67 +851,13 @@
       }
     }
 
-    function setSyncStatus(text, color="rgba(229,231,235,.85)"){
-      if (!syncLabel) syncLabel = document.getElementById("sync-label");
-      if (syncLabel){
-        syncLabel.textContent = text;
-        syncLabel.style.color = color;
-      }
-    }
-
-    function showLoginOnly(){ loginScreen.style.display = "flex"; appEl.style.display = "none"; }
-    function showApp(){ loginScreen.style.display = "none"; appEl.style.display = "block"; }
-
-    async function doLogin(){
-      if (!window._firebaseReady || !window._auth || !window._provider || !window._signInWithPopup){
-        alert("Sto caricando Firebase… riprova tra 1 secondo.");
-        return;
-      }
-      try{
-        await window._signInWithPopup(window._auth, window._provider);
-      }catch(e){
-        console.error("Login error:", e);
-        alert("Login Google non riuscito.\n• controlla popup bloccati\n• controlla console (F12)");
-      }
-    }
-
-    async function doLogout(){
-      try{
-        if (unsubscribe){ unsubscribe(); unsubscribe = null; }
-        await window._signOut(window._auth);
-
-        currentUser = null;
-        userInfo.textContent = "";
-        logoutBtnSidebar.style.display = "none";
-        logoutBtnTop.style.display = "none";
-        loginBtnTop.style.display = "inline-flex";
-        setSyncStatus("Login richiesto", "rgba(245,158,11,1)");
-
-        resetUIEmpty();
-        showLoginOnly();
-      }catch(e){
-        console.error("Logout error:", e);
-        alert("Logout non riuscito.");
-      }
-    }
-
-    loginScreenBtn.addEventListener("click", doLogin);
-    loginBtnSidebar.addEventListener("click", doLogin);
-    loginBtnTop.addEventListener("click", doLogin);
-    logoutBtnSidebar.addEventListener("click", doLogout);
-    logoutBtnTop.addEventListener("click", doLogout);
-
     monthSelector.addEventListener("change", ()=>{
       currentMonth = monthSelector.value;
       localStorage.setItem("budgetMonth", currentMonth);
       attachRealtimeListener();
     });
 
-    function parseAmount(x){ return parseFloat((x ?? "").toString().replace(",", ".")) || 0; }
-    function formatCurrency(v){ return "€ " + (Number(v||0)).toFixed(2).replace(".", ","); }
-    function escapeAttr(s){ return (s ?? "").toString().replaceAll('"','&quot;'); }
-
-    // ===== Pie Chart =====
+    // ===== Charts =====
     let pieChart = null;
     function updatePieChart(){
       const canvas = document.getElementById("budgetPie");
@@ -1099,13 +899,11 @@
       }
     }
 
-    // ===== Totals + Goal =====
     function updateBudgetTotals(){
       let totalEntrate = 0;
       document.querySelectorAll('#entrate-items .item-amount-input').forEach(i => totalEntrate += parseAmount(i.value));
       let totalSpese = 0;
       document.querySelectorAll('#spese-items .item-amount-input').forEach(i => totalSpese += parseAmount(i.value));
-
       const balance = totalEntrate - totalSpese;
 
       document.getElementById('total-entrate').textContent = formatCurrency(totalEntrate);
@@ -1128,7 +926,6 @@
 
       const totalIncome = parseFloat((document.getElementById('summary-entrate')?.textContent || "€ 0,00").replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
       const totalExpense = parseFloat((document.getElementById('total-spese')?.textContent || "€ 0,00").replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
-
       const savedAmount = totalIncome - totalExpense;
 
       let percentage = (savedAmount / goalAmount) * 100;
@@ -1141,50 +938,12 @@
       document.getElementById('remaining-amount').textContent = "€" + remaining.toFixed(2).replace('.', ',');
     }
 
-    // ===== Food =====
-    function updateFoodTotals(){
-      let monthlyTotal = 0;
-      for (let week=1; week<=4; week++){
-        let weekTotal = 0;
-        document.querySelectorAll(`.week${week}-shopping`).forEach(i => weekTotal += parseAmount(i.value));
-        monthlyTotal += weekTotal;
-        document.getElementById(`total-week${week}`).textContent = formatCurrency(weekTotal);
-      }
-      const monthlyBudget = 500;
-      const remainingMonthly = monthlyBudget - monthlyTotal;
-
-      document.getElementById('total-food-spent').textContent = formatCurrency(monthlyTotal);
-
-      const remEl = document.getElementById('total-food-remaining');
-      remEl.textContent = formatCurrency(remainingMonthly);
-      remEl.classList.toggle('pos', remainingMonthly >= 0);
-      remEl.classList.toggle('neg', remainingMonthly < 0);
-    }
-
-    document.addEventListener("input", (e)=>{
-      const t = e.target;
-      if (!t) return;
-
-      if (t.classList.contains("week1-shopping") || t.classList.contains("week2-shopping") ||
-          t.classList.contains("week3-shopping") || t.classList.contains("week4-shopping")){
-        updateFoodTotals();
-        saveMonthData();
-        return;
-      }
-
-      if (t.classList.contains("item-label-input") || t.classList.contains("item-amount-input")){
-        updateBudgetTotals();
-        saveMonthData();
-      }
-    });
-
     // ===== Data =====
     function collectCurrentData(){
       const data = {
         month: currentMonth,
         entrate: [],
         spese: [],
-        spesaAlimentare: { week1:[], week2:[], week3:[], week4:[] },
         lastModified: new Date().toISOString()
       };
 
@@ -1193,30 +952,24 @@
         const amount = item.querySelector('.item-amount-input')?.value || "";
         if (label || amount) data.entrate.push({ label, amount });
       });
-
       document.querySelectorAll('#spese-items .entry-item').forEach(item=>{
         const label = item.querySelector('.item-label-input')?.value || "";
         const amount = item.querySelector('.item-amount-input')?.value || "";
         if (label || amount) data.spese.push({ label, amount });
       });
-
-      for (let week=1; week<=4; week++){
-        document.querySelectorAll(`.week${week}-shopping`).forEach(input=>{
-          data.spesaAlimentare[`week${week}`].push(input.value || "");
-        });
-      }
       return data;
     }
 
     async function saveMonthData(){
-      if (!window._firebaseReady || !window._db || !currentUser) return;
+      if (!window._firebaseReady || !window._firebase || !currentUser) return;
       try{
         isSaving = true;
         setSyncStatus("Salvataggio…", "rgba(245,158,11,1)");
 
+        const { db, doc, setDoc } = window._firebase;
         const data = collectCurrentData();
-        const ref = window._doc(window._db, "users", currentUser.uid, "budgets", currentMonth);
-        await window._setDoc(ref, data, { merge:true });
+        const ref = doc(db, "users", currentUser.uid, "budgets", currentMonth);
+        await setDoc(ref, data, { merge:true });
 
         setSyncStatus("Salvato ✅", "rgba(34,197,94,1)");
       }catch(e){
@@ -1230,11 +983,7 @@
     function resetUIEmpty(){
       document.getElementById('entrate-items').innerHTML = '';
       document.getElementById('spese-items').innerHTML = '';
-      for (let week=1; week<=4; week++){
-        document.querySelectorAll(`.week${week}-shopping`).forEach(input => input.value = '');
-      }
       updateBudgetTotals();
-      updateFoodTotals();
       updatePieChart();
       updateSavingsGoal();
     }
@@ -1267,26 +1016,21 @@
         speseContainer.appendChild(div);
       });
 
-      for (let week=1; week<=4; week++){
-        const inputs = document.querySelectorAll(`.week${week}-shopping`);
-        const weekData = (data.spesaAlimentare && data.spesaAlimentare[`week${week}`]) ? data.spesaAlimentare[`week${week}`] : [];
-        inputs.forEach((input, idx)=> input.value = weekData[idx] || '');
-      }
-
       updateBudgetTotals();
-      updateFoodTotals();
       updatePieChart();
       updateSavingsGoal();
     }
 
     function attachRealtimeListener(){
-      if (!window._firebaseReady || !window._db || !currentUser) return;
+      if (!window._firebaseReady || !window._firebase || !currentUser) return;
       if (unsubscribe){ unsubscribe(); unsubscribe = null; }
 
       setSyncStatus("Caricamento…", "rgba(245,158,11,1)");
 
-      const ref = window._doc(window._db, "users", currentUser.uid, "budgets", currentMonth);
-      unsubscribe = window._onSnapshot(ref, (snap)=>{
+      const { db, doc, onSnapshot } = window._firebase;
+      const ref = doc(db, "users", currentUser.uid, "budgets", currentMonth);
+
+      unsubscribe = onSnapshot(ref, (snap)=>{
         if (isSaving) return;
         if (snap.exists()){
           populateUIFromData(snap.data());
@@ -1301,7 +1045,7 @@
       });
     }
 
-    // ===== Row add/remove =====
+    // ===== Add/Remove rows =====
     function addEntryItem(type){
       const container = document.getElementById(type === 'entrate' ? 'entrate-items' : 'spese-items');
       const div = document.createElement('div');
@@ -1313,8 +1057,6 @@
       `;
       container.appendChild(div);
       updateBudgetTotals();
-      updatePieChart();
-      updateSavingsGoal();
       saveMonthData();
     }
 
@@ -1323,29 +1065,79 @@
       if (row){
         row.remove();
         updateBudgetTotals();
-        updatePieChart();
-        updateSavingsGoal();
         saveMonthData();
       }
     }
     window.addEntryItem = addEntryItem;
     window.removeEntry = removeEntry;
 
-    // ===== INIT + AUTH =====
-    window.addEventListener("load", ()=>{
-      const check = setInterval(()=>{
-        if (!window._firebaseReady) return;
-        clearInterval(check);
+    // Autosave on input
+    document.addEventListener("input", (e)=>{
+      const t = e.target;
+      if (!t) return;
+      if (t.classList.contains("item-label-input") || t.classList.contains("item-amount-input")){
+        updateBudgetTotals();
+        saveMonthData();
+      }
+    });
 
-        window._onAuthStateChanged(window._auth, (user)=>{
+    // ===== Login/Logout =====
+    async function doLogin(){
+      if (!window._firebaseReady || !window._firebase){
+        alert("Sto caricando Firebase… riprova tra 1 secondo.");
+        return;
+      }
+      try{
+        const { auth, provider, signInWithPopup } = window._firebase;
+        await signInWithPopup(auth, provider);
+      }catch(e){
+        console.error("Login error:", e);
+        alert("Login Google non riuscito.\n• controlla popup bloccati\n• controlla console (F12)");
+      }
+    }
+
+    async function doLogout(){
+      try{
+        if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+        const { auth, signOut } = window._firebase;
+        await signOut(auth);
+
+        currentUser = null;
+        userInfo.textContent = "";
+        logoutBtnSidebar.style.display = "none";
+        logoutBtnTop.style.display = "none";
+        loginBtnTop.style.display = "inline-flex";
+        setSyncStatus("Login richiesto", "rgba(245,158,11,1)");
+        resetUIEmpty();
+        showLoginOnly();
+      }catch(e){
+        console.error("Logout error:", e);
+        alert("Logout non riuscito.");
+      }
+    }
+
+    loginScreenBtn.addEventListener("click", doLogin);
+    loginBtnSidebar.addEventListener("click", doLogin);
+    loginBtnTop.addEventListener("click", doLogin);
+    logoutBtnSidebar.addEventListener("click", doLogout);
+    logoutBtnTop.addEventListener("click", doLogout);
+
+    // ===== Wait Firebase then auth listener =====
+    (function waitFirebase(){
+      const t = setInterval(()=>{
+        if (!window._firebaseReady || !window._firebase) return;
+        clearInterval(t);
+
+        const { auth, onAuthStateChanged } = window._firebase;
+        onAuthStateChanged(auth, (user)=>{
           currentUser = user || null;
 
           if (!currentUser){
+            showLoginOnly();
             userInfo.textContent = "";
             logoutBtnSidebar.style.display = "none";
             logoutBtnTop.style.display = "none";
             loginBtnTop.style.display = "inline-flex";
-            showLoginOnly();
             setSyncStatus("Login richiesto", "rgba(245,158,11,1)");
             resetUIEmpty();
             return;
@@ -1356,15 +1148,14 @@
           logoutBtnSidebar.style.display = "block";
           logoutBtnTop.style.display = "inline-flex";
           loginBtnTop.style.display = "none";
-
           setSyncStatus("Pronto ✅", "rgba(229,231,235,.85)");
           attachRealtimeListener();
           setTimeout(()=>{ updatePieChart(); updateSavingsGoal(); }, 120);
         });
       }, 60);
-    });
+    })();
 
-    // ===== AI CHAT =====
+    // ================= AI CHAT =================
     (function(){
       const chatButton = document.getElementById('ai-chat-button');
       const chatBox = document.getElementById('ai-chat-box');
@@ -1387,9 +1178,11 @@
         const wrap = document.createElement('div');
         wrap.className = 'ai-msg ' + (who === 'user' ? 'ai-msg-user' : 'ai-msg-ai');
         wrap.dataset.id = id;
+
         const bubble = document.createElement('div');
         bubble.className = 'ai-msg-bubble';
         bubble.textContent = text;
+
         wrap.appendChild(bubble);
         messagesEl.appendChild(wrap);
         messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -1408,22 +1201,21 @@
           return { label, amount };
         }).filter(x => x.label || x.amount);
       }
+
       function getText(id){ return document.getElementById(id)?.textContent?.trim() || ""; }
       function buildListText(title, arr){
         if (!arr.length) return `${title}: (vuoto)`;
         return `${title}:\n` + arr.map((x,i)=> `- ${i+1}) ${x.label || "(senza nome)"} = ${x.amount || "0"}`).join("\n");
       }
 
+      // Tap orb -> open chat (drag-safe)
       chatButton.addEventListener('click', ()=>{
-        // click bloccato se stiamo trascinando (vedi script orb)
         if (window.__orbDragging) return;
-
         if (!currentUser){
           alert("Devi fare login prima di usare l'assistente AI.");
           return;
         }
         chatBox.classList.remove('hidden');
-        chatBox.classList.remove('minimized');
         input.focus();
         if (!messagesEl.dataset.started){
           addMsg("Ciao! cosa posso fare oggi per te capo?💪", 'ai');
@@ -1437,7 +1229,10 @@
         delete messagesEl.dataset.started;
       });
 
-      minimizeBtn.addEventListener('click', ()=> chatBox.classList.toggle('minimized'));
+      // ✅ “−” chiude la chat (niente barra che resta)
+      minimizeBtn.addEventListener('click', ()=>{
+        chatBox.classList.add('hidden');
+      });
 
       form.addEventListener('submit', async (e)=>{
         e.preventDefault();
@@ -1466,24 +1261,10 @@
 
         const budgetContext = {
           month: localStorage.getItem("budgetMonth") || "",
-          summary: {
-            entrate: getText("summary-entrate"),
-            spese: getText("summary-spese"),
-            risparmio: getText("summary-balance")
-          },
-          obiettivo: {
-            obiettivo_mensile: "€" + (document.getElementById("goal-amount")?.textContent || "250,00"),
-            risparmiato: getText("saved-amount"),
-            mancano: getText("remaining-amount")
-          },
+          summary: { entrate: getText("summary-entrate"), spese: getText("summary-spese"), risparmio: getText("summary-balance") },
+          obiettivo: { obiettivo_mensile: "€" + (document.getElementById("goal-amount")?.textContent || "250,00"), risparmiato: getText("saved-amount"), mancano: getText("remaining-amount") },
           entrate_items,
           spese_items,
-          food: {
-            week1: [...document.querySelectorAll(".week1-shopping")].map(i=>i.value||""),
-            week2: [...document.querySelectorAll(".week2-shopping")].map(i=>i.value||""),
-            week3: [...document.querySelectorAll(".week3-shopping")].map(i=>i.value||""),
-            week4: [...document.querySelectorAll(".week4-shopping")].map(i=>i.value||"")
-          },
           listText
         };
 
@@ -1492,16 +1273,8 @@
 
           const res = await fetch(API_URL, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + idToken
-            },
-            body: JSON.stringify({
-              question: q,
-              context_html: comparatoriContent,
-              budget: budgetContext,
-              month: budgetContext.month
-            })
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken },
+            body: JSON.stringify({ question: q, context_html: comparatoriContent, budget: budgetContext, month: budgetContext.month })
           });
 
           if (!res.ok){
@@ -1521,140 +1294,114 @@
       });
     })();
 
-<script>
-/* ================= ORB DRAG (PC + iPhone) =================
-   ✅ Tap su iPhone apre la chat
-   ✅ Drag su iPhone NON scrolla la pagina dietro
-   ✅ Drag su PC funziona
-   ✅ Se trascini e molli: l'orb torna SEMPRE alla posizione definita (bottom-right)
-*/
-(function(){
-  const widget = document.getElementById('ai-chat-widget');
-  const btn = document.getElementById('ai-chat-button');
-  if(!widget || !btn) return;
+    // ================= ORB DRAG (PC + iPhone) =================
+    // ✅ tap apre chat / drag non scrolla / rilascio torna al default
+    (function(){
+      const widget = document.getElementById('ai-chat-widget');
+      const btn = document.getElementById('ai-chat-button');
+      if(!widget || !btn) return;
 
-  // flag per evitare che il click apra chat mentre stai trascinando
-  window.__orbDragging = false;
-
-  let isDragging = false;
-  let moved = false;
-  let offsetX = 0, offsetY = 0;
-
-  // posizione "definita" (default) = basso-destra sopra bottom-nav
-  function resetToDefault(){
-    widget.style.left = 'auto';
-    widget.style.top = 'auto';
-    widget.style.right = '16px';
-    widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
-  }
-
-  // sempre in posizione definita all'avvio
-  resetToDefault();
-
-  function pointFromEvent(e){
-    if (e.touches && e.touches[0]) return e.touches[0];
-    return e;
-  }
-
-  function startDrag(e){
-    // solo click sinistro su mouse
-    if (e.button !== undefined && e.button !== 0) return;
-
-    const p = pointFromEvent(e);
-    const rect = widget.getBoundingClientRect();
-
-    offsetX = p.clientX - rect.left;
-    offsetY = p.clientY - rect.top;
-
-    isDragging = true;
-    moved = false;
-
-    // ✅ IMPORTANTISSIMO: NON bloccare ancora il tap
-    // il tap deve aprire la chat su iPhone
-    window.__orbDragging = false;
-
-    // stop animazione float mentre tocchi (più stabile)
-    const img = widget.querySelector('img');
-    if (img) img.style.animation = 'none';
-  }
-
-  function onMove(e){
-    if(!isDragging) return;
-
-    // ✅ appena muovi davvero -> allora è drag:
-    // blocca lo scroll iPhone + blocca il click
-    if (!moved) {
-      moved = true;
-      window.__orbDragging = true;
-    }
-
-    if (e.cancelable) e.preventDefault();
-
-    const p = pointFromEvent(e);
-
-    const w = widget.offsetWidth;
-    const h = widget.offsetHeight;
-
-    let x = p.clientX - offsetX;
-    let y = p.clientY - offsetY;
-
-    // clamp dentro lo schermo
-    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
-    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
-
-    widget.style.left = x + 'px';
-    widget.style.top = y + 'px';
-    widget.style.right = 'auto';
-    widget.style.bottom = 'auto';
-  }
-
-  function endDrag(){
-    if(!isDragging) return;
-    isDragging = false;
-
-    // riattiva animazione
-    const img = widget.querySelector('img');
-    if (img) img.style.animation = '';
-
-    // ✅ se non hai trascinato (tap):
-    // NON resettare e NON bloccare -> il tap aprirà la chat
-    if (!moved){
       window.__orbDragging = false;
-      return;
-    }
 
-    // ✅ se hai trascinato: torna sempre al default
-    resetToDefault();
+      let isDragging = false;
+      let moved = false;
+      let offsetX = 0, offsetY = 0;
 
-    // sblocca click subito dopo
-    setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 60);
-  }
+      function resetToDefault(){
+        widget.style.left = 'auto';
+        widget.style.top = 'auto';
+        widget.style.right = '16px';
+        widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
+      }
+      resetToDefault();
 
-  // Mouse (PC)
-  btn.addEventListener('mousedown', startDrag);
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', endDrag);
+      function pointFromEvent(e){
+        if (e.touches && e.touches[0]) return e.touches[0];
+        return e;
+      }
 
-  // Touch (iPhone) - passive:false per poter preventDefault su move
-  btn.addEventListener('touchstart', startDrag, { passive:false });
-  document.addEventListener('touchmove', onMove, { passive:false });
-  document.addEventListener('touchend', endDrag, { passive:true });
-  document.addEventListener('touchcancel', endDrag, { passive:true });
+      function startDrag(e){
+        if (e.button !== undefined && e.button !== 0) return;
 
-  // evita che il click apra la chat se stavi trascinando
-  btn.addEventListener('click', (e)=>{
-    if(window.__orbDragging){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, true);
+        const p = pointFromEvent(e);
+        const rect = widget.getBoundingClientRect();
 
-  // se ruoti / resize: torna al default
-  window.addEventListener('orientationchange', ()=> setTimeout(resetToDefault, 120));
-  window.addEventListener('resize', ()=> setTimeout(resetToDefault, 60));
-})();
-</script>
+        offsetX = p.clientX - rect.left;
+        offsetY = p.clientY - rect.top;
 
+        isDragging = true;
+        moved = false;
+        window.__orbDragging = false; // tap non deve essere bloccato
+
+        const img = widget.querySelector('img');
+        if (img) img.style.animation = 'none';
+      }
+
+      function onMove(e){
+        if(!isDragging) return;
+
+        if (!moved) {
+          moved = true;
+          window.__orbDragging = true; // ora sì: è drag
+        }
+        if (e.cancelable) e.preventDefault();
+
+        const p = pointFromEvent(e);
+        const w = widget.offsetWidth;
+        const h = widget.offsetHeight;
+
+        let x = p.clientX - offsetX;
+        let y = p.clientY - offsetY;
+
+        x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+        y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
+
+        widget.style.left = x + 'px';
+        widget.style.top = y + 'px';
+        widget.style.right = 'auto';
+        widget.style.bottom = 'auto';
+      }
+
+      function endDrag(){
+        if(!isDragging) return;
+        isDragging = false;
+
+        const img = widget.querySelector('img');
+        if (img) img.style.animation = '';
+
+        // tap: lascia click libero
+        if (!moved){
+          window.__orbDragging = false;
+          return;
+        }
+
+        // drag: torna sempre al default
+        resetToDefault();
+        setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 80);
+      }
+
+      // PC
+      btn.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', endDrag);
+
+      // iPhone (passive false per preventDefault)
+      btn.addEventListener('touchstart', startDrag, { passive:false });
+      document.addEventListener('touchmove', onMove, { passive:false });
+      document.addEventListener('touchend', endDrag, { passive:true });
+      document.addEventListener('touchcancel', endDrag, { passive:true });
+
+      // blocca click quando era drag
+      btn.addEventListener('click', (e)=>{
+        if(window.__orbDragging){
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      window.addEventListener('orientationchange', ()=> setTimeout(resetToDefault, 120));
+      window.addEventListener('resize', ()=> setTimeout(resetToDefault, 60));
+    })();
   </script>
 
   <!-- FIRESTORE RULES (Firebase Console -> Firestore Rules)
