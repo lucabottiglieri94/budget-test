@@ -748,7 +748,12 @@
       .shell{ grid-template-columns: 1fr; }
       .sidebar{ display:none; }
       .bottom-nav{ display:block; }
-      #ai-chat-widget{ bottom: calc(78px + var(--safe-bottom)); }
+#ai-chat-widget{
+  right: 16px !important;
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 99999 !important;
+}
+
       .summary{ grid-template-columns: 1fr; }
       .grid{ grid-template-columns: 1fr; }
       .select{ min-width: 0; width: 100%; }
@@ -1759,6 +1764,44 @@
       widget.style.bottom = 'auto';
     } catch(e){}
   }
+  // ✅ FIX iPhone: se la posizione salvata finisce fuori schermo, reset/clamp
+  function clampWidgetIntoViewport(){
+    const rect = widget.getBoundingClientRect();
+    const pad = 8;
+
+    // se completamente fuori viewport → reset in basso a destra
+    const out =
+      rect.right < pad ||
+      rect.left > window.innerWidth - pad ||
+      rect.bottom < pad ||
+      rect.top > window.innerHeight - pad;
+
+    if (out){
+      widget.style.left = 'auto';
+      widget.style.top = 'auto';
+      widget.style.right = '16px';
+      widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
+      localStorage.removeItem('aiWidgetPos');
+      return;
+    }
+
+    // se parzialmente fuori → clamp dentro viewport
+    const w = rect.width, h = rect.height;
+    let x = rect.left, y = rect.top;
+
+    x = Math.max(pad, Math.min(window.innerWidth - w - pad, x));
+    y = Math.max(pad, Math.min(window.innerHeight - h - pad, y));
+
+    widget.style.left = x + 'px';
+    widget.style.top = y + 'px';
+    widget.style.right = 'auto';
+    widget.style.bottom = 'auto';
+  }
+
+  // esegui dopo restore e su rotate/resize
+  setTimeout(clampWidgetIntoViewport, 60);
+  window.addEventListener('resize', ()=> setTimeout(clampWidgetIntoViewport, 60));
+  window.addEventListener('orientationchange', ()=> setTimeout(clampWidgetIntoViewport, 120));
 
   let isDragging = false;
   let moved = false;
