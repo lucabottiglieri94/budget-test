@@ -1,37 +1,43 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Budget Mensile - Gestione Familiare</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#764ba2" />
+  <title>Budget Mensile - Web App</title>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
 
   <style>
-    :root {
-      --color-primary: #2196F3;
-      --color-success: #4CAF50;
-      --color-danger: #F44336;
-      --color-warning: #FF9800;
-      --color-light: #f5f5f5;
-      --color-dark: #333;
-      --color-border: #ddd;
+    :root{
+      --bg1:#667eea; --bg2:#764ba2;
+      --primary:#2196F3;
+      --success:#4CAF50;
+      --danger:#F44336;
+      --warning:#FF9800;
+      --light:#f5f5f5;
+      --dark:#111827;
+      --border:#e5e7eb;
+
+      --radius:16px;
+      --shadow:0 14px 40px rgba(0,0,0,.18);
+
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+
+      --header-h: 140px;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
+    *{box-sizing:border-box;margin:0;padding:0}
+    html, body{height:100%}
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color: var(--dark);
       padding: 0;
-      margin: 0;
-      color: var(--color-dark);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
     }
 
     /* ===== LOGIN SCREEN ===== */
@@ -39,290 +45,459 @@
       position: fixed;
       inset: 0;
       z-index: 999999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg,#667eea 0%, #764ba2 100%);
-      padding: 20px;
-      pointer-events: auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: calc(16px + var(--safe-top)) calc(16px + var(--safe-left)) calc(16px + var(--safe-bottom)) calc(16px + var(--safe-right));
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
     }
     #login-card{
-      width: min(520px, 92vw);
+      width: min(560px, 94vw);
       background: rgba(255,255,255,0.14);
       border: 1px solid rgba(255,255,255,0.22);
       border-radius: 18px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.28);
       backdrop-filter: blur(10px);
-      padding: 22px;
+      padding: 22px 18px;
       color: #fff;
-      text-align: center;
-      pointer-events: auto;
+      text-align:center;
     }
-    #login-card h1{ font-size: 34px; font-weight: 900; margin-bottom: 8px; }
-    #login-card p{ opacity: .95; font-weight: 600; margin-bottom: 18px; }
+    #login-card h1{font-size: clamp(26px, 5vw, 36px); font-weight: 900; margin-bottom: 8px;}
+    #login-card p{opacity:.95; font-weight:700; margin-bottom: 16px; line-height:1.35}
     #login-screen-btn{
-      width: 100%;
-      padding: 12px 16px;
+      width:100%;
+      padding: 14px 16px;
       border: none;
       border-radius: 12px;
       font-weight: 900;
       cursor: pointer;
-      background: #fff;
-      color: #111827;
+      background:#fff;
+      color:#111827;
       box-shadow: 0 10px 22px rgba(0,0,0,0.18);
-      pointer-events: auto;
     }
-    #login-screen small{ display:block; margin-top: 12px; font-size: 12px; opacity: .9; }
+    #login-screen small{display:block;margin-top:10px;font-size:12px;opacity:.9}
 
-    /* APP nascosta finché non logghi */
-    #app{ display:none; width:100%; }
-
-    .container {
-      width: 100vw;
-      max-width: 100vw;
-      background: white;
+    /* ===== APP ===== */
+    #app{display:none; min-height:100vh; padding: 0; }
+    .container{
+      min-height:100vh;
+      background: #fff;
+      display:flex;
+      flex-direction:column;
       border-radius: 0;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-      margin: 0;
-      height: 100vh;
-      max-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      overflow:hidden;
     }
 
-    header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 25px 20px;
-      text-align: center;
-      position: fixed;
+    /* Header sticky (mobile-friendly) */
+    header{
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
       z-index: 1000;
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:#fff;
+      padding:
+        calc(16px + var(--safe-top))
+        calc(14px + var(--safe-left))
+        12px
+        calc(14px + var(--safe-right));
+      box-shadow: 0 10px 26px rgba(0,0,0,0.18);
     }
-    header.header-hidden { transform: translateY(-100%); opacity: 0; }
+    header .title{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    header h1{
+      font-size: clamp(20px, 5vw, 28px);
+      font-weight: 900;
+      line-height: 1.1;
+      margin: 0;
+    }
+    header p{
+      margin-top: 6px;
+      font-size: 13px;
+      opacity: .95;
+      font-weight: 600;
+      line-height: 1.3;
+    }
 
-    header h1 { font-size: 1.8em; margin-bottom: 5px; font-weight: 700; }
-    header p { font-size: 0.85em; opacity: 0.95; font-weight: 300; }
+    .header-controls{
+      margin-top: 12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
 
-    .content {
+    #month-selector{
       flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      padding-top: 200px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .section {
-      background: var(--color-light);
-      padding: 20px;
-      border-radius: 15px;
-      border-left: 5px solid var(--color-primary);
-    }
-    .section.entrate { border-left-color: var(--color-success); }
-    .section.spese { border-left-color: var(--color-danger); }
-
-    .section h2 {
-      color: var(--color-dark);
-      margin-bottom: 15px;
-      font-size: 1.25em;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .entry-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-
-    .entry-item {
-      background: white;
-      padding: 12px;
-      border-radius: 10px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      border: 1px solid var(--color-border);
-      transition: all 0.2s ease;
-    }
-
-    .item-label-input,
-    .item-amount-input {
-      padding: 8px;
-      border: 1px solid;
-      border-radius: 8px;
-      font-size: 0.95em;
-      font-family: inherit;
-    }
-
-    .item-label-input { flex: 1; font-weight: 600; }
-    .item-amount-input { width: 90px; text-align: right; font-weight: 600; }
-
-    .entrata-input { border-color: var(--color-success); }
-    .spesa-input { border-color: var(--color-danger); }
-
-    .btn-remove {
-      background: var(--color-danger);
-      color: white;
-      border: none;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9em;
-      min-width: 35px;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-
-    .btn-add {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.95em;
-      margin-bottom: 12px;
-      color: white;
-    }
-    .btn-add-entrate { background: var(--color-success); }
-    .btn-add-spese { background: var(--color-danger); }
-
-    .total-row {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 2px solid var(--color-primary);
-      font-size: 1.15em;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-    .total-amount.entrata { color: var(--color-success); }
-    .total-amount.spesa { color: var(--color-danger); }
-
-    .summary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 15px;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      text-align: center;
-    }
-    .summary-card {
-      background: rgba(255, 255, 255, 0.15);
-      padding: 15px;
+      min-width: 210px;
+      padding: 10px 12px;
       border-radius: 12px;
-      backdrop-filter: blur(10px);
-    }
-    .summary-label {
-      font-size: 0.8em;
-      opacity: 0.9;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
-    .summary-value { font-size: 1.5em; font-weight: 700; }
-    .balance-positive { color: #4CAF50; }
-    .balance-negative { color: #FF6B6B; }
-
-    /* Obiettivo di Risparmio */
-    .savings-goal { margin-top: 20px; }
-    .goal-card {
-      background: white;
-      border-radius: 15px;
-      padding: 25px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .goal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .goal-label { font-size: 1.1em; color: #666; }
-    .goal-amount { font-size: 1.5em; font-weight: bold; color: var(--color-primary); }
-
-    .progress-bar-container {
-      width: 100%;
-      height: 40px;
-      background: #f0f0f0;
-      border-radius: 20px;
-      overflow: hidden;
-      position: relative;
-      margin-bottom: 15px;
-    }
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--color-success) 0%, #45a049 100%);
-      border-radius: 20px;
-      width: 0%;
-      transition: width 0.2s linear;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .progress-text {
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      font-weight: bold;
-      color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-      font-size: 1.1em;
-    }
-    .goal-footer {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.95em;
-      color: #666;
-    }
-    .goal-footer strong { color: var(--color-dark); }
-
-    /* Pulsanti fissi */
-    #risparmi-btn {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: none;
-      background: #ff9800;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 1500;
-    }
-    #comparatori-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: none;
-      background: #4CAF50;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 1500;
-    }
-
-    /* status badge spesa settimanale */
-    .budget-status{
-      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.92);
+      color: #111827;
+      font-size: 15px;
       font-weight: 800;
+      outline:none;
+    }
+
+    .auth-row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 900;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.16);
+      transition: transform .08s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+    .btn:active{transform:scale(.98)}
+    .btn.white{background:#fff;color:#111827}
+    .btn.ghost{background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.25); box-shadow:none}
+    .btn.red{background:#ff5b5b;color:#fff}
+
+    #sync-status{
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: .95;
+      font-weight: 800;
+    }
+    #user-info{
+      font-size: 12px;
+      opacity: .95;
+      font-weight: 800;
+      max-width: 55vw;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    /* Content */
+    .content{
+      flex: 1;
+      padding: 14px;
+      padding-bottom: calc(120px + var(--safe-bottom)); /* spazio bottoni flottanti */
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+      background: #fff;
+    }
+
+    .section{
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 16px;
+      border-left: 5px solid var(--primary);
+    }
+    .section.entrate{border-left-color: var(--success)}
+    .section.spese{border-left-color: var(--danger)}
+    .section h2{
+      font-size: 16px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .entry-items{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+    .entry-item{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .item-label-input, .item-amount-input{
+      border:1px solid;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 16px; /* IMPORTANTISSIMO su iPhone: evita zoom */
+      font-weight: 800;
+      outline:none;
+    }
+    .item-label-input{flex:1; min-width: 0}
+    .item-amount-input{width: 110px; text-align:right}
+
+    .entrata-input{border-color: rgba(76,175,80,.55)}
+    .spesa-input{border-color: rgba(244,67,54,.55)}
+    .entrata-input:focus{border-color: var(--success); box-shadow:0 0 0 3px rgba(76,175,80,.18)}
+    .spesa-input:focus{border-color: var(--danger); box-shadow:0 0 0 3px rgba(244,67,54,.18)}
+
+    .btn-remove{
+      background: var(--danger);
+      color:#fff;
+      border:none;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 900;
+      cursor:pointer;
+      flex-shrink:0;
+    }
+
+    .btn-add{
+      width:100%;
+      padding: 12px;
+      border:none;
+      border-radius: 14px;
+      font-weight: 900;
+      color:#fff;
+      cursor:pointer;
+    }
+    .btn-add-entrate{background: var(--success)}
+    .btn-add-spese{background: var(--danger)}
+
+    .total-row{
+      background:#fff;
+      border:2px solid rgba(33,150,243,.4);
+      border-radius: 14px;
+      padding: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      font-weight: 900;
+      gap:12px;
+    }
+    .total-amount.entrata{color: var(--success)}
+    .total-amount.spesa{color: var(--danger)}
+
+    .summary{
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      border-radius: var(--radius);
+      padding: 14px;
+      color:#fff;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+    }
+    .summary-card{
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 12px;
+      text-align:center;
+      backdrop-filter: blur(8px);
+    }
+    .summary-label{font-size: 11px; letter-spacing:.6px; text-transform:uppercase; font-weight:900; opacity:.95; margin-bottom:6px}
+    .summary-value{font-size: 18px; font-weight: 900}
+    .balance-positive{color:#7CFF9C}
+    .balance-negative{color:#FFB4B4}
+
+    /* Pie section */
+    .pie-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+    }
+    .pie-wrap{position:relative; height: 280px}
+
+    /* Savings goal */
+    .goal-card{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+    }
+    .goal-header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      margin-bottom: 12px;
+    }
+    .goal-label{font-weight:900;color:#374151}
+    .goal-amount{font-weight: 900; color: var(--primary); font-size: 18px}
+
+    .progress-bar-container{
+      width:100%;
+      height: 38px;
+      background:#f0f0f0;
+      border-radius: 999px;
+      overflow:hidden;
+      position:relative;
+      margin-bottom: 10px;
+    }
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--success), #45a049);
+      border-radius: 999px;
+      transition: width .18s linear;
+    }
+    .progress-text{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-weight: 900;
+      text-shadow:0 2px 10px rgba(0,0,0,0.35);
+    }
+    .goal-footer{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      font-weight: 800; color:#4b5563; font-size: 13px;
+    }
+
+    /* Weekly food */
+    .week-card{
+      background:#fff;
+      border-radius: 14px;
+      border:2px solid var(--warning);
+      padding: 14px;
+    }
+    .week-title{
+      font-weight: 900;
+      color: var(--warning);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--warning);
+    }
+    .week-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .week-grid label{
+      display:block;
+      font-size: 12px;
+      color:#6b7280;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .week-grid input{
+      width:100%;
+      border-color: rgba(255,152,0,.55);
+    }
+
+    /* Floating buttons (mobile-safe) */
+    #risparmi-btn, #comparatori-btn{
+      position: fixed;
+      bottom: calc(16px + var(--safe-bottom));
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: none;
+      color:#fff;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+      z-index: 1500;
+    }
+    #risparmi-btn{left: calc(16px + var(--safe-left)); background: #ff9800;}
+    #comparatori-btn{right: calc(16px + var(--safe-right)); background: var(--success);}
+
+    /* AI Chat */
+    #ai-chat-widget{
+      position: fixed;
+      bottom: calc(82px + var(--safe-bottom));
+      right: calc(16px + var(--safe-right));
+      z-index: 9999;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ai-chat-button{
+      width: 62px; height: 62px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.25);
+      cursor:pointer;
+      padding:0;
+      overflow:hidden;
+    }
+    #ai-chat-button img{width:100%; height:100%; object-fit:cover; display:block}
+
+    #ai-chat-box{
+      position:absolute;
+      bottom: 74px;
+      right: 0;
+      width: min(360px, calc(100vw - 28px));
+      max-height: min(520px, 70vh);
+      background:#fff;
+      border-radius: 14px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.30);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+    #ai-chat-box.hidden{display:none}
+
+    .ai-chat-header{
+      display:flex; align-items:center; justify-content:space-between;
+      background:#111827; color:#f9fafb;
+      padding: 10px 10px;
+    }
+    .ai-chat-title{font-weight: 900; font-size: 14px}
+    .ai-chat-actions button{
+      background:transparent;border:none;color:#e5e7eb;
+      font-size:18px; cursor:pointer; line-height:1; padding: 6px 8px;
+    }
+    #ai-chat-messages{
+      padding: 10px;
+      overflow-y:auto;
+      flex:1;
+      background:#f3f4f6;
+      font-size: 13px;
+    }
+    .ai-msg{display:flex; margin-bottom:8px}
+    .ai-msg-user{justify-content:flex-end}
+    .ai-msg-ai{justify-content:flex-start}
+    .ai-msg-bubble{
+      max-width: 86%;
+      padding: 9px 10px;
+      border-radius: 12px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-weight:700;
+    }
+    .ai-msg-user .ai-msg-bubble{background:#2563eb;color:#fff;border-bottom-right-radius:3px}
+    .ai-msg-ai .ai-msg-bubble{background:#e5e7eb;color:#111827;border-bottom-left-radius:3px}
+
+    #ai-chat-form{display:flex;border-top:1px solid #e5e7eb}
+    #ai-chat-input{
+      flex:1;border:none;padding: 12px 10px;
+      font-size: 16px; /* evita zoom iPhone */
+      outline:none;
+    }
+    #ai-chat-form button{
+      border:none;background:#2563eb;color:#fff;
+      padding: 0 14px; font-weight: 900; cursor:pointer;
+    }
+    #ai-chat-box.minimized #ai-chat-messages,
+    #ai-chat-box.minimized #ai-chat-form{display:none}
+
+    /* Quando tastiera aperta: sposta bottoni/chat più su */
+    body.kbd-open #risparmi-btn,
+    body.kbd-open #comparatori-btn{
+      bottom: calc(230px + var(--safe-bottom));
+    }
+    body.kbd-open #ai-chat-widget{
+      bottom: calc(300px + var(--safe-bottom));
+    }
+
+    /* Responsive small */
+    @media (max-width: 420px){
+      .summary{grid-template-columns: 1fr}
+      .item-amount-input{width: 98px}
+      #month-selector{min-width: 0; width:100%}
+      .header-controls{flex-direction:column; align-items:stretch}
+      .auth-row{justify-content:flex-start}
+      #user-info{max-width: 90vw}
     }
   </style>
 </head>
@@ -333,8 +508,8 @@
   <div id="login-screen">
     <div id="login-card">
       <h1>💰 Budget Mensile</h1>
-      <p>Accedi con Google per vedere e salvare i tuoi dati.</p>
-      <button id="login-screen-btn" type="button" onclick="safeLogin()">Accedi con Google</button>
+      <p>Accedi con Google per vedere e salvare <b>solo i tuoi dati</b>.</p>
+      <button id="login-screen-btn">Accedi con Google</button>
       <small>Ogni account vede solo i propri dati.</small>
     </div>
   </div>
@@ -342,16 +517,18 @@
   <!-- APP -->
   <div id="app">
     <div class="container">
-      <header>
-        <h1>💰 Budget Mensile</h1>
-        <p>Gestione entrate e spese familiari (sincronizzato)</p>
 
-        <div style="margin-top: 15px;">
-          <select id="month-selector"
-            style="padding: 10px 20px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.5);
-                   background: rgba(255,255,255,0.95); color: #333; font-size: 1.05em; font-weight: 700;
-                   cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
-            onchange="changeMonth()">
+      <header>
+        <div class="title">
+          <div>
+            <h1>💰 Budget Mensile</h1>
+            <p>Gestione entrate e spese (sincronizzato)</p>
+          </div>
+          <div id="sync-status">🔄 Stato sincronizzazione: <span id="sync-label">In attesa...</span></div>
+        </div>
+
+        <div class="header-controls">
+          <select id="month-selector" onchange="changeMonth()">
             <option value="2026-02">Febbraio 2026</option>
             <option value="2026-03">Marzo 2026</option>
             <option value="2026-04">Aprile 2026</option>
@@ -365,26 +542,17 @@
             <option value="2026-12">Dicembre 2026</option>
             <option value="2027-01">Gennaio 2027</option>
           </select>
-        </div>
 
-        <div id="sync-status" style="margin-top: 10px; font-size: 0.8em; opacity: 0.9;">
-          🔄 Stato sincronizzazione: <span id="sync-label">In attesa...</span>
-        </div>
-
-        <div style="margin-top: 10px;">
-          <button id="login-btn"
-                  style="padding:8px 16px;border-radius:8px;border:none;font-weight:800;cursor:pointer;">
-            Accedi con Google
-          </button>
-          <button id="logout-btn"
-                  style="padding:8px 16px;border-radius:8px;border:none;font-weight:800;cursor:pointer;display:none;margin-left:8px;">
-            Esci
-          </button>
-          <span id="user-info" style="font-size:0.8em;margin-left:8px;"></span>
+          <div class="auth-row">
+            <button id="login-btn" class="btn white">Accedi Google</button>
+            <button id="logout-btn" class="btn red" style="display:none;">Esci</button>
+            <span id="user-info"></span>
+          </div>
         </div>
       </header>
 
       <div class="content">
+
         <button id="risparmi-btn" onclick="location.href='risparmi.html'">📈 Grafico Risparmi</button>
         <button id="comparatori-btn" onclick="location.href='comparatori.html'">📊 Comparatori</button>
 
@@ -394,7 +562,7 @@
           <div class="entry-items" id="entrate-items"></div>
           <button class="btn-add btn-add-entrate" onclick="addEntryItem('entrate')">+ Aggiungi Entrata</button>
           <div class="total-row">
-            <span class="total-label">Totale Entrate</span>
+            <span>Totale Entrate</span>
             <span class="total-amount entrata" id="total-entrate">€ 0,00</span>
           </div>
         </div>
@@ -405,7 +573,7 @@
           <div class="entry-items" id="spese-items"></div>
           <button class="btn-add btn-add-spese" onclick="addEntryItem('spese')">+ Aggiungi Spesa</button>
           <div class="total-row">
-            <span class="total-label">Totale Spese</span>
+            <span>Totale Spese</span>
             <span class="total-amount spesa" id="total-spese">€ 0,00</span>
           </div>
         </div>
@@ -413,33 +581,33 @@
         <!-- RIEPILOGO -->
         <div class="summary">
           <div class="summary-card">
-            <div class="summary-label">📥 Entrate</div>
-            <div class="summary-value" style="color: #4CAF50;" id="summary-entrate">€ 0,00</div>
+            <div class="summary-label">Entrate</div>
+            <div class="summary-value" style="color:#7CFF9C" id="summary-entrate">€ 0,00</div>
           </div>
           <div class="summary-card">
-            <div class="summary-label">📤 Spese</div>
-            <div class="summary-value" style="color: #F44336;" id="summary-spese">€ 0,00</div>
+            <div class="summary-label">Spese</div>
+            <div class="summary-value" style="color:#FFB4B4" id="summary-spese">€ 0,00</div>
           </div>
           <div class="summary-card">
-            <div class="summary-label">💾 Risparmio</div>
+            <div class="summary-label">Risparmio</div>
             <div class="summary-value balance-positive" id="summary-balance">€ 0,00</div>
           </div>
         </div>
 
-        <!-- ✅ GRAFICO A TORTA (AUTO) - SOPRA OBIETTIVO -->
-        <div class="section" id="pie-section" style="border-left-color:#2196F3;">
-          <h2>🥧 Ripartizione Entrate/Spese</h2>
-          <div style="background:white;border:1px solid #e5e7eb;border-radius:14px;padding:14px;box-shadow:0 10px 22px rgba(0,0,0,0.08);">
-            <div style="position:relative;height:320px;">
+        <!-- GRAFICO A TORTA (AUTO) -->
+        <div class="section" style="border-left-color:var(--primary);">
+          <h2>🥧 Ripartizione Entrate / Spese</h2>
+          <div class="pie-card">
+            <div class="pie-wrap">
               <canvas id="budgetPie"></canvas>
             </div>
-            <div style="margin-top:10px;color:#6b7280;font-size:0.9em;font-weight:700;">
+            <div style="margin-top:10px;color:#6b7280;font-size:13px;font-weight:900;">
               Si aggiorna automaticamente quando modifichi le voci.
             </div>
           </div>
         </div>
 
-        <!-- OBIETTIVO DI RISPARMIO -->
+        <!-- OBIETTIVO RISPARMIO -->
         <div class="section savings-goal">
           <h2>💰 Obiettivo di Risparmio</h2>
           <div class="goal-card">
@@ -448,9 +616,8 @@
               <span class="goal-amount">€250,00</span>
             </div>
             <div class="progress-bar-container">
-              <div class="progress-bar" id="savings-progress-bar">
-                <span class="progress-text" id="progress-percentage">0%</span>
-              </div>
+              <div class="progress-bar" id="savings-progress-bar"></div>
+              <div class="progress-text" id="progress-percentage">0%</div>
             </div>
             <div class="goal-footer">
               <span>Risparmiato: <strong id="saved-amount">€0,00</strong></span>
@@ -459,169 +626,85 @@
           </div>
         </div>
 
-        <!-- ✅✅✅ LISTA DELLA SPESA SETTIMANALE (RIMESSA COMPLETA) -->
-        <div class="section" style="border-left-color: #FF9800;">
+        <!-- SPESA ALIMENTARE -->
+        <div class="section" style="border-left-color: var(--warning);">
           <h2>🛒 Spese Alimentari Settimanali</h2>
-          <p style="color: #666; margin-bottom: 15px; font-size: 0.9em;">Budget: <strong>€500/mese (€125/settimana)</strong></p>
+          <p style="color:#6b7280;font-size:13px;font-weight:900;margin-bottom:12px;">
+            Budget: <strong>€500/mese (€125/settimana)</strong>
+          </p>
 
-          <div id="weeks-container" style="display: flex; flex-direction: column; gap: 15px;">
-
-            <!-- Settimana 1 -->
-            <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
-              <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 1</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
+          <div id="weeks-container" style="display:flex;flex-direction:column;gap:12px;">
+            <!-- WEEK TEMPLATE x4 -->
+            <div class="week-card">
+              <div class="week-title">📅 Settimana 1</div>
+              <div class="week-grid">
+                <div><label>Spesa 1</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 2</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 3</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 4</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
               </div>
-              <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
+              <div class="total-row" style="border-color: var(--warning);">
                 <span>Totale Settimana:</span>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                  <span id="total-week1" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
-                  <span class="budget-status" id="status-week1" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <span id="total-week1" style="color:var(--warning);font-weight:900;">€ 0,00</span>
+                  <span id="status-week1" style="font-size:12px;padding:6px 10px;border-radius:999px;background:#E8F5E9;color:#2E7D32;font-weight:900;">✓ OK</span>
                 </div>
               </div>
             </div>
 
-            <!-- Settimana 2 -->
-            <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
-              <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 2</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
+            <div class="week-card">
+              <div class="week-title">📅 Settimana 2</div>
+              <div class="week-grid">
+                <div><label>Spesa 1</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 2</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 3</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 4</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
               </div>
-              <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
+              <div class="total-row" style="border-color: var(--warning);">
                 <span>Totale Settimana:</span>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                  <span id="total-week2" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
-                  <span class="budget-status" id="status-week2" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <span id="total-week2" style="color:var(--warning);font-weight:900;">€ 0,00</span>
+                  <span id="status-week2" style="font-size:12px;padding:6px 10px;border-radius:999px;background:#E8F5E9;color:#2E7D32;font-weight:900;">✓ OK</span>
                 </div>
               </div>
             </div>
 
-            <!-- Settimana 3 -->
-            <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
-              <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 3</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
+            <div class="week-card">
+              <div class="week-title">📅 Settimana 3</div>
+              <div class="week-grid">
+                <div><label>Spesa 1</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 2</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 3</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 4</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
               </div>
-              <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
+              <div class="total-row" style="border-color: var(--warning);">
                 <span>Totale Settimana:</span>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                  <span id="total-week3" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
-                  <span class="budget-status" id="status-week3" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <span id="total-week3" style="color:var(--warning);font-weight:900;">€ 0,00</span>
+                  <span id="status-week3" style="font-size:12px;padding:6px 10px;border-radius:999px;background:#E8F5E9;color:#2E7D32;font-weight:900;">✓ OK</span>
                 </div>
               </div>
             </div>
 
-            <!-- Settimana 4 -->
-            <div style="background: white; border-radius: 10px; padding: 15px; border: 2px solid #FF9800;">
-              <div style="font-size: 1.1em; font-weight: 700; color: #FF9800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #FF9800;">📅 Settimana 4</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 1</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 2</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 3</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
-                <div>
-                  <label style="font-size: 0.85em; color: #666; margin-bottom: 4px; display: block;">Spesa 4</label>
-                  <input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"
-                    style="width: 100%; border-color: #FF9800;"
-                    onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()">
-                </div>
+            <div class="week-card">
+              <div class="week-title">📅 Settimana 4</div>
+              <div class="week-grid">
+                <div><label>Spesa 1</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 2</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 3</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
+                <div><label>Spesa 4</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0" onchange="updateFoodTotals(); saveMonthData()" oninput="updateFoodTotals()"></div>
               </div>
-              <div class="total-row" style="border-color: #FF9800; margin-top: 12px;">
+              <div class="total-row" style="border-color: var(--warning);">
                 <span>Totale Settimana:</span>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                  <span id="total-week4" style="color: #FF9800; font-weight: 700;">€ 0,00</span>
-                  <span class="budget-status" id="status-week4" style="font-size: 0.8em; padding: 4px 8px;">✓ OK</span>
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <span id="total-week4" style="color:var(--warning);font-weight:900;">€ 0,00</span>
+                  <span id="status-week4" style="font-size:12px;padding:6px 10px;border-radius:999px;background:#E8F5E9;color:#2E7D32;font-weight:900;">✓ OK</span>
                 </div>
               </div>
             </div>
-
           </div>
 
-          <!-- RIEPILOGO MENSILE ALIMENTARE -->
-          <div class="summary" style="margin-top: 20px;">
+          <div class="summary" style="margin-top: 12px;">
             <div class="summary-card">
               <div class="summary-label">Budget</div>
               <div class="summary-value">€ 500</div>
@@ -637,147 +720,39 @@
           </div>
         </div>
 
-      </div>
-    </div>
+        <!-- AI CHAT WIDGET -->
+        <div id="ai-chat-widget">
+          <button id="ai-chat-button" aria-label="Apri chat AI">
+            <img src="https://image2url.com/r2/default/images/1770371281075-bf035a1c-704a-476c-a3c3-fa76d3b13bc5.png" alt="AI">
+          </button>
 
-    <!-- ===== AI CHAT WIDGET (solo dopo login) ===== -->
-    <div id="ai-chat-widget">
-      <button id="ai-chat-button" aria-label="Apri chat AI">
-        <img src="https://image2url.com/r2/default/images/1770371281075-bf035a1c-704a-476c-a3c3-fa76d3b13bc5.png" alt="AI">
-      </button>
+          <div id="ai-chat-box" class="hidden">
+            <div class="ai-chat-header">
+              <div class="ai-chat-title">Assistente AI</div>
+              <div class="ai-chat-actions">
+                <button id="ai-chat-minimize" title="Minimizza">−</button>
+                <button id="ai-chat-close" title="Chiudi">×</button>
+              </div>
+            </div>
 
-      <div id="ai-chat-box" class="hidden">
-        <div class="ai-chat-header">
-          <div class="ai-chat-title"><span>Assistente AI</span></div>
-          <div class="ai-chat-actions">
-            <button id="ai-chat-minimize" title="Minimizza">−</button>
-            <button id="ai-chat-close" title="Chiudi">×</button>
+            <div id="ai-chat-messages"></div>
+
+            <form id="ai-chat-form">
+              <input id="ai-chat-input" type="text" placeholder="Chiedimi sul tuo budget…" autocomplete="off" />
+              <button type="submit">Invia</button>
+            </form>
           </div>
         </div>
 
-        <div id="ai-chat-messages"></div>
+      </div><!-- content -->
+    </div><!-- container -->
+  </div><!-- app -->
 
-        <form id="ai-chat-form">
-          <input type="text" id="ai-chat-input" placeholder="Fai login per usare l’assistente…" autocomplete="off" disabled />
-          <button type="submit" disabled>Invia</button>
-        </form>
-      </div>
-    </div>
-
-    <style>
-      #ai-chat-widget {
-        position: fixed;
-        bottom: 100px;
-        right: 20px;
-        z-index: 9999;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-      #ai-chat-button {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        border: none;
-        background: transparent;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-        cursor: pointer;
-        padding: 0;
-        overflow: hidden;
-      }
-      #ai-chat-button img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-      #ai-chat-box {
-        position: absolute;
-        bottom: 80px;
-        right: 0;
-        width: 360px;
-        max-height: 480px;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      #ai-chat-box.hidden { display: none; }
-
-      .ai-chat-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #111827;
-        color: #f9fafb;
-        padding: 8px 10px;
-      }
-      .ai-chat-title span { font-size: 14px; font-weight: 700; }
-      .ai-chat-actions button {
-        background: transparent;
-        border: none;
-        color: #e5e7eb;
-        font-size: 18px;
-        margin-left: 4px;
-        cursor: pointer;
-        line-height: 1;
-      }
-      .ai-chat-actions button:hover { color: #ffffff; }
-
-      #ai-chat-messages {
-        padding: 10px;
-        overflow-y: auto;
-        flex: 1;
-        background: #f3f4f6;
-        font-size: 13px;
-      }
-
-      .ai-msg { margin-bottom: 8px; display: flex; }
-      .ai-msg-user { justify-content: flex-end; }
-      .ai-msg-ai { justify-content: flex-start; }
-      .ai-msg-bubble {
-        max-width: 80%;
-        padding: 8px 10px;
-        border-radius: 10px;
-        line-height: 1.4;
-        word-wrap: break-word;
-        white-space: pre-wrap;
-      }
-      .ai-msg-user .ai-msg-bubble {
-        background: #2563eb;
-        color: #ffffff;
-        border-bottom-right-radius: 2px;
-      }
-      .ai-msg-ai .ai-msg-bubble {
-        background: #e5e7eb;
-        color: #111827;
-        border-bottom-left-radius: 2px;
-      }
-
-      #ai-chat-form { display: flex; border-top: 1px solid #e5e7eb; }
-      #ai-chat-input { flex: 1; border: none; padding: 8px 10px; font-size: 13px; outline: none; }
-      #ai-chat-form button[type="submit"] {
-        border: none;
-        background: #2563eb;
-        color: #ffffff;
-        padding: 0 14px;
-        font-size: 13px;
-        cursor: pointer;
-      }
-      #ai-chat-form button[type="submit"]:hover { background: #1d4ed8; }
-      #ai-chat-box.minimized { height: auto; }
-      #ai-chat-box.minimized #ai-chat-messages,
-      #ai-chat-box.minimized #ai-chat-form { display: none; }
-      @media (max-width: 480px) {
-        #ai-chat-box { width: 90vw; right: 50%; transform: translateX(50%); }
-      }
-    </style>
-  </div><!-- /app -->
-
-  <!-- Firebase + Firestore + Auth (MODULE) -->
+  <!-- Firebase + Firestore + Auth (module) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-    import {
-      getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut,
-      setPersistence, browserSessionPersistence
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAdZbBv6JYbYnl6CxuFVfHhSftvIxwf2DY",
@@ -793,12 +768,12 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // ✅ login non “eterno”: solo sessione tab
+    // Login solo per sessione (non resta “per sempre”)
     await setPersistence(auth, browserSessionPersistence);
 
     const provider = new GoogleAuthProvider();
 
-    // expose
+    // expose per script non-module
     window._db = db;
     window._doc = doc;
     window._setDoc = setDoc;
@@ -811,31 +786,38 @@
     window._onAuthStateChanged = onAuthStateChanged;
 
     window._firebaseReady = true;
-    console.log("✅ Firebase ready");
+    console.log("✅ Firebase pronto");
   </script>
 
   <script>
+    // ====== Mobile keyboard helper ======
+    document.addEventListener("focusin", (e) => {
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) document.body.classList.add("kbd-open");
+    });
+    document.addEventListener("focusout", () => {
+      setTimeout(() => document.body.classList.remove("kbd-open"), 120);
+    });
+
     // ===== STATE =====
     let currentMonth = localStorage.getItem("budgetMonth") || "2026-02";
     localStorage.setItem("budgetMonth", currentMonth);
 
     let isSaving = false;
-    let syncLabel = null;
     let unsubscribe = null;
-
     let currentUser = null;
-    window.currentUser = null;
 
-    // per bloccare “contaminazione” AI: conversation id cambia ad ogni login
-    let aiConversationId = "anon:" + Date.now();
-    window.aiConversationId = aiConversationId;
+    let syncLabel = null;
 
     const loginScreen = document.getElementById("login-screen");
+    const loginScreenBtn = document.getElementById("login-screen-btn");
     const appEl = document.getElementById("app");
+
     const loginBtn = document.getElementById("login-btn");
     const logoutBtn = document.getElementById("logout-btn");
     const userInfo = document.getElementById("user-info");
     const monthSelector = document.getElementById("month-selector");
+
     if (monthSelector) monthSelector.value = currentMonth;
 
     function setSyncStatus(text, color="#fff"){
@@ -845,49 +827,21 @@
         syncLabel.style.color = color;
       }
     }
-
-    function setChatEnabled(enabled){
-      const input = document.getElementById('ai-chat-input');
-      const btn = document.querySelector('#ai-chat-form button[type="submit"]');
-      if (!input || !btn) return;
-      input.disabled = !enabled;
-      btn.disabled = !enabled;
-      input.placeholder = enabled
-        ? "Chiedimi qualcosa sul tuo budget o sui comparatori…"
-        : "Fai login per usare l’assistente…";
-    }
-
-    function showLoginOnly(){
-      loginScreen.style.display = "flex";
-      appEl.style.display = "none";
-      setChatEnabled(false);
-    }
-    function showApp(){
-      loginScreen.style.display = "none";
-      appEl.style.display = "block";
-      setChatEnabled(true);
-    }
+    function showLoginOnly(){ loginScreen.style.display = "flex"; appEl.style.display = "none"; }
+    function showApp(){ loginScreen.style.display = "none"; appEl.style.display = "block"; }
 
     async function doLogin(){
+      if (!window._firebaseReady || !window._auth || !window._provider || !window._signInWithPopup){
+        alert("Sto caricando Firebase… riprova tra 1 secondo.");
+        return;
+      }
       try{
-        if (!window._firebaseReady || !window._auth || !window._provider || !window._signInWithPopup){
-          alert("Firebase non è ancora pronto. Attendi 1 secondo e riprova.");
-          return;
-        }
         await window._signInWithPopup(window._auth, window._provider);
       }catch(e){
         console.error("Login error:", e);
-        alert("Login Google non riuscito. Controlla popup bloccati o Console (F12).");
+        alert("Login Google non riuscito.\n• controlla popup bloccati\n• controlla console (F12)");
       }
     }
-
-    window.safeLogin = async function(){
-      if (!window._firebaseReady){
-        alert("Sto caricando Firebase… riprova tra un attimo.");
-        return;
-      }
-      await doLogin();
-    };
 
     async function doLogout(){
       try{
@@ -895,13 +849,6 @@
         await window._signOut(window._auth);
 
         currentUser = null;
-        window.currentUser = null;
-
-        // reset conversazione AI
-        aiConversationId = "anon:" + Date.now();
-        window.aiConversationId = aiConversationId;
-        resetChatHard();
-
         userInfo.textContent = "";
         logoutBtn.style.display = "none";
         setSyncStatus("Login richiesto", "#ffc107");
@@ -914,6 +861,7 @@
       }
     }
 
+    if (loginScreenBtn) loginScreenBtn.addEventListener("click", doLogin);
     if (loginBtn) loginBtn.addEventListener("click", doLogin);
     if (logoutBtn) logoutBtn.addEventListener("click", doLogout);
 
@@ -922,37 +870,31 @@
       localStorage.setItem("budgetMonth", currentMonth);
       attachRealtimeListener();
     }
-    window.changeMonth = changeMonth;
 
-    function formatCurrency(value){
-      return "€ " + (Number(value||0)).toFixed(2).replace('.', ',');
+    // ===== PIE CHART =====
+    let pieChart = null;
+
+    function euro(v){
+      return "€ " + (Number(v || 0)).toFixed(2).replace(".", ",");
     }
     function parseAmount(x){
       return parseFloat((x ?? "").toString().replace(",", ".")) || 0;
     }
 
-    // ===== PIE CHART =====
-    let pieChart = null;
     function updatePieChart(){
       const canvas = document.getElementById("budgetPie");
       if (!canvas || typeof Chart === "undefined") return;
 
       let sumEntrate = 0;
-      document.querySelectorAll('#entrate-items .item-amount-input').forEach(input=>{
-        sumEntrate += parseAmount(input.value);
-      });
+      document.querySelectorAll('#entrate-items .item-amount-input').forEach(input => sumEntrate += parseAmount(input.value));
 
       let sumSpese = 0;
-      document.querySelectorAll('#spese-items .item-amount-input').forEach(input=>{
-        sumSpese += parseAmount(input.value);
-      });
+      document.querySelectorAll('#spese-items .item-amount-input').forEach(input => sumSpese += parseAmount(input.value));
 
-      const hasData = (sumEntrate > 0 || sumSpese > 0);
-      const labels = hasData ? ["Entrate", "Spese"] : ["Nessun dato"];
-      const values = hasData ? [sumEntrate, sumSpese] : [1];
-      const colors = hasData
-        ? ["rgba(76,175,80,0.85)", "rgba(244,67,54,0.85)"]
-        : ["rgba(156,163,175,0.35)"];
+      const has = (sumEntrate > 0 || sumSpese > 0);
+      const labels = has ? ["Entrate", "Spese"] : ["Nessun dato"];
+      const values = has ? [sumEntrate, sumSpese] : [1];
+      const colors = has ? ["rgba(76,175,80,0.86)", "rgba(244,67,54,0.86)"] : ["rgba(156,163,175,0.35)"];
 
       if (!pieChart){
         pieChart = new Chart(canvas, {
@@ -964,12 +906,12 @@
             animation: false,
             plugins: {
               legend: { position: "bottom", labels: { boxWidth: 12, boxHeight: 12, padding: 12 } },
-              tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${formatCurrency(ctx.parsed)}` } }
+              tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${euro(ctx.parsed)}` } }
             },
             cutout: "55%"
           }
         });
-      } else {
+      }else{
         pieChart.data.labels = labels;
         pieChart.data.datasets[0].data = values;
         pieChart.data.datasets[0].backgroundColor = colors;
@@ -977,57 +919,175 @@
       }
     }
 
+    // ===== DATA =====
+    function collectCurrentData(){
+      const data = {
+        month: currentMonth,
+        entrate: [],
+        spese: [],
+        spesaAlimentare: { week1:[], week2:[], week3:[], week4:[] },
+        lastModified: new Date().toISOString()
+      };
+
+      document.querySelectorAll('#entrate-items .entry-item').forEach(item=>{
+        const label = item.querySelector('.item-label-input')?.value || "";
+        const amount = item.querySelector('.item-amount-input')?.value || "";
+        if (label || amount) data.entrate.push({ label, amount });
+      });
+
+      document.querySelectorAll('#spese-items .entry-item').forEach(item=>{
+        const label = item.querySelector('.item-label-input')?.value || "";
+        const amount = item.querySelector('.item-amount-input')?.value || "";
+        if (label || amount) data.spese.push({ label, amount });
+      });
+
+      for (let week=1; week<=4; week++){
+        document.querySelectorAll(`.week${week}-shopping`).forEach(input=>{
+          data.spesaAlimentare[`week${week}`].push(input.value || "");
+        });
+      }
+
+      return data;
+    }
+
+    async function saveMonthData(){
+      if (!window._firebaseReady || !window._db || !currentUser) return;
+      try{
+        isSaving = true;
+        setSyncStatus("Salvataggio…", "#ffeb3b");
+
+        const data = collectCurrentData();
+        const ref = window._doc(window._db, "users", currentUser.uid, "budgets", currentMonth);
+        await window._setDoc(ref, data, { merge:true });
+
+        setSyncStatus("Salvato ✅", "#8bc34a");
+      }catch(e){
+        console.error("Save error:", e);
+        setSyncStatus("Errore ❌", "#ff5252");
+      }finally{
+        setTimeout(()=>{ isSaving = false; }, 250);
+      }
+    }
+
     function resetUIEmpty(){
       document.getElementById('entrate-items').innerHTML = '';
       document.getElementById('spese-items').innerHTML = '';
-      for (let w=1; w<=4; w++){
-        document.querySelectorAll(`.week${w}-shopping`).forEach(i => i.value = '');
+      for (let week=1; week<=4; week++){
+        document.querySelectorAll(`.week${week}-shopping`).forEach(input => input.value = '');
       }
       updateBudgetTotals();
       updateFoodTotals();
-      setTimeout(updateSavingsGoal, 80);
+      setTimeout(updateSavingsGoal, 120);
       updatePieChart();
+    }
+
+    function escapeAttr(s){
+      return (s ?? "").toString().replaceAll('"','&quot;');
+    }
+
+    function populateUIFromData(data){
+      const entrateContainer = document.getElementById('entrate-items');
+      const speseContainer = document.getElementById('spese-items');
+
+      entrateContainer.innerHTML = '';
+      (data.entrate || []).forEach(item=>{
+        const div = document.createElement('div');
+        div.className = 'entry-item';
+        div.innerHTML = `
+          <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="${escapeAttr(item.label)}"
+                 onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
+          <input type="number" class="item-amount-input entrata-input" placeholder="€" value="${escapeAttr(item.amount)}"
+                 step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
+          <button class="btn-remove" onclick="removeEntry(this)">✕</button>
+        `;
+        entrateContainer.appendChild(div);
+      });
+
+      speseContainer.innerHTML = '';
+      (data.spese || []).forEach(item=>{
+        const div = document.createElement('div');
+        div.className = 'entry-item';
+        div.innerHTML = `
+          <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="${escapeAttr(item.label)}"
+                 onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
+          <input type="number" class="item-amount-input spesa-input" placeholder="€" value="${escapeAttr(item.amount)}"
+                 step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
+          <button class="btn-remove" onclick="removeEntry(this)">✕</button>
+        `;
+        speseContainer.appendChild(div);
+      });
+
+      for (let week=1; week<=4; week++){
+        const inputs = document.querySelectorAll(`.week${week}-shopping`);
+        const weekData = (data.spesaAlimentare && data.spesaAlimentare[`week${week}`]) ? data.spesaAlimentare[`week${week}`] : [];
+        inputs.forEach((input, idx)=> input.value = weekData[idx] || '');
+      }
+
+      updateBudgetTotals();
+      updateFoodTotals();
+      setTimeout(updateSavingsGoal, 120);
+      updatePieChart();
+    }
+
+    function attachRealtimeListener(){
+      if (!window._firebaseReady || !window._db || !currentUser) return;
+      if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+
+      setSyncStatus("Caricamento…", "#ffeb3b");
+      const ref = window._doc(window._db, "users", currentUser.uid, "budgets", currentMonth);
+
+      unsubscribe = window._onSnapshot(ref, (snap)=>{
+        if (isSaving) return;
+        if (snap.exists()){
+          populateUIFromData(snap.data());
+          setSyncStatus("Sincronizzato ✅", "#8bc34a");
+        } else {
+          resetUIEmpty();
+          setSyncStatus("Vuoto ✅", "#ffffff");
+        }
+      }, (err)=>{
+        console.error("Snapshot error:", err);
+        setSyncStatus("Errore ❌", "#ff5252");
+      });
     }
 
     function addEntryItem(type){
       const container = document.getElementById(type === 'entrate' ? 'entrate-items' : 'spese-items');
-      const newItem = document.createElement('div');
-      newItem.className = 'entry-item';
+      const div = document.createElement('div');
+      div.className = 'entry-item';
       const cls = type === 'entrate' ? 'entrata-input' : 'spesa-input';
-      newItem.innerHTML = `
+      div.innerHTML = `
         <input type="text" class="item-label-input ${cls}" placeholder="Nome"
                onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
         <input type="number" class="item-amount-input ${cls}" placeholder="€" step="0.01" min="0"
                onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
         <button class="btn-remove" onclick="removeEntry(this)">✕</button>
       `;
-      container.appendChild(newItem);
+      container.appendChild(div);
       updateBudgetTotals();
-      setTimeout(updateSavingsGoal, 80);
+      updatePieChart();
+      setTimeout(updateSavingsGoal, 120);
     }
-    window.addEntryItem = addEntryItem;
 
-    function removeEntry(button){
-      const item = button.closest('.entry-item');
-      if (item){
-        item.remove();
+    function removeEntry(btn){
+      const row = btn.closest(".entry-item");
+      if (row){
+        row.remove();
         updateBudgetTotals();
+        updatePieChart();
         saveMonthData();
-        setTimeout(updateSavingsGoal, 80);
+        setTimeout(updateSavingsGoal, 120);
       }
     }
-    window.removeEntry = removeEntry;
+
+    function formatCurrency(v){ return "€ " + (Number(v||0)).toFixed(2).replace(".", ","); }
 
     function updateBudgetTotals(){
       let totalEntrate = 0;
-      document.querySelectorAll('#entrate-items .item-amount-input').forEach(input=>{
-        totalEntrate += parseAmount(input.value);
-      });
+      document.querySelectorAll('#entrate-items .item-amount-input').forEach(i => totalEntrate += parseAmount(i.value));
 
       let totalSpese = 0;
-      document.querySelectorAll('#spese-items .item-amount-input').forEach(input=>{
-        totalSpese += parseAmount(input.value);
-      });
+      document.querySelectorAll('#spese-items .item-amount-input').forEach(i => totalSpese += parseAmount(i.value));
 
       const balance = totalEntrate - totalSpese;
 
@@ -1036,52 +1096,21 @@
       document.getElementById('summary-entrate').textContent = formatCurrency(totalEntrate);
       document.getElementById('summary-spese').textContent = formatCurrency(totalSpese);
 
-      const balanceEl = document.getElementById('summary-balance');
-      balanceEl.textContent = formatCurrency(balance);
-      balanceEl.classList.toggle('balance-positive', balance >= 0);
-      balanceEl.classList.toggle('balance-negative', balance < 0);
+      const balEl = document.getElementById('summary-balance');
+      balEl.textContent = formatCurrency(balance);
+      balEl.classList.toggle('balance-positive', balance >= 0);
+      balEl.classList.toggle('balance-negative', balance < 0);
 
       updatePieChart();
     }
-    window.updateBudgetTotals = updateBudgetTotals;
 
-    function updateSavingsGoal(){
-      const goalAmount = 250;
-
-      const incomeText = document.getElementById('summary-entrate')?.textContent || "€ 0,00";
-      const expenseText = document.getElementById('total-spese')?.textContent || "€ 0,00";
-
-      const totalIncome = parseFloat(incomeText.replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
-      const totalExpense = parseFloat(expenseText.replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
-
-      const savedAmount = totalIncome - totalExpense;
-      let percentage = (savedAmount / goalAmount) * 100;
-      percentage = Math.max(0, Math.min(100, percentage));
-
-      const progressBar = document.getElementById('savings-progress-bar');
-      const progressText = document.getElementById('progress-percentage');
-      const savedAmountElement = document.getElementById('saved-amount');
-      const remainingAmountElement = document.getElementById('remaining-amount');
-
-      if (progressBar) progressBar.style.width = percentage + '%';
-      if (progressText) progressText.textContent = percentage.toFixed(0) + '%';
-      if (savedAmountElement) savedAmountElement.textContent = '€' + savedAmount.toFixed(2).replace('.', ',');
-      if (remainingAmountElement){
-        const remaining = Math.max(0, goalAmount - savedAmount);
-        remainingAmountElement.textContent = '€' + remaining.toFixed(2).replace('.', ',');
-      }
-    }
-
-    // ===== FOOD TOTALS =====
     function updateFoodTotals(){
       const weeklyBudget = 125;
       let monthlyTotal = 0;
 
       for (let week=1; week<=4; week++){
         let weekTotal = 0;
-        document.querySelectorAll(`.week${week}-shopping`).forEach(input=>{
-          weekTotal += parseAmount(input.value);
-        });
+        document.querySelectorAll(`.week${week}-shopping`).forEach(i => weekTotal += parseAmount(i.value));
         monthlyTotal += weekTotal;
 
         const weekTotalEl = document.getElementById(`total-week${week}`);
@@ -1089,7 +1118,6 @@
         if (weekTotalEl && statusEl){
           weekTotalEl.textContent = formatCurrency(weekTotal);
           const remaining = weeklyBudget - weekTotal;
-
           if (remaining >= 0){
             statusEl.textContent = `✓ OK (rimasti ${formatCurrency(remaining)})`;
             statusEl.style.backgroundColor = '#E8F5E9';
@@ -1106,197 +1134,68 @@
       const remainingMonthly = monthlyBudget - monthlyTotal;
 
       document.getElementById('total-food-spent').textContent = formatCurrency(monthlyTotal);
+
       const remainingEl = document.getElementById('total-food-remaining');
       remainingEl.textContent = formatCurrency(remainingMonthly);
       remainingEl.classList.toggle('balance-positive', remainingMonthly >= 0);
       remainingEl.classList.toggle('balance-negative', remainingMonthly < 0);
     }
-    window.updateFoodTotals = updateFoodTotals;
 
-    // ===== FIRESTORE DATA =====
-    function collectCurrentData(){
-      const data = {
-        month: currentMonth,
-        entrate: [],
-        spese: [],
-        spesaAlimentare: { week1:[], week2:[], week3:[], week4:[] },
-        lastModified: new Date().toISOString()
-      };
+    function updateSavingsGoal(){
+      const goalAmount = 250;
 
-      document.querySelectorAll('#entrate-items .entry-item').forEach(item=>{
-        const label = item.querySelector('.item-label-input').value;
-        const amount = item.querySelector('.item-amount-input').value;
-        if (label || amount) data.entrate.push({ label, amount });
-      });
+      const incomeText = document.getElementById('summary-entrate')?.textContent || "€ 0,00";
+      const expenseText = document.getElementById('total-spese')?.textContent || "€ 0,00";
 
-      document.querySelectorAll('#spese-items .entry-item').forEach(item=>{
-        const label = item.querySelector('.item-label-input').value;
-        const amount = item.querySelector('.item-amount-input').value;
-        if (label || amount) data.spese.push({ label, amount });
-      });
+      const totalIncome = parseFloat(incomeText.replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
+      const totalExpense = parseFloat(expenseText.replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
 
-      for (let week=1; week<=4; week++){
-        document.querySelectorAll(`.week${week}-shopping`).forEach(input=>{
-          data.spesaAlimentare[`week${week}`].push(input.value || '');
-        });
-      }
+      const savedAmount = totalIncome - totalExpense;
 
-      return data;
+      let percentage = (savedAmount / goalAmount) * 100;
+      percentage = Math.max(0, Math.min(100, percentage));
+
+      document.getElementById('savings-progress-bar').style.width = percentage + "%";
+      document.getElementById('progress-percentage').textContent = percentage.toFixed(0) + "%";
+      document.getElementById('saved-amount').textContent = "€" + savedAmount.toFixed(2).replace('.', ',');
+      const remaining = Math.max(0, goalAmount - savedAmount);
+      document.getElementById('remaining-amount').textContent = "€" + remaining.toFixed(2).replace('.', ',');
     }
 
-    async function saveMonthData(){
-      if (!window._firebaseReady || !window._db || !currentUser) return;
-      try{
-        isSaving = true;
-        setSyncStatus("Salvataggio...", "#ffeb3b");
-
-        const data = collectCurrentData();
-        const ref = window._doc(window._db, "users", currentUser.uid, "budgets", currentMonth);
-        await window._setDoc(ref, data, { merge:true });
-
-        setSyncStatus("Salvato ✅", "#8bc34a");
-      }catch(e){
-        console.error("Save error:", e);
-        setSyncStatus("Errore ❌", "#ff5252");
-      }finally{
-        setTimeout(()=>{ isSaving = false; }, 250);
-      }
-    }
-    window.saveMonthData = saveMonthData;
-
-    function populateUIFromData(data){
-      const entrateContainer = document.getElementById('entrate-items');
-      const speseContainer = document.getElementById('spese-items');
-
-      entrateContainer.innerHTML = '';
-      (data.entrate || []).forEach(item=>{
-        const div = document.createElement('div');
-        div.className = 'entry-item';
-        div.innerHTML = `
-          <input type="text" class="item-label-input entrata-input" placeholder="Nome" value="${(item.label||'').replaceAll('"','&quot;')}"
-                 onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-          <input type="number" class="item-amount-input entrata-input" placeholder="€" value="${(item.amount||'').replaceAll('"','&quot;')}"
-                 step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-          <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-        `;
-        entrateContainer.appendChild(div);
-      });
-
-      speseContainer.innerHTML = '';
-      (data.spese || []).forEach(item=>{
-        const div = document.createElement('div');
-        div.className = 'entry-item';
-        div.innerHTML = `
-          <input type="text" class="item-label-input spesa-input" placeholder="Nome" value="${(item.label||'').replaceAll('"','&quot;')}"
-                 onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-          <input type="number" class="item-amount-input spesa-input" placeholder="€" value="${(item.amount||'').replaceAll('"','&quot;')}"
-                 step="0.01" min="0" onchange="updateBudgetTotals(); saveMonthData()" oninput="updateBudgetTotals()">
-          <button class="btn-remove" onclick="removeEntry(this)">✕</button>
-        `;
-        speseContainer.appendChild(div);
-      });
-
-      for (let week=1; week<=4; week++){
-        const inputs = document.querySelectorAll(`.week${week}-shopping`);
-        const weekData = (data.spesaAlimentare && data.spesaAlimentare[`week${week}`]) ? data.spesaAlimentare[`week${week}`] : [];
-        inputs.forEach((input, idx)=>{ input.value = weekData[idx] || ''; });
-      }
-
-      updateBudgetTotals();
-      updateFoodTotals();
-      setTimeout(updateSavingsGoal, 80);
-      updatePieChart();
-    }
-
-    function attachRealtimeListener(){
-      if (!window._firebaseReady || !window._db || !currentUser) return;
-      if (unsubscribe){ unsubscribe(); unsubscribe = null; }
-
-      setSyncStatus("Caricamento...", "#ffeb3b");
-
-      const ref = window._doc(window._db, "users", currentUser.uid, "budgets", currentMonth);
-
-      unsubscribe = window._onSnapshot(ref, (snap)=>{
-        if (isSaving) return;
-
-        if (snap.exists()){
-          populateUIFromData(snap.data());
-          setSyncStatus("Sincronizzato ✅", "#8bc34a");
-        } else {
-          resetUIEmpty();
-          setSyncStatus("Vuoto ✅", "#ffffff");
-        }
-      }, (err)=>{
-        console.error("Snapshot error:", err);
-        setSyncStatus("Errore ❌", "#ff5252");
-      });
-    }
-
-    // ===== CHAT RESET HARD (importante per non “contaminare”) =====
-    function resetChatHard(){
-      const messagesEl = document.getElementById('ai-chat-messages');
-      if (messagesEl){
-        messagesEl.innerHTML = '';
-        delete messagesEl.dataset.started;
-      }
-    }
-
-    // ===== AUTH INIT =====
-    window.addEventListener('load', ()=>{
-      const wait = setInterval(()=>{
+    // ===== INIT + AUTH =====
+    window.addEventListener("load", ()=>{
+      const check = setInterval(()=>{
         if (!window._firebaseReady) return;
-        clearInterval(wait);
+        clearInterval(check);
+
+        monthSelector.value = currentMonth;
 
         window._onAuthStateChanged(window._auth, (user)=>{
           currentUser = user || null;
-          window.currentUser = currentUser;
 
           if (!currentUser){
-            // reset chat identity
-            aiConversationId = "anon:" + Date.now();
-            window.aiConversationId = aiConversationId;
-            resetChatHard();
-
             userInfo.textContent = "";
             logoutBtn.style.display = "none";
-            resetUIEmpty();
-            setSyncStatus("Login richiesto", "#ffc107");
             showLoginOnly();
+            setSyncStatus("Login richiesto", "#ffc107");
+            resetUIEmpty();
             return;
           }
 
-          // ✅ ogni login -> nuova conversation id legata all’utente
-          aiConversationId = "uid:" + currentUser.uid + "|t:" + Date.now();
-          window.aiConversationId = aiConversationId;
-          resetChatHard();
-
           showApp();
-          logoutBtn.style.display = "inline-block";
+          logoutBtn.style.display = "inline-flex";
           userInfo.textContent = currentUser.email || "";
           setSyncStatus("Pronto ✅", "#ffffff");
 
-          if (monthSelector) monthSelector.value = currentMonth;
-
           attachRealtimeListener();
-          setTimeout(()=>{ updatePieChart(); updateSavingsGoal(); updateFoodTotals(); }, 120);
+          setTimeout(()=>{ updatePieChart(); updateSavingsGoal(); }, 150);
         });
 
-      }, 80);
+      }, 60);
     });
 
-    // ===== header auto hide =====
-    const headerEl = document.querySelector('header');
-    const contentEl = document.querySelector('.content');
-    function handleHeaderScroll(scrollValue){
-      if (!headerEl) return;
-      if (scrollValue > 10) headerEl.classList.add('header-hidden');
-      else headerEl.classList.remove('header-hidden');
-    }
-    window.addEventListener('scroll', ()=>handleHeaderScroll(window.scrollY || window.pageYOffset));
-    if (contentEl) contentEl.addEventListener('scroll', ()=>handleHeaderScroll(contentEl.scrollTop));
-
-    // ===== AI CHAT LOGIC (STATLESS) =====
-    (function initAI(){
+    // ===== AI CHAT (usa SOLO dati del DOM corrente) =====
+    (function(){
       const chatButton = document.getElementById('ai-chat-button');
       const chatBox = document.getElementById('ai-chat-box');
       const closeBtn = document.getElementById('ai-chat-close');
@@ -1305,130 +1204,111 @@
       const form = document.getElementById('ai-chat-form');
       const input = document.getElementById('ai-chat-input');
 
-      if (!chatButton || !chatBox || !messagesEl || !form || !input) return;
-
-      // backend AI
       const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat/';
+
       let comparatoriContent = '';
-
-      fetch('comparatori1.html')
-        .then(res => res.ok ? res.text() : '')
-        .then(text => { comparatoriContent = text || ''; })
-        .catch(() => { comparatoriContent = ''; });
-
-      function getText(id){
-        return document.getElementById(id)?.textContent?.trim() || "";
-      }
+      fetch('comparatori1.html').then(r=> r.ok ? r.text() : '').then(t=> comparatoriContent = t || '').catch(()=> comparatoriContent='');
 
       function addMsg(text, who){
-        const wrapper = document.createElement('div');
-        wrapper.className = 'ai-msg ' + (who === 'user' ? 'ai-msg-user' : 'ai-msg-ai');
+        const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+        const wrap = document.createElement('div');
+        wrap.className = 'ai-msg ' + (who === 'user' ? 'ai-msg-user' : 'ai-msg-ai');
+        wrap.dataset.id = id;
         const bubble = document.createElement('div');
         bubble.className = 'ai-msg-bubble';
         bubble.textContent = text;
-        wrapper.appendChild(bubble);
-        messagesEl.appendChild(wrapper);
+        wrap.appendChild(bubble);
+        messagesEl.appendChild(wrap);
         messagesEl.scrollTop = messagesEl.scrollHeight;
-        return wrapper;
+        return id;
+      }
+      function updateMsg(id, text){
+        const el = messagesEl.querySelector(`[data-id="${id}"] .ai-msg-bubble`);
+        if (el) el.textContent = text;
+        else addMsg(text, 'ai');
       }
 
-      function setMsg(node, text){
-        const bubble = node?.querySelector('.ai-msg-bubble');
-        if (bubble) bubble.textContent = text;
-        messagesEl.scrollTop = messagesEl.scrollHeight;
+      function readItems(containerId){
+        return [...document.querySelectorAll(`#${containerId} .entry-item`)].map(row=>{
+          const label = row.querySelector(".item-label-input")?.value?.trim() || "";
+          const amount = row.querySelector(".item-amount-input")?.value || "";
+          return { label, amount };
+        }).filter(x => x.label || x.amount);
       }
 
-      function isLogged(){
-        return !!(window.currentUser && window.currentUser.uid);
-      }
-
-      chatButton.addEventListener('click', () => {
+      chatButton?.addEventListener('click', ()=>{
         chatBox.classList.remove('hidden');
         chatBox.classList.remove('minimized');
-
-        if (!messagesEl.dataset.started) {
-          if (!isLogged()) addMsg('Devi fare login per usare l’assistente.', 'ai');
-          else addMsg('Ciao! Rispondo SOLO usando i dati che vedo ORA nella pagina del tuo account.', 'ai');
+        input.focus();
+        if (!messagesEl.dataset.started){
+          addMsg("Ciao! Rispondo SOLO usando i dati che vedo ORA nella tua pagina (il tuo account). Dimmi cosa vuoi analizzare 💪", 'ai');
           messagesEl.dataset.started = 'true';
         }
-        input.focus();
       });
-
-      closeBtn.addEventListener('click', () => {
+      closeBtn?.addEventListener('click', ()=>{
         chatBox.classList.add('hidden');
         messagesEl.innerHTML = '';
         delete messagesEl.dataset.started;
       });
+      minimizeBtn?.addEventListener('click', ()=> chatBox.classList.toggle('minimized'));
 
-      minimizeBtn.addEventListener('click', () => {
-        chatBox.classList.toggle('minimized');
-      });
-
-      form.addEventListener('submit', (e) => {
+      form?.addEventListener('submit', async (e)=>{
         e.preventDefault();
-        const text = input.value.trim();
-        if (!text) return;
+        const q = input.value.trim();
+        if (!q) return;
 
-        if (!isLogged()){
-          addMsg('Devi fare login per usare l’assistente.', 'ai');
-          setChatEnabled(false);
-          return;
-        }
-
-        addMsg(text, 'user');
+        addMsg(q, 'user');
         input.value = '';
 
-        const typingNode = addMsg('Sto pensando…', 'ai');
+        const typingId = addMsg("Sto analizzando il tuo budget…", 'ai');
 
-        // ✅ SOLO DOM ATTUALE (utente loggato)
+        // ✅ SOLO DATI DOM (utente corrente)
         const budgetContext = {
-          month: (localStorage.getItem("budgetMonth") || ""),
-          entrate: getText("summary-entrate"),
-          spese: getText("summary-spese"),
-          risparmio: getText("summary-balance"),
-          obiettivo_risparmio: "€250,00",
-          risparmiato: getText("saved-amount"),
-          mancano: getText("remaining-amount"),
-          food_speso: getText("total-food-spent"),
-          food_rimasto: getText("total-food-remaining")
+          month: localStorage.getItem("budgetMonth") || "",
+          summary: {
+            entrate: document.getElementById("summary-entrate")?.textContent?.trim() || "",
+            spese: document.getElementById("summary-spese")?.textContent?.trim() || "",
+            risparmio: document.getElementById("summary-balance")?.textContent?.trim() || ""
+          },
+          obiettivo: {
+            obiettivo_mensile: "€250,00",
+            risparmiato: document.getElementById("saved-amount")?.textContent?.trim() || "",
+            mancano: document.getElementById("remaining-amount")?.textContent?.trim() || ""
+          },
+          entrate_items: readItems("entrate-items"),
+          spese_items: readItems("spese-items"),
+          food: {
+            week1: [...document.querySelectorAll(".week1-shopping")].map(i=>i.value||""),
+            week2: [...document.querySelectorAll(".week2-shopping")].map(i=>i.value||""),
+            week3: [...document.querySelectorAll(".week3-shopping")].map(i=>i.value||""),
+            week4: [...document.querySelectorAll(".week4-shopping")].map(i=>i.value||"")
+          }
         };
 
-        // ✅ identità forte: uid + conversation id che cambia ad ogni login
-        const sessionId = "uid:" + window.currentUser.uid;
-        const conversationId = window.aiConversationId;
-
-        // ✅ modalità stateless: NON mandiamo history, e chiediamo al backend di NON usare memoria
-        fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session_id: sessionId,
-            conversation_id: conversationId,
-            stateless: true,
-            history: [],
-            question: text,
-            context_html: comparatoriContent,
-            budget: budgetContext,
-            hard_rules: [
-              "Regole OBBLIGATORIE:",
-              "1) Rispondi SOLO usando i valori presenti in budget (forniti dal DOM).",
-              "2) NON usare memoria di altri utenti o altre sessioni.",
-              "3) Se un dato non è presente, di' che non è disponibile.",
-              "4) Non inventare numeri e non citare dati di altri account."
-            ].join("\n")
-          })
-        })
-        .then(res => res.ok ? res.json() : Promise.reject())
-        .then(data => setMsg(typingNode, data.answer || "Non sono riuscito a rispondere, riprova."))
-        .catch(err => {
+        try{
+          const res = await fetch(API_URL, {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({
+              question: q,
+              context_html: comparatoriContent,   // opzionale
+              budget: budgetContext               // ✅ questo è “la verità”
+            })
+          });
+          if (!res.ok) throw new Error("AI error");
+          const data = await res.json();
+          updateMsg(typingId, data.answer || "Non sono riuscito a rispondere, riprova.");
+        }catch(err){
           console.error(err);
-          setMsg(typingNode, "Errore nel contattare l’AI. Riprova più tardi.");
-        });
+          updateMsg(typingId, "Errore nel contattare l’AI. Riprova più tardi.");
+        }
+
+        messagesEl.scrollTop = messagesEl.scrollHeight;
       });
     })();
   </script>
 
-  <!-- FIRESTORE RULES (METTILE SU FIREBASE)
+  <!-- Firestore rules promemoria:
   rules_version = '2';
   service cloud.firestore {
     match /databases/{database}/documents {
