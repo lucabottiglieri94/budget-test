@@ -1294,115 +1294,163 @@
       });
     })();
 
-    // ================= ORB DRAG (PC + iPhone) =================
-    // ✅ tap apre chat / drag non scrolla / rilascio torna al default
-    (function(){
-      const widget = document.getElementById('ai-chat-widget');
-      const btn = document.getElementById('ai-chat-button');
-      if(!widget || !btn) return;
+    <script>
+/* ================= ORB DRAG (PC + iPhone)
+   ✅ Drag: l'orb resta dove lo lasci (salvato in sessionStorage)
+   ✅ Refresh / chiudi tab: torna al default (sessionStorage si resetta)
+   ✅ Tap: apre la chat (drag-safe)
+   ✅ iPhone: drag NON scrolla pagina dietro
+*/
+(function(){
+  const widget = document.getElementById('ai-chat-widget');
+  const btn = document.getElementById('ai-chat-button');
+  if(!widget || !btn) return;
 
+  window.__orbDragging = false;
+
+  let isDragging = false;
+  let moved = false;
+  let offsetX = 0, offsetY = 0;
+
+  // posizione di default (come ora)
+  function setDefault(){
+    widget.style.left = 'auto';
+    widget.style.top = 'auto';
+    widget.style.right = '16px';
+    widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
+  }
+
+  // ripristina posizione salvata SOLO per questa sessione
+  function restoreSessionPos(){
+    const raw = sessionStorage.getItem('aiWidgetPosSession');
+    if(!raw) return false;
+    try{
+      const p = JSON.parse(raw);
+      if(!p || !p.left || !p.top) return false;
+      widget.style.left = p.left;
+      widget.style.top  = p.top;
+      widget.style.right = 'auto';
+      widget.style.bottom = 'auto';
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  // salva posizione nella sessione
+  function saveSessionPos(){
+    const rect = widget.getBoundingClientRect();
+    sessionStorage.setItem('aiWidgetPosSession', JSON.stringify({
+      left: rect.left + 'px',
+      top: rect.top + 'px'
+    }));
+  }
+
+  // init: o posizione sessione, o default
+  if(!restoreSessionPos()) setDefault();
+
+  function pointFromEvent(e){
+    return (e.touches && e.touches[0]) ? e.touches[0] : e;
+  }
+
+  function startDrag(e){
+    if (e.button !== undefined && e.button !== 0) return;
+
+    const p = pointFromEvent(e);
+    const rect = widget.getBoundingClientRect();
+    offsetX = p.clientX - rect.left;
+    offsetY = p.clientY - rect.top;
+
+    isDragging = true;
+    moved = false;
+    window.__orbDragging = false; // tap non bloccato
+
+    const img = widget.querySelector('img');
+    if (img) img.style.animation = 'none';
+  }
+
+  function onMove(e){
+    if(!isDragging) return;
+
+    if(!moved){
+      moved = true;
+      window.__orbDragging = true; // ora è drag vero
+    }
+    if (e.cancelable) e.preventDefault();
+
+    const p = pointFromEvent(e);
+
+    const w = widget.offsetWidth;
+    const h = widget.offsetHeight;
+
+    let x = p.clientX - offsetX;
+    let y = p.clientY - offsetY;
+
+    // clamp
+    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
+
+    widget.style.left = x + 'px';
+    widget.style.top  = y + 'px';
+    widget.style.right = 'auto';
+    widget.style.bottom = 'auto';
+  }
+
+  function endDrag(){
+    if(!isDragging) return;
+    isDragging = false;
+
+    const img = widget.querySelector('img');
+    if (img) img.style.animation = '';
+
+    // tap: lascia click libero
+    if(!moved){
       window.__orbDragging = false;
+      return;
+    }
 
-      let isDragging = false;
-      let moved = false;
-      let offsetX = 0, offsetY = 0;
+    // drag: salva posizione e resta lì
+    saveSessionPos();
 
-      function resetToDefault(){
-        widget.style.left = 'auto';
-        widget.style.top = 'auto';
-        widget.style.right = '16px';
-        widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
+    setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 80);
+  }
+
+  // PC
+  btn.addEventListener('mousedown', startDrag);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', endDrag);
+
+  // iPhone (passive false per bloccare scroll durante drag)
+  btn.addEventListener('touchstart', startDrag, { passive:false });
+  document.addEventListener('touchmove', onMove, { passive:false });
+  document.addEventListener('touchend', endDrag, { passive:true });
+  document.addEventListener('touchcancel', endDrag, { passive:true });
+
+  // blocca click se era drag
+  btn.addEventListener('click', (e)=>{
+    if(window.__orbDragging){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+
+  // se cambia orientamento, riclamppa e risalva
+  window.addEventListener('orientationchange', ()=>{
+    setTimeout(()=>{
+      // se c'è posizione sessione, la ripristiniamo e la riclamppiamo
+      restoreSessionPos();
+      // clamp leggero: se finisce fuori schermo, torna default
+      const r = widget.getBoundingClientRect();
+      if (r.right > window.innerWidth || r.bottom > window.innerHeight || r.left < 0 || r.top < 0){
+        setDefault();
+        sessionStorage.removeItem('aiWidgetPosSession');
+      } else {
+        saveSessionPos();
       }
-      resetToDefault();
-
-      function pointFromEvent(e){
-        if (e.touches && e.touches[0]) return e.touches[0];
-        return e;
-      }
-
-      function startDrag(e){
-        if (e.button !== undefined && e.button !== 0) return;
-
-        const p = pointFromEvent(e);
-        const rect = widget.getBoundingClientRect();
-
-        offsetX = p.clientX - rect.left;
-        offsetY = p.clientY - rect.top;
-
-        isDragging = true;
-        moved = false;
-        window.__orbDragging = false; // tap non deve essere bloccato
-
-        const img = widget.querySelector('img');
-        if (img) img.style.animation = 'none';
-      }
-
-      function onMove(e){
-        if(!isDragging) return;
-
-        if (!moved) {
-          moved = true;
-          window.__orbDragging = true; // ora sì: è drag
-        }
-        if (e.cancelable) e.preventDefault();
-
-        const p = pointFromEvent(e);
-        const w = widget.offsetWidth;
-        const h = widget.offsetHeight;
-
-        let x = p.clientX - offsetX;
-        let y = p.clientY - offsetY;
-
-        x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
-        y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
-
-        widget.style.left = x + 'px';
-        widget.style.top = y + 'px';
-        widget.style.right = 'auto';
-        widget.style.bottom = 'auto';
-      }
-
-      function endDrag(){
-        if(!isDragging) return;
-        isDragging = false;
-
-        const img = widget.querySelector('img');
-        if (img) img.style.animation = '';
-
-        // tap: lascia click libero
-        if (!moved){
-          window.__orbDragging = false;
-          return;
-        }
-
-        // drag: torna sempre al default
-        resetToDefault();
-        setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 80);
-      }
-
-      // PC
-      btn.addEventListener('mousedown', startDrag);
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', endDrag);
-
-      // iPhone (passive false per preventDefault)
-      btn.addEventListener('touchstart', startDrag, { passive:false });
-      document.addEventListener('touchmove', onMove, { passive:false });
-      document.addEventListener('touchend', endDrag, { passive:true });
-      document.addEventListener('touchcancel', endDrag, { passive:true });
-
-      // blocca click quando era drag
-      btn.addEventListener('click', (e)=>{
-        if(window.__orbDragging){
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }, true);
-
-      window.addEventListener('orientationchange', ()=> setTimeout(resetToDefault, 120));
-      window.addEventListener('resize', ()=> setTimeout(resetToDefault, 60));
-    })();
-  </script>
+    }, 150);
+  });
+})();
+</script>
 
   <!-- FIRESTORE RULES (Firebase Console -> Firestore Rules)
   rules_version = '2';
