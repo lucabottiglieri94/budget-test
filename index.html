@@ -519,29 +519,40 @@
     .bottom-nav .b1{ background: linear-gradient(135deg, rgba(245,158,11,1), rgba(239,68,68,1)); }
     .bottom-nav .b2{ background: linear-gradient(135deg, rgba(34,197,94,1), rgba(56,189,248,1)); }
 
-    /* AI chat */
-    #ai-chat-widget{
-      position: fixed;
-      right: calc(16px + var(--safe-right));
-      bottom: calc(86px + var(--safe-bottom));
-      z-index: 9000;
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    }
-    /* quando lo trascini */
-#ai-chat-widget.dragging{
-  opacity: .95;
+/* ================= AI ORB – FINAL SIZE ================= */
+
+#ai-chat-widget{
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  width: 160px;
+  height: 160px;
+  z-index: 9999;
 }
-    #ai-chat-button{
-      width: 62px; height: 62px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      box-shadow: 0 16px 40px rgba(0,0,0,.45);
-      cursor:pointer;
-      padding:0;
-      overflow:hidden;
-    }
-    #ai-chat-button img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+#ai-chat-button{
+  width: 160px;
+  height: 160px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.ai-orb-img{
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  filter: none;            /* niente cerchio grigio */
+  animation: aiFloat 4s ease-in-out infinite;
+}
+
+@keyframes aiFloat {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
 
     #ai-chat-box{
       position:absolute;
