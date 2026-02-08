@@ -329,6 +329,28 @@
 
     .pie-wrap{ position:relative; height: 260px; }
 
+    /* ===== FOOD ===== */
+    .week-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .week-grid label{
+      display:block;
+      font-size: 12px;
+      color: rgba(229,231,235,.70);
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .total-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      font-weight: 950;
+      margin-top: 10px;
+    }
+
     /* ===== AI ORB + CHAT ===== */
     #ai-chat-widget{
       position: fixed;
@@ -576,6 +598,63 @@
             <div style="display:none" id="goal-amount">250,00</div>
           </section>
         </div>
+
+        <!-- ✅ SPESE ALIMENTARI (4 settimane) -->
+        <section class="card">
+          <h2>🛒 Spese Alimentari <span class="muted">€500/mese • €125/settimana</span></h2>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+            <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
+              <div style="font-weight:950; margin-bottom:10px;">📅 Settimana 1</div>
+              <div class="week-grid">
+                <div><label>Spesa 1</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 2</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 3</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 4</label><input type="number" class="item-amount-input week1-shopping" placeholder="€" step="0.01" min="0"></div>
+              </div>
+              <div class="total-row"><span>Totale</span><span id="total-week1">€ 0,00</span></div>
+            </div>
+
+            <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
+              <div style="font-weight:950; margin-bottom:10px;">📅 Settimana 2</div>
+              <div class="week-grid">
+                <div><label>Spesa 1</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 2</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 3</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 4</label><input type="number" class="item-amount-input week2-shopping" placeholder="€" step="0.01" min="0"></div>
+              </div>
+              <div class="total-row"><span>Totale</span><span id="total-week2">€ 0,00</span></div>
+            </div>
+
+            <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
+              <div style="font-weight:950; margin-bottom:10px;">📅 Settimana 3</div>
+              <div class="week-grid">
+                <div><label>Spesa 1</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 2</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 3</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 4</label><input type="number" class="item-amount-input week3-shopping" placeholder="€" step="0.01" min="0"></div>
+              </div>
+              <div class="total-row"><span>Totale</span><span id="total-week3">€ 0,00</span></div>
+            </div>
+
+            <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
+              <div style="font-weight:950; margin-bottom:10px;">📅 Settimana 4</div>
+              <div class="week-grid">
+                <div><label>Spesa 1</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 2</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 3</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"></div>
+                <div><label>Spesa 4</label><input type="number" class="item-amount-input week4-shopping" placeholder="€" step="0.01" min="0"></div>
+              </div>
+              <div class="total-row"><span>Totale</span><span id="total-week4">€ 0,00</span></div>
+            </div>
+          </div>
+
+          <div class="summary" style="margin-top:14px;">
+            <div class="sum"><div class="label">Budget</div><div class="value">€ 500</div></div>
+            <div class="sum"><div class="label">Speso</div><div class="value" id="total-food-spent">€ 0,00</div></div>
+            <div class="sum"><div class="label">Rimasto</div><div class="value pos" id="total-food-remaining">€ 500,00</div></div>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -643,7 +722,6 @@
 
     await setPersistence(auth, browserSessionPersistence);
 
-    // expose tutto a window (fix definitivo module/non-module)
     window.firebaseAuth = {
       db,
       auth,
@@ -658,13 +736,11 @@
       signOut
     };
 
-    // gestisce risultato redirect (iPhone)
     getRedirectResult(auth).catch(()=>{});
   </script>
 
   <!-- APP + CHAT + ORB (NO MODULE) -->
   <script>
-    // ===== Month options =====
     function pad2(n){ return String(n).padStart(2,"0"); }
     function monthLabel(y,m){
       const mesi = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
@@ -689,13 +765,11 @@
     function formatCurrency(v){ return "€ " + (Number(v||0)).toFixed(2).replace(".", ","); }
     function escapeAttr(s){ return (s ?? "").toString().replaceAll('"','&quot;'); }
 
-    // ===== State =====
     let currentMonth = localStorage.getItem("budgetMonth") || "";
     let currentUser = null;
     let unsubscribe = null;
     let isSaving = false;
 
-    // ===== DOM =====
     const loginScreen = document.getElementById("login-screen");
     const loginScreenBtn = document.getElementById("login-screen-btn");
     const appEl = document.getElementById("app");
@@ -717,7 +791,6 @@
     function showLoginOnly(){ loginScreen.style.display = "flex"; appEl.style.display = "none"; }
     function showApp(){ loginScreen.style.display = "none"; appEl.style.display = "block"; }
 
-    // ===== Month init =====
     buildMonthOptions(monthSelector);
     if (!currentMonth){
       currentMonth = monthSelector.value;
@@ -731,7 +804,34 @@
       attachRealtimeListener();
     });
 
-    // ===== Pie Chart =====
+    // ===== Food totals =====
+    function updateFoodTotals(){
+      const monthlyBudget = 500;
+      let monthlyTotal = 0;
+
+      for (let week=1; week<=4; week++){
+        let weekTotal = 0;
+        document.querySelectorAll(`.week${week}-shopping`).forEach(i => weekTotal += parseAmount(i.value));
+        monthlyTotal += weekTotal;
+
+        const el = document.getElementById(`total-week${week}`);
+        if (el) el.textContent = formatCurrency(weekTotal);
+      }
+
+      const spentEl = document.getElementById('total-food-spent');
+      const remEl = document.getElementById('total-food-remaining');
+
+      if (spentEl) spentEl.textContent = formatCurrency(monthlyTotal);
+
+      if (remEl){
+        const remaining = monthlyBudget - monthlyTotal;
+        remEl.textContent = formatCurrency(remaining);
+        remEl.classList.toggle('pos', remaining >= 0);
+        remEl.classList.toggle('neg', remaining < 0);
+      }
+    }
+
+    // ===== Pie =====
     let pieChart = null;
     function updatePieChart(){
       const canvas = document.getElementById("budgetPie");
@@ -810,12 +910,13 @@
       document.getElementById('remaining-amount').textContent = "€" + Math.max(0, goalAmount - savedAmount).toFixed(2).replace('.', ',');
     }
 
-    // ===== Data =====
+    // ===== Data (include food) =====
     function collectCurrentData(){
       const data = {
         month: currentMonth,
         entrate: [],
         spese: [],
+        spesaAlimentare: { week1:[], week2:[], week3:[], week4:[] },
         lastModified: new Date().toISOString()
       };
 
@@ -830,6 +931,12 @@
         const amount = item.querySelector('.item-amount-input')?.value || "";
         if (label || amount) data.spese.push({ label, amount });
       });
+
+      for (let week=1; week<=4; week++){
+        document.querySelectorAll(`.week${week}-shopping`).forEach(input=>{
+          data.spesaAlimentare[`week${week}`].push(input.value || "");
+        });
+      }
 
       return data;
     }
@@ -858,9 +965,13 @@
     function resetUIEmpty(){
       document.getElementById('entrate-items').innerHTML = '';
       document.getElementById('spese-items').innerHTML = '';
+      for (let week=1; week<=4; week++){
+        document.querySelectorAll(`.week${week}-shopping`).forEach(input => input.value = '');
+      }
       updateBudgetTotals();
       updatePieChart();
       updateSavingsGoal();
+      updateFoodTotals();
     }
 
     function populateUIFromData(data){
@@ -891,9 +1002,16 @@
         speseContainer.appendChild(div);
       });
 
+      for (let week=1; week<=4; week++){
+        const inputs = document.querySelectorAll(`.week${week}-shopping`);
+        const weekData = (data.spesaAlimentare && data.spesaAlimentare[`week${week}`]) ? data.spesaAlimentare[`week${week}`] : [];
+        inputs.forEach((input, idx)=> input.value = weekData[idx] || '');
+      }
+
       updateBudgetTotals();
       updatePieChart();
       updateSavingsGoal();
+      updateFoodTotals();
     }
 
     function attachRealtimeListener(){
@@ -944,9 +1062,18 @@
     window.addEntryItem = addEntryItem;
     window.removeEntry = removeEntry;
 
+    // autosave: entrate/spese + food
     document.addEventListener("input", (e)=>{
       const t = e.target;
       if (!t) return;
+
+      if (t.classList.contains("week1-shopping") || t.classList.contains("week2-shopping") ||
+          t.classList.contains("week3-shopping") || t.classList.contains("week4-shopping")){
+        updateFoodTotals();
+        saveMonthData();
+        return;
+      }
+
       if (t.classList.contains("item-label-input") || t.classList.contains("item-amount-input")){
         updateBudgetTotals();
         saveMonthData();
@@ -995,7 +1122,6 @@
     logoutBtnSidebar.addEventListener("click", doLogout);
     logoutBtnTop.addEventListener("click", doLogout);
 
-    // ===== Auth listener =====
     (function waitAuth(){
       const t = setInterval(()=>{
         const fb = window.firebaseAuth;
@@ -1023,12 +1149,12 @@
           loginBtnTop.style.display = "none";
           setSyncStatus("Pronto ✅", "rgba(229,231,235,.85)");
           attachRealtimeListener();
-          setTimeout(()=>{ updatePieChart(); updateSavingsGoal(); }, 120);
+          setTimeout(()=>{ updatePieChart(); updateSavingsGoal(); updateFoodTotals(); }, 120);
         });
       }, 60);
     })();
 
-    // ===== AI CHAT (UI + endpoint) =====
+    // ===== AI CHAT =====
     (function(){
       const chatButton = document.getElementById('ai-chat-button');
       const chatBox = document.getElementById('ai-chat-box');
@@ -1070,7 +1196,6 @@
       }
       function getText(id){ return document.getElementById(id)?.textContent?.trim() || ""; }
 
-      // open chat
       chatButton.addEventListener('click', ()=>{
         if (window.__orbDragging) return;
         if (!currentUser){
@@ -1085,14 +1210,13 @@
         }
       });
 
-      // close clears
       closeBtn.addEventListener('click', ()=>{
         chatBox.classList.add('hidden');
         messagesEl.innerHTML = '';
         delete messagesEl.dataset.started;
       });
 
-      // minimize = hide (no barra)
+      // minimize = chiudi (niente barra rimasta)
       minimizeBtn.addEventListener('click', ()=>{
         chatBox.classList.add('hidden');
       });
@@ -1120,7 +1244,13 @@
             risparmio: getText("summary-balance")
           },
           entrate_items: readItems("entrate-items"),
-          spese_items: readItems("spese-items")
+          spese_items: readItems("spese-items"),
+          food: {
+            week1: [...document.querySelectorAll(".week1-shopping")].map(i=>i.value||""),
+            week2: [...document.querySelectorAll(".week2-shopping")].map(i=>i.value||""),
+            week3: [...document.querySelectorAll(".week3-shopping")].map(i=>i.value||""),
+            week4: [...document.querySelectorAll(".week4-shopping")].map(i=>i.value||"")
+          }
         };
 
         try{
@@ -1147,7 +1277,7 @@
       });
     })();
 
-    // ================= ORB DRAG: resta in posizione in sessione, reset su refresh =================
+    // ===== ORB DRAG: sessione (resta finché non refresh), NO scroll dietro su iPhone =====
     (function(){
       const widget = document.getElementById('ai-chat-widget');
       const btn = document.getElementById('ai-chat-button');
@@ -1253,18 +1383,15 @@
         setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 80);
       }
 
-      // PC
       btn.addEventListener('mousedown', startDrag);
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup', endDrag);
 
-      // iPhone
       btn.addEventListener('touchstart', startDrag, { passive:false });
       document.addEventListener('touchmove', onMove, { passive:false });
       document.addEventListener('touchend', endDrag, { passive:true });
       document.addEventListener('touchcancel', endDrag, { passive:true });
 
-      // blocca click se era drag
       btn.addEventListener('click', (e)=>{
         if(window.__orbDragging){
           e.preventDefault();
@@ -1272,7 +1399,6 @@
         }
       }, true);
 
-      // se orientation change e la posizione va fuori schermo -> torna default
       window.addEventListener('orientationchange', ()=>{
         setTimeout(()=>{
           restoreSessionPos();
