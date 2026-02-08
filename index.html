@@ -842,13 +842,6 @@
   display: none !important;
 }
 
-/* iPhone: evita scroll pagina mentre trascini l'orb */
-#ai-chat-widget, #ai-chat-button, .ai-orb-img{
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
 
   </style>
 </head>
@@ -1816,27 +1809,28 @@
 
   function startDrag(e){
     // click destro no
-    function startDrag(e){
-  if (e.button !== undefined && e.button !== 0) return;
+    if (e.button !== undefined && e.button !== 0) return;
 
-  // ✅ blocca lo scroll quando inizi a trascinare (iPhone)
-  if (e.cancelable) e.preventDefault();
+    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
 
-  const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
-  ...
-}
+    const rect = widget.getBoundingClientRect();
+    offsetX = p.clientX - rect.left;
+    offsetY = p.clientY - rect.top;
 
-function onMove(e){
-  if(!isDragging) return;
+    isDragging = true;
+    moved = false;
+    widget.classList.add('dragging');
 
-  // ✅ blocca scroll pagina mentre trascini
-  if (e.cancelable) e.preventDefault();
+    // disattiva animazione fluttuante mentre trascini (se la usi sull'immagine)
+    const img = widget.querySelector('img');
+    if (img) img.style.animation = 'none';
+  }
 
-  const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
-  moved = true;
-  ...
-}
+  function onMove(e){
+    if(!isDragging) return;
 
+    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
+    moved = true;
 
     // limita dentro lo schermo
     const w = widget.offsetWidth;
@@ -1877,11 +1871,9 @@ function onMove(e){
   document.addEventListener('mouseup', endDrag);
 
   // Touch (mobile)
-btn.addEventListener('touchstart', startDrag, { passive: false });
-document.addEventListener('touchmove', onMove, { passive: false });
-document.addEventListener('touchend', endDrag, { passive: true });
-document.addEventListener('touchcancel', endDrag, { passive: true });
-
+  btn.addEventListener('touchstart', startDrag, {passive:true});
+  document.addEventListener('touchmove', onMove, {passive:true});
+  document.addEventListener('touchend', endDrag);
 
   // Evita che un drag apra la chat (blocca il click se hai trascinato)
   btn.addEventListener('click', (e) => {
