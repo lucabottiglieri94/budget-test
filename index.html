@@ -654,11 +654,10 @@
 }
 
 .ai-orb-img {
-  width: 140px;
-  height: 140px;
-  border-radius: 10%;
-
-  filter: drop-shadow(0 0 16px rgba(120, 100, 255, 0.55));
+  width: 1800px;
+  height: 180px;
+  border-radius: 50%;
+  filter: none; /* niente grigio */
   animation: aiFloat 4s ease-in-out infinite;
   transition: transform .25s ease;
 }
@@ -666,6 +665,7 @@
 .ai-orb-img:hover {
   transform: scale(1.05);
 }
+
 
 @keyframes aiFloat {
   0%   { transform: translateY(0); }
