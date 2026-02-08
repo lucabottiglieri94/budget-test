@@ -13,11 +13,13 @@
     :root{
       --bg0:#070B14;
       --bg1:#0B1220;
+
       --card: rgba(15,23,42,.72);
       --text:#E5E7EB;
       --muted:#9CA3AF;
-      --shadow2: 0 14px 40px rgba(0,0,0,.30);
+
       --shadow: 0 22px 70px rgba(0,0,0,.45);
+      --shadow2: 0 14px 40px rgba(0,0,0,.30);
       --radius:18px;
 
       --safe-top: env(safe-area-inset-top, 0px);
@@ -31,14 +33,14 @@
     body{
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       background:
-        radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.18), transparent 55%),
+        radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.16), transparent 55%),
         radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.10), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
       color: var(--text);
       overflow-x:hidden;
     }
 
-    /* ===== LOGIN SCREEN ===== */
+    /* ===== LOGIN ===== */
     #login-screen{
       position: fixed;
       inset: 0;
@@ -49,7 +51,7 @@
       padding: calc(18px + var(--safe-top)) calc(18px + var(--safe-left))
                calc(18px + var(--safe-bottom)) calc(18px + var(--safe-right));
       background:
-        radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.22), transparent 55%),
+        radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.20), transparent 55%),
         radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.12), transparent 55%),
         linear-gradient(180deg, var(--bg0), var(--bg1));
     }
@@ -154,12 +156,7 @@
       color: rgba(229,231,235,.92);
     }
 
-    .menu{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-top: 12px;
-    }
+    .menu{ display:flex; flex-direction:column; gap:10px; margin-top: 12px; }
     .navbtn{
       width:100%;
       display:flex;
@@ -178,17 +175,9 @@
     }
     .navbtn:hover{ background: rgba(255,255,255,.09) }
     .navbtn:active{ transform: scale(.99) }
-    .navbtn .hint{
-      font-size: 12px;
-      font-weight: 900;
-      color: rgba(229,231,235,.75);
-    }
+    .navbtn .hint{ font-size: 12px; font-weight: 900; color: rgba(229,231,235,.75); }
 
-    .main{
-      display:flex;
-      flex-direction:column;
-      gap: 14px;
-    }
+    .main{ display:flex; flex-direction:column; gap: 14px; }
 
     .topbar{
       border-radius: var(--radius);
@@ -207,14 +196,7 @@
     .topbar-title{ font-weight: 950; font-size: 18px; letter-spacing:.2px; }
     .topbar-sub{ color: rgba(229,231,235,.78); font-weight:700; font-size:12px; }
 
-    .topbar-right{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-      flex: 1;
-    }
+    .topbar-right{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; flex: 1; }
     .select{
       flex: 1;
       min-width: 220px;
@@ -254,19 +236,10 @@
       text-overflow:ellipsis;
       white-space:nowrap;
     }
-    #sync-status{
-      font-size: 12px;
-      font-weight: 900;
-      color: rgba(229,231,235,.85);
-      margin-top: 8px;
-    }
+    #sync-status{ font-size: 12px; font-weight: 900; color: rgba(229,231,235,.85); margin-top: 8px; }
     #sync-label{ font-weight: 950; }
 
-    .summary{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-    }
+    .summary{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
     .sum{
       border-radius: var(--radius);
       padding: 14px;
@@ -283,19 +256,11 @@
       text-transform: uppercase;
       margin-bottom: 8px;
     }
-    .sum .value{
-      font-size: 20px;
-      font-weight: 950;
-      letter-spacing:.2px;
-    }
+    .sum .value{ font-size: 20px; font-weight: 950; letter-spacing:.2px; }
     .pos{ color: rgba(34,197,94,1); }
     .neg{ color: rgba(239,68,68,1); }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .card{
       border-radius: var(--radius);
       background: var(--card);
@@ -332,7 +297,7 @@
       background: rgba(255,255,255,.06);
       color: rgba(229,231,235,.92);
       padding: 10px;
-      font-size: 16px; /* no zoom iPhone */
+      font-size: 16px;
       font-weight: 900;
       outline:none;
     }
@@ -364,70 +329,7 @@
 
     .pie-wrap{ position:relative; height: 260px; }
 
-    .goal-line{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; flex-wrap:wrap;
-      margin-bottom: 10px;
-      font-weight: 950;
-    }
-    .bar{
-      height: 38px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      overflow:hidden;
-      position:relative;
-      margin-bottom: 10px;
-    }
-    .bar > div{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, rgba(34,197,94,1), rgba(56,189,248,1));
-      border-radius: 999px;
-      transition: width .18s linear;
-    }
-    .bar span{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      font-weight: 950;
-      color:#061019;
-      text-shadow: 0 2px 12px rgba(0,0,0,.35);
-    }
-    .goal-foot{
-      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
-      font-weight: 900;
-      color: rgba(229,231,235,.78);
-      font-size: 12px;
-    }
-
-    /* ===== Bottom nav (mobile) ===== */
-    .bottom-nav{
-      position: fixed;
-      left: 0; right: 0;
-      bottom: 0;
-      padding: 10px calc(12px + var(--safe-left)) calc(10px + var(--safe-bottom)) calc(12px + var(--safe-right));
-      background: rgba(7,11,20,.70);
-      border-top: 1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
-      display:none;
-      z-index: 5000;
-    }
-    .bottom-nav .row{ display:flex; gap:10px; }
-    .bottom-nav button{
-      flex:1;
-      border:none;
-      cursor:pointer;
-      border-radius: 16px;
-      padding: 12px;
-      font-weight: 950;
-      color:#061019;
-      box-shadow: 0 14px 35px rgba(0,0,0,.35);
-    }
-    .bottom-nav .b1{ background: linear-gradient(135deg, rgba(245,158,11,1), rgba(239,68,68,1)); }
-    .bottom-nav .b2{ background: linear-gradient(135deg, rgba(34,197,94,1), rgba(56,189,248,1)); }
-
-    /* ================= AI ORB + CHAT ================= */
-
+    /* ===== AI ORB + CHAT ===== */
     #ai-chat-widget{
       position: fixed;
       right: 16px;
@@ -435,8 +337,6 @@
       width: 92px;
       height: 92px;
       z-index: 99999;
-
-      /* iPhone: evita scroll/gesture mentre trascini */
       touch-action: none;
       -webkit-user-select: none;
       user-select: none;
@@ -461,7 +361,6 @@
       user-select: none;
       touch-action: none;
     }
-    .ai-orb-img:hover{ transform: scale(1.05); }
     @keyframes aiFloat {
       0% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
@@ -518,8 +417,6 @@
     .ai-msg{ display:flex; margin-bottom: 10px; }
     .ai-msg-user{ justify-content:flex-end; }
     .ai-msg-ai{ justify-content:flex-start; }
-
-    /* Apple-style bubbles */
     .ai-msg-bubble{
       max-width: 86%;
       padding: 12px 12px;
@@ -578,31 +475,20 @@
       box-shadow: 0 14px 34px rgba(0,0,0,.35);
     }
 
-    /* keyboard helper */
-    body.kbd-open #ai-chat-widget{ bottom: calc(300px + env(safe-area-inset-bottom, 0px)); }
-
-    /* Responsive */
+    /* Mobile */
     @media (max-width: 980px){
       .shell{ grid-template-columns: 1fr; }
       .sidebar{ display:none; }
-      .bottom-nav{ display:block; }
       .summary{ grid-template-columns: 1fr; }
       .grid{ grid-template-columns: 1fr; }
       .select{ min-width: 0; width: 100%; }
       .topbar-right{ justify-content:flex-start; }
       #user-info{ max-width: 90vw; }
-
-      #ai-chat-widget{
-        right: 16px !important;
-        bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
-        z-index: 99999 !important;
-      }
     }
   </style>
 </head>
 
 <body>
-
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <div id="login-card">
@@ -610,14 +496,13 @@
       <h1>💰 Budget Mensile</h1>
       <p>Accedi con Google per vedere e salvare <b>solo i tuoi dati</b>.</p>
       <button id="login-screen-btn" type="button">Accedi con Google</button>
-      <small>Se non clicca: controlla popup bloccati (Safari/Chrome) o prova un altro browser.</small>
+      <small>Se non clicca: controlla popup bloccati (Safari/Chrome).</small>
     </div>
   </div>
 
   <!-- APP -->
   <div id="app">
     <div class="shell">
-
       <aside class="sidebar">
         <div class="brand">
           <h1>Budget Dashboard</h1>
@@ -629,12 +514,6 @@
         <div id="user-info"></div>
 
         <div class="menu">
-          <button class="navbtn" type="button" onclick="location.href='risparmi.html'">
-            <span>📈 Grafico Risparmi</span><span class="hint">Apri</span>
-          </button>
-          <button class="navbtn" type="button" onclick="location.href='comparatori.html'">
-            <span>📊 Comparatori</span><span class="hint">Apri</span>
-          </button>
           <button id="login-btn" class="navbtn" type="button">
             <span>🔑 Accedi Google</span><span class="hint">Login</span>
           </button>
@@ -648,7 +527,7 @@
         <div class="topbar">
           <div class="topbar-left">
             <div class="topbar-title">💰 Budget Mensile</div>
-            <div class="topbar-sub">Gestione entrate/spese • sincronizzato • mobile-ready</div>
+            <div class="topbar-sub">Gestione entrate/spese • sincronizzato</div>
           </div>
           <div class="topbar-right">
             <select id="month-selector" class="select"></select>
@@ -679,35 +558,25 @@
 
         <div class="grid">
           <section class="card">
-            <h2>🥧 Ripartizione Entrate/Spese <span class="muted">auto</span></h2>
+            <h2>🥧 Ripartizione <span class="muted">auto</span></h2>
             <div class="pie-wrap"><canvas id="budgetPie"></canvas></div>
-            <div class="muted" style="margin-top:10px;">Si aggiorna automaticamente quando modifichi le voci.</div>
           </section>
 
           <section class="card">
-            <h2>🎯 Obiettivo Risparmio <span class="muted">coach mode</span></h2>
-            <div class="goal-line">
-              <span class="muted">Obiettivo mensile</span>
-              <span style="font-weight:950;">€ <span id="goal-amount">250,00</span></span>
+            <h2>🎯 Obiettivo <span class="muted">€250</span></h2>
+            <div class="muted" style="margin-bottom:8px;">Risparmio mensile</div>
+            <div style="height:38px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);overflow:hidden;position:relative;margin-bottom:10px;">
+              <div id="savings-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg, rgba(34,197,94,1), rgba(56,189,248,1));border-radius:999px;transition:width .18s linear;"></div>
+              <span id="progress-percentage" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:950;color:#061019;text-shadow:0 2px 12px rgba(0,0,0,.35);">0%</span>
             </div>
-            <div class="bar">
-              <div id="savings-progress-bar"></div>
-              <span id="progress-percentage">0%</span>
-            </div>
-            <div class="goal-foot">
+            <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-weight:900;color:rgba(229,231,235,.78);font-size:12px;">
               <span>Risparmiato: <b id="saved-amount">€0,00</b></span>
               <span>Mancano: <b id="remaining-amount">€250,00</b></span>
             </div>
+            <div style="display:none" id="goal-amount">250,00</div>
           </section>
         </div>
       </main>
-    </div>
-
-    <div class="bottom-nav">
-      <div class="row">
-        <button class="b1" type="button" onclick="location.href='risparmi.html'">📈 Risparmi</button>
-        <button class="b2" type="button" onclick="location.href='comparatori.html'">📊 Comparatori</button>
-      </div>
     </div>
 
     <!-- AI CHAT -->
@@ -723,7 +592,7 @@
 
       <div id="ai-chat-box" class="hidden">
         <div class="ai-chat-header">
-          <div class="ai-chat-title">Assistente AI (coach)</div>
+          <div class="ai-chat-title">Assistente AI</div>
           <div class="ai-chat-actions">
             <button id="ai-chat-minimize" type="button">−</button>
             <button id="ai-chat-close" type="button">×</button>
@@ -740,14 +609,20 @@
     </div>
   </div>
 
-  <!-- ============ FIREBASE (MODULE) ============ -->
+  <!-- FIREBASE (MODULE) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
     import {
-      getAuth, onAuthStateChanged, GoogleAuthProvider,
-      signInWithPopup, signOut,
-      setPersistence, browserSessionPersistence
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
+      onAuthStateChanged,
+      signOut,
+      setPersistence,
+      browserSessionPersistence
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -763,30 +638,33 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
-    // Sessione solo finché il tab è aperto (evita problemi su iPhone)
-    await setPersistence(auth, browserSessionPersistence);
-
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    // export per gli script normali
-    window._firebase = { db, auth, provider, doc, setDoc, onSnapshot, signInWithPopup, signOut, onAuthStateChanged };
-    window._firebaseReady = true;
+    await setPersistence(auth, browserSessionPersistence);
+
+    // expose tutto a window (fix definitivo module/non-module)
+    window.firebaseAuth = {
+      db,
+      auth,
+      provider,
+      doc,
+      setDoc,
+      onSnapshot,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
+      onAuthStateChanged,
+      signOut
+    };
+
+    // gestisce risultato redirect (iPhone)
+    getRedirectResult(auth).catch(()=>{});
   </script>
 
-  <!-- ============ APP + CHAT + ORB (NO MODULE) ============ -->
+  <!-- APP + CHAT + ORB (NO MODULE) -->
   <script>
-    // ===== Keyboard helper =====
-    document.addEventListener("focusin", (e) => {
-      const t = e.target;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) document.body.classList.add("kbd-open");
-    });
-    document.addEventListener("focusout", () => {
-      setTimeout(() => document.body.classList.remove("kbd-open"), 120);
-    });
-
-    // ===== Utils =====
+    // ===== Month options =====
     function pad2(n){ return String(n).padStart(2,"0"); }
     function monthLabel(y,m){
       const mesi = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
@@ -806,9 +684,16 @@
       }
       selectEl.innerHTML = opts.map(o=>`<option value="${o.val}">${o.text}</option>`).join("");
     }
+
     function parseAmount(x){ return parseFloat((x ?? "").toString().replace(",", ".")) || 0; }
     function formatCurrency(v){ return "€ " + (Number(v||0)).toFixed(2).replace(".", ","); }
     function escapeAttr(s){ return (s ?? "").toString().replaceAll('"','&quot;'); }
+
+    // ===== State =====
+    let currentMonth = localStorage.getItem("budgetMonth") || "";
+    let currentUser = null;
+    let unsubscribe = null;
+    let isSaving = false;
 
     // ===== DOM =====
     const loginScreen = document.getElementById("login-screen");
@@ -818,15 +703,12 @@
     const monthSelector = document.getElementById("month-selector");
     const loginBtnSidebar = document.getElementById("login-btn");
     const logoutBtnSidebar = document.getElementById("logout-btn");
+
     const loginBtnTop = document.getElementById("top-login");
     const logoutBtnTop = document.getElementById("top-logout");
+
     const userInfo = document.getElementById("user-info");
     const syncLabel = document.getElementById("sync-label");
-
-    let currentMonth = localStorage.getItem("budgetMonth") || "";
-    let currentUser = null;
-    let unsubscribe = null;
-    let isSaving = false;
 
     function setSyncStatus(text, color="rgba(229,231,235,.85)"){
       syncLabel.textContent = text;
@@ -842,22 +724,14 @@
       localStorage.setItem("budgetMonth", currentMonth);
     } else {
       monthSelector.value = currentMonth;
-      if (monthSelector.value !== currentMonth){
-        const opt = document.createElement("option");
-        opt.value = currentMonth;
-        opt.textContent = currentMonth;
-        monthSelector.prepend(opt);
-        monthSelector.value = currentMonth;
-      }
     }
-
     monthSelector.addEventListener("change", ()=>{
       currentMonth = monthSelector.value;
       localStorage.setItem("budgetMonth", currentMonth);
       attachRealtimeListener();
     });
 
-    // ===== Charts =====
+    // ===== Pie Chart =====
     let pieChart = null;
     function updatePieChart(){
       const canvas = document.getElementById("budgetPie");
@@ -908,6 +782,7 @@
 
       document.getElementById('total-entrate').textContent = formatCurrency(totalEntrate);
       document.getElementById('total-spese').textContent = formatCurrency(totalSpese);
+
       document.getElementById('summary-entrate').textContent = formatCurrency(totalEntrate);
       document.getElementById('summary-spese').textContent = formatCurrency(totalSpese);
 
@@ -922,20 +797,17 @@
 
     function updateSavingsGoal(){
       const goalAmount = 250;
-      document.getElementById("goal-amount").textContent = goalAmount.toFixed(2).replace(".", ",");
-
       const totalIncome = parseFloat((document.getElementById('summary-entrate')?.textContent || "€ 0,00").replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
       const totalExpense = parseFloat((document.getElementById('total-spese')?.textContent || "€ 0,00").replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
-      const savedAmount = totalIncome - totalExpense;
 
+      const savedAmount = totalIncome - totalExpense;
       let percentage = (savedAmount / goalAmount) * 100;
       percentage = Math.max(0, Math.min(100, percentage));
 
       document.getElementById('savings-progress-bar').style.width = percentage + "%";
       document.getElementById('progress-percentage').textContent = percentage.toFixed(0) + "%";
       document.getElementById('saved-amount').textContent = "€" + savedAmount.toFixed(2).replace('.', ',');
-      const remaining = Math.max(0, goalAmount - savedAmount);
-      document.getElementById('remaining-amount').textContent = "€" + remaining.toFixed(2).replace('.', ',');
+      document.getElementById('remaining-amount').textContent = "€" + Math.max(0, goalAmount - savedAmount).toFixed(2).replace('.', ',');
     }
 
     // ===== Data =====
@@ -952,24 +824,27 @@
         const amount = item.querySelector('.item-amount-input')?.value || "";
         if (label || amount) data.entrate.push({ label, amount });
       });
+
       document.querySelectorAll('#spese-items .entry-item').forEach(item=>{
         const label = item.querySelector('.item-label-input')?.value || "";
         const amount = item.querySelector('.item-amount-input')?.value || "";
         if (label || amount) data.spese.push({ label, amount });
       });
+
       return data;
     }
 
     async function saveMonthData(){
-      if (!window._firebaseReady || !window._firebase || !currentUser) return;
+      const fb = window.firebaseAuth;
+      if (!fb || !currentUser) return;
+
       try{
         isSaving = true;
         setSyncStatus("Salvataggio…", "rgba(245,158,11,1)");
 
-        const { db, doc, setDoc } = window._firebase;
         const data = collectCurrentData();
-        const ref = doc(db, "users", currentUser.uid, "budgets", currentMonth);
-        await setDoc(ref, data, { merge:true });
+        const ref = fb.doc(fb.db, "users", currentUser.uid, "budgets", currentMonth);
+        await fb.setDoc(ref, data, { merge:true });
 
         setSyncStatus("Salvato ✅", "rgba(34,197,94,1)");
       }catch(e){
@@ -1022,15 +897,14 @@
     }
 
     function attachRealtimeListener(){
-      if (!window._firebaseReady || !window._firebase || !currentUser) return;
-      if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+      const fb = window.firebaseAuth;
+      if (!fb || !currentUser) return;
 
+      if (unsubscribe){ unsubscribe(); unsubscribe = null; }
       setSyncStatus("Caricamento…", "rgba(245,158,11,1)");
 
-      const { db, doc, onSnapshot } = window._firebase;
-      const ref = doc(db, "users", currentUser.uid, "budgets", currentMonth);
-
-      unsubscribe = onSnapshot(ref, (snap)=>{
+      const ref = fb.doc(fb.db, "users", currentUser.uid, "budgets", currentMonth);
+      unsubscribe = fb.onSnapshot(ref, (snap)=>{
         if (isSaving) return;
         if (snap.exists()){
           populateUIFromData(snap.data());
@@ -1045,7 +919,7 @@
       });
     }
 
-    // ===== Add/Remove rows =====
+    // ===== Add/Remove =====
     function addEntryItem(type){
       const container = document.getElementById(type === 'entrate' ? 'entrate-items' : 'spese-items');
       const div = document.createElement('div');
@@ -1059,7 +933,6 @@
       updateBudgetTotals();
       saveMonthData();
     }
-
     function removeEntry(btn){
       const row = btn.closest(".entry-item");
       if (row){
@@ -1071,7 +944,6 @@
     window.addEntryItem = addEntryItem;
     window.removeEntry = removeEntry;
 
-    // Autosave on input
     document.addEventListener("input", (e)=>{
       const t = e.target;
       if (!t) return;
@@ -1081,65 +953,66 @@
       }
     });
 
-    // ===== Login/Logout =====
+    // ===== Login/Logout (popup + redirect fallback) =====
     async function doLogin(){
-      if (!window._firebaseReady || !window._firebase){
-        alert("Sto caricando Firebase… riprova tra 1 secondo.");
+      const fb = window.firebaseAuth;
+      if (!fb){
+        alert("Firebase non pronto. Ricarica la pagina.");
         return;
       }
       try{
-        const { auth, provider, signInWithPopup } = window._firebase;
-        await signInWithPopup(auth, provider);
+        await fb.signInWithPopup(fb.auth, fb.provider);
       }catch(e){
-        console.error("Login error:", e);
-        alert("Login Google non riuscito.\n• controlla popup bloccati\n• controlla console (F12)");
+        console.error("Popup login error:", e);
+        const code = e && e.code ? e.code : "";
+        if (
+          code === "auth/popup-blocked" ||
+          code === "auth/cancelled-popup-request" ||
+          code === "auth/operation-not-supported-in-this-environment"
+        ){
+          await fb.signInWithRedirect(fb.auth, fb.provider);
+          return;
+        }
+        if (code === "auth/unauthorized-domain"){
+          alert("Dominio non autorizzato.\nFirebase Console → Authentication → Settings → Authorized domains.");
+          return;
+        }
+        alert("Errore login Google. Guarda Console (F12).");
       }
     }
 
     async function doLogout(){
-      try{
-        if (unsubscribe){ unsubscribe(); unsubscribe = null; }
-        const { auth, signOut } = window._firebase;
-        await signOut(auth);
-
-        currentUser = null;
-        userInfo.textContent = "";
-        logoutBtnSidebar.style.display = "none";
-        logoutBtnTop.style.display = "none";
-        loginBtnTop.style.display = "inline-flex";
-        setSyncStatus("Login richiesto", "rgba(245,158,11,1)");
-        resetUIEmpty();
-        showLoginOnly();
-      }catch(e){
-        console.error("Logout error:", e);
-        alert("Logout non riuscito.");
-      }
+      const fb = window.firebaseAuth;
+      if (!fb) return;
+      if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+      await fb.signOut(fb.auth);
     }
 
     loginScreenBtn.addEventListener("click", doLogin);
     loginBtnSidebar.addEventListener("click", doLogin);
     loginBtnTop.addEventListener("click", doLogin);
+
     logoutBtnSidebar.addEventListener("click", doLogout);
     logoutBtnTop.addEventListener("click", doLogout);
 
-    // ===== Wait Firebase then auth listener =====
-    (function waitFirebase(){
+    // ===== Auth listener =====
+    (function waitAuth(){
       const t = setInterval(()=>{
-        if (!window._firebaseReady || !window._firebase) return;
+        const fb = window.firebaseAuth;
+        if (!fb) return;
         clearInterval(t);
 
-        const { auth, onAuthStateChanged } = window._firebase;
-        onAuthStateChanged(auth, (user)=>{
+        fb.onAuthStateChanged(fb.auth, (user)=>{
           currentUser = user || null;
 
           if (!currentUser){
-            showLoginOnly();
             userInfo.textContent = "";
             logoutBtnSidebar.style.display = "none";
             logoutBtnTop.style.display = "none";
             loginBtnTop.style.display = "inline-flex";
             setSyncStatus("Login richiesto", "rgba(245,158,11,1)");
             resetUIEmpty();
+            showLoginOnly();
             return;
           }
 
@@ -1155,7 +1028,7 @@
       }, 60);
     })();
 
-    // ================= AI CHAT =================
+    // ===== AI CHAT (UI + endpoint) =====
     (function(){
       const chatButton = document.getElementById('ai-chat-button');
       const chatBox = document.getElementById('ai-chat-box');
@@ -1166,12 +1039,6 @@
       const input = document.getElementById('ai-chat-input');
 
       const API_URL = 'https://ai-chat-backend-vercel.vercel.app/api/ai-chat';
-
-      let comparatoriContent = '';
-      fetch('comparatori1.html')
-        .then(r=> r.ok ? r.text() : '')
-        .then(t=> comparatoriContent = t || '')
-        .catch(()=> comparatoriContent='');
 
       function addMsg(text, who){
         const id = 'msg-' + Date.now() + '-' + Math.random().toString(16).slice(2);
@@ -1201,14 +1068,9 @@
           return { label, amount };
         }).filter(x => x.label || x.amount);
       }
-
       function getText(id){ return document.getElementById(id)?.textContent?.trim() || ""; }
-      function buildListText(title, arr){
-        if (!arr.length) return `${title}: (vuoto)`;
-        return `${title}:\n` + arr.map((x,i)=> `- ${i+1}) ${x.label || "(senza nome)"} = ${x.amount || "0"}`).join("\n");
-      }
 
-      // Tap orb -> open chat (drag-safe)
+      // open chat
       chatButton.addEventListener('click', ()=>{
         if (window.__orbDragging) return;
         if (!currentUser){
@@ -1218,18 +1080,19 @@
         chatBox.classList.remove('hidden');
         input.focus();
         if (!messagesEl.dataset.started){
-          addMsg("Ciao! cosa posso fare oggi per te capo?💪", 'ai');
+          addMsg("Ciao! Come posso aiutarti con il budget?", 'ai');
           messagesEl.dataset.started = 'true';
         }
       });
 
+      // close clears
       closeBtn.addEventListener('click', ()=>{
         chatBox.classList.add('hidden');
         messagesEl.innerHTML = '';
         delete messagesEl.dataset.started;
       });
 
-      // ✅ “−” chiude la chat (niente barra che resta)
+      // minimize = hide (no barra)
       minimizeBtn.addEventListener('click', ()=>{
         chatBox.classList.add('hidden');
       });
@@ -1247,25 +1110,17 @@
         addMsg(q, 'user');
         input.value = '';
 
-        const typingId = addMsg("Sto analizzando il tuo budget…", 'ai');
-
-        const entrate_items = readItems("entrate-items");
-        const spese_items = readItems("spese-items");
-
-        const listText =
-          buildListText("ENTRATE (lista completa)", entrate_items) + "\n\n" +
-          buildListText("SPESE (lista completa)", spese_items) + "\n\n" +
-          `RIEPILOGO: entrate=${getText("summary-entrate")}, spese=${getText("summary-spese")}, risparmio=${getText("summary-balance")}\n` +
-          `OBIETTIVO: obiettivo=€${getText("goal-amount")}, risparmiato=${getText("saved-amount")}, mancano=${getText("remaining-amount")}\n` +
-          `MESE: ${localStorage.getItem("budgetMonth") || ""}`;
+        const typingId = addMsg("Sto analizzando…", 'ai');
 
         const budgetContext = {
           month: localStorage.getItem("budgetMonth") || "",
-          summary: { entrate: getText("summary-entrate"), spese: getText("summary-spese"), risparmio: getText("summary-balance") },
-          obiettivo: { obiettivo_mensile: "€" + (document.getElementById("goal-amount")?.textContent || "250,00"), risparmiato: getText("saved-amount"), mancano: getText("remaining-amount") },
-          entrate_items,
-          spese_items,
-          listText
+          summary: {
+            entrate: getText("summary-entrate"),
+            spese: getText("summary-spese"),
+            risparmio: getText("summary-balance")
+          },
+          entrate_items: readItems("entrate-items"),
+          spese_items: readItems("spese-items")
         };
 
         try{
@@ -1274,7 +1129,7 @@
           const res = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken },
-            body: JSON.stringify({ question: q, context_html: comparatoriContent, budget: budgetContext, month: budgetContext.month })
+            body: JSON.stringify({ question: q, budget: budgetContext, month: budgetContext.month })
           });
 
           if (!res.ok){
@@ -1284,173 +1139,154 @@
           }
 
           const data = await res.json().catch(()=> ({}));
-          updateMsg(typingId, data.answer || "Nessuna risposta dall’AI.");
+          updateMsg(typingId, data.answer || "Nessuna risposta.");
         }catch(err){
           console.error(err);
-          updateMsg(typingId, "Errore nel contattare l’AI. Controlla API_URL / CORS / endpoint.");
+          updateMsg(typingId, "Errore nel contattare l’AI.");
         }
-
-        messagesEl.scrollTop = messagesEl.scrollHeight;
       });
     })();
 
-    <script>
-/* ================= ORB DRAG (PC + iPhone)
-   ✅ Drag: l'orb resta dove lo lasci (salvato in sessionStorage)
-   ✅ Refresh / chiudi tab: torna al default (sessionStorage si resetta)
-   ✅ Tap: apre la chat (drag-safe)
-   ✅ iPhone: drag NON scrolla pagina dietro
-*/
-(function(){
-  const widget = document.getElementById('ai-chat-widget');
-  const btn = document.getElementById('ai-chat-button');
-  if(!widget || !btn) return;
+    // ================= ORB DRAG: resta in posizione in sessione, reset su refresh =================
+    (function(){
+      const widget = document.getElementById('ai-chat-widget');
+      const btn = document.getElementById('ai-chat-button');
+      if(!widget || !btn) return;
 
-  window.__orbDragging = false;
-
-  let isDragging = false;
-  let moved = false;
-  let offsetX = 0, offsetY = 0;
-
-  // posizione di default (come ora)
-  function setDefault(){
-    widget.style.left = 'auto';
-    widget.style.top = 'auto';
-    widget.style.right = '16px';
-    widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
-  }
-
-  // ripristina posizione salvata SOLO per questa sessione
-  function restoreSessionPos(){
-    const raw = sessionStorage.getItem('aiWidgetPosSession');
-    if(!raw) return false;
-    try{
-      const p = JSON.parse(raw);
-      if(!p || !p.left || !p.top) return false;
-      widget.style.left = p.left;
-      widget.style.top  = p.top;
-      widget.style.right = 'auto';
-      widget.style.bottom = 'auto';
-      return true;
-    }catch(e){
-      return false;
-    }
-  }
-
-  // salva posizione nella sessione
-  function saveSessionPos(){
-    const rect = widget.getBoundingClientRect();
-    sessionStorage.setItem('aiWidgetPosSession', JSON.stringify({
-      left: rect.left + 'px',
-      top: rect.top + 'px'
-    }));
-  }
-
-  // init: o posizione sessione, o default
-  if(!restoreSessionPos()) setDefault();
-
-  function pointFromEvent(e){
-    return (e.touches && e.touches[0]) ? e.touches[0] : e;
-  }
-
-  function startDrag(e){
-    if (e.button !== undefined && e.button !== 0) return;
-
-    const p = pointFromEvent(e);
-    const rect = widget.getBoundingClientRect();
-    offsetX = p.clientX - rect.left;
-    offsetY = p.clientY - rect.top;
-
-    isDragging = true;
-    moved = false;
-    window.__orbDragging = false; // tap non bloccato
-
-    const img = widget.querySelector('img');
-    if (img) img.style.animation = 'none';
-  }
-
-  function onMove(e){
-    if(!isDragging) return;
-
-    if(!moved){
-      moved = true;
-      window.__orbDragging = true; // ora è drag vero
-    }
-    if (e.cancelable) e.preventDefault();
-
-    const p = pointFromEvent(e);
-
-    const w = widget.offsetWidth;
-    const h = widget.offsetHeight;
-
-    let x = p.clientX - offsetX;
-    let y = p.clientY - offsetY;
-
-    // clamp
-    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
-    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
-
-    widget.style.left = x + 'px';
-    widget.style.top  = y + 'px';
-    widget.style.right = 'auto';
-    widget.style.bottom = 'auto';
-  }
-
-  function endDrag(){
-    if(!isDragging) return;
-    isDragging = false;
-
-    const img = widget.querySelector('img');
-    if (img) img.style.animation = '';
-
-    // tap: lascia click libero
-    if(!moved){
       window.__orbDragging = false;
-      return;
-    }
 
-    // drag: salva posizione e resta lì
-    saveSessionPos();
+      let isDragging = false;
+      let moved = false;
+      let offsetX = 0, offsetY = 0;
 
-    setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 80);
-  }
-
-  // PC
-  btn.addEventListener('mousedown', startDrag);
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', endDrag);
-
-  // iPhone (passive false per bloccare scroll durante drag)
-  btn.addEventListener('touchstart', startDrag, { passive:false });
-  document.addEventListener('touchmove', onMove, { passive:false });
-  document.addEventListener('touchend', endDrag, { passive:true });
-  document.addEventListener('touchcancel', endDrag, { passive:true });
-
-  // blocca click se era drag
-  btn.addEventListener('click', (e)=>{
-    if(window.__orbDragging){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, true);
-
-  // se cambia orientamento, riclamppa e risalva
-  window.addEventListener('orientationchange', ()=>{
-    setTimeout(()=>{
-      // se c'è posizione sessione, la ripristiniamo e la riclamppiamo
-      restoreSessionPos();
-      // clamp leggero: se finisce fuori schermo, torna default
-      const r = widget.getBoundingClientRect();
-      if (r.right > window.innerWidth || r.bottom > window.innerHeight || r.left < 0 || r.top < 0){
-        setDefault();
-        sessionStorage.removeItem('aiWidgetPosSession');
-      } else {
-        saveSessionPos();
+      function setDefault(){
+        widget.style.left = 'auto';
+        widget.style.top = 'auto';
+        widget.style.right = '16px';
+        widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
       }
-    }, 150);
-  });
-})();
-</script>
+
+      function restoreSessionPos(){
+        const raw = sessionStorage.getItem('aiWidgetPosSession');
+        if(!raw) return false;
+        try{
+          const p = JSON.parse(raw);
+          if(!p || !p.left || !p.top) return false;
+          widget.style.left = p.left;
+          widget.style.top  = p.top;
+          widget.style.right = 'auto';
+          widget.style.bottom = 'auto';
+          return true;
+        }catch(e){
+          return false;
+        }
+      }
+
+      function saveSessionPos(){
+        const rect = widget.getBoundingClientRect();
+        sessionStorage.setItem('aiWidgetPosSession', JSON.stringify({
+          left: rect.left + 'px',
+          top: rect.top + 'px'
+        }));
+      }
+
+      if(!restoreSessionPos()) setDefault();
+
+      function pointFromEvent(e){
+        return (e.touches && e.touches[0]) ? e.touches[0] : e;
+      }
+
+      function startDrag(e){
+        if (e.button !== undefined && e.button !== 0) return;
+
+        const p = pointFromEvent(e);
+        const rect = widget.getBoundingClientRect();
+        offsetX = p.clientX - rect.left;
+        offsetY = p.clientY - rect.top;
+
+        isDragging = true;
+        moved = false;
+        window.__orbDragging = false;
+
+        const img = widget.querySelector('img');
+        if (img) img.style.animation = 'none';
+      }
+
+      function onMove(e){
+        if(!isDragging) return;
+
+        if(!moved){
+          moved = true;
+          window.__orbDragging = true;
+        }
+        if (e.cancelable) e.preventDefault();
+
+        const p = pointFromEvent(e);
+        const w = widget.offsetWidth;
+        const h = widget.offsetHeight;
+
+        let x = p.clientX - offsetX;
+        let y = p.clientY - offsetY;
+
+        x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+        y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
+
+        widget.style.left = x + 'px';
+        widget.style.top  = y + 'px';
+        widget.style.right = 'auto';
+        widget.style.bottom = 'auto';
+      }
+
+      function endDrag(){
+        if(!isDragging) return;
+        isDragging = false;
+
+        const img = widget.querySelector('img');
+        if (img) img.style.animation = '';
+
+        if(!moved){
+          window.__orbDragging = false;
+          return;
+        }
+
+        saveSessionPos();
+        setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 80);
+      }
+
+      // PC
+      btn.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', endDrag);
+
+      // iPhone
+      btn.addEventListener('touchstart', startDrag, { passive:false });
+      document.addEventListener('touchmove', onMove, { passive:false });
+      document.addEventListener('touchend', endDrag, { passive:true });
+      document.addEventListener('touchcancel', endDrag, { passive:true });
+
+      // blocca click se era drag
+      btn.addEventListener('click', (e)=>{
+        if(window.__orbDragging){
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      // se orientation change e la posizione va fuori schermo -> torna default
+      window.addEventListener('orientationchange', ()=>{
+        setTimeout(()=>{
+          restoreSessionPos();
+          const r = widget.getBoundingClientRect();
+          if (r.right > window.innerWidth || r.bottom > window.innerHeight || r.left < 0 || r.top < 0){
+            setDefault();
+            sessionStorage.removeItem('aiWidgetPosSession');
+          } else {
+            saveSessionPos();
+          }
+        }, 150);
+      });
+    })();
+  </script>
 
   <!-- FIRESTORE RULES (Firebase Console -> Firestore Rules)
   rules_version = '2';
