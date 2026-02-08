@@ -1335,22 +1335,35 @@
         };
 
         try{
-          const idToken = await currentUser.getIdToken(); // ✅ per bloccare utenti lato backend
+  // 🔐 token sicuro dell’utente loggato (refresh forzato)
+  const idToken = await currentUser.getIdToken(true);
 
-          const res = await fetch(API_URL, {
-            method:"POST",
-            headers:{
-              "Content-Type":"application/json",
-              "Authorization": "Bearer " + idToken
-            },
-            body: JSON.stringify({
-              question: q,
-              context_html: comparatoriContent, // opzionale
-              budget: budgetContext,            // ✅ verità = DOM utente corrente
-              uid: currentUser.uid,
-              month: budgetContext.month
-            })
-          });
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + idToken   // ✅ OBBLIGATORIO
+    },
+    body: JSON.stringify({
+      question: q,
+      context_html: comparatoriContent,   // opzionale
+      budget: budgetContext,              // dati DOM dell’utente corrente
+      month: budgetContext.month          // ✅ OBBLIGATORIO
+    })
+  });
+
+  if (!res.ok){
+    const t = await res.text().catch(()=> "");
+    throw new Error(`HTTP ${res.status}: ${t}`);
+  }
+
+  const data = await res.json();
+  updateMsg(typingId, data.answer || "Nessuna risposta dall’AI.");
+}
+catch(err){
+  console.error(err);
+  updateMsg(typingId, "Errore AI. Riprova tra qualche secondo.");
+}
 
           if (!res.ok){
             const t = await res.text().catch(()=> "");
