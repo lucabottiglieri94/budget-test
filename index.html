@@ -527,6 +527,10 @@
       z-index: 9000;
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
+    /* quando lo trascini */
+#ai-chat-widget.dragging{
+  opacity: .95;
+}
     #ai-chat-button{
       width: 62px; height: 62px;
       border-radius: 50%;
@@ -1573,5 +1577,106 @@
     }
   }
   -->
+  <script>
+(function(){
+  const widget = document.getElementById('ai-chat-widget');
+  const btn = document.getElementById('ai-chat-button');
+  if(!widget || !btn) return;
+
+  // --- ripristina posizione salvata ---
+  const saved = localStorage.getItem('aiWidgetPos');
+  if (saved) {
+    try {
+      const p = JSON.parse(saved);
+      widget.style.left = p.left;
+      widget.style.top = p.top;
+      widget.style.right = 'auto';
+      widget.style.bottom = 'auto';
+    } catch(e){}
+  }
+
+  let isDragging = false;
+  let moved = false;
+  let offsetX = 0, offsetY = 0;
+
+  function startDrag(e){
+    // click destro no
+    if (e.button !== undefined && e.button !== 0) return;
+
+    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
+
+    const rect = widget.getBoundingClientRect();
+    offsetX = p.clientX - rect.left;
+    offsetY = p.clientY - rect.top;
+
+    isDragging = true;
+    moved = false;
+    widget.classList.add('dragging');
+
+    // disattiva animazione fluttuante mentre trascini (se la usi sull'immagine)
+    const img = widget.querySelector('img');
+    if (img) img.style.animation = 'none';
+  }
+
+  function onMove(e){
+    if(!isDragging) return;
+
+    const p = (e.touches && e.touches[0]) ? e.touches[0] : e;
+    moved = true;
+
+    // limita dentro lo schermo
+    const w = widget.offsetWidth;
+    const h = widget.offsetHeight;
+
+    let x = p.clientX - offsetX;
+    let y = p.clientY - offsetY;
+
+    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
+
+    widget.style.left = x + 'px';
+    widget.style.top = y + 'px';
+    widget.style.right = 'auto';
+    widget.style.bottom = 'auto';
+  }
+
+  function endDrag(){
+    if(!isDragging) return;
+    isDragging = false;
+    widget.classList.remove('dragging');
+
+    // riattiva animazione
+    const img = widget.querySelector('img');
+    if (img) img.style.animation = '';
+
+    // salva posizione
+    const rect = widget.getBoundingClientRect();
+    localStorage.setItem('aiWidgetPos', JSON.stringify({
+      left: rect.left + 'px',
+      top: rect.top + 'px'
+    }));
+  }
+
+  // Mouse
+  btn.addEventListener('mousedown', startDrag);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', endDrag);
+
+  // Touch (mobile)
+  btn.addEventListener('touchstart', startDrag, {passive:true});
+  document.addEventListener('touchmove', onMove, {passive:true});
+  document.addEventListener('touchend', endDrag);
+
+  // Evita che un drag apra la chat (blocca il click se hai trascinato)
+  btn.addEventListener('click', (e) => {
+    if(moved){
+      e.preventDefault();
+      e.stopPropagation();
+      moved = false;
+    }
+  }, true);
+})();
+</script>
+
 </body>
 </html>
