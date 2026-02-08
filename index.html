@@ -782,6 +782,46 @@
   50%  { transform: translateY(-10px); }
   100% { transform: translateY(0); }
 }
+    /* ================= CHAT APPLE STYLE ================= */
+
+/* UTENTE – bubble dark, pulita, neutra */
+.ai-msg-user .ai-msg-bubble{
+  background: rgba(255,255,255,.14);
+  color: #F9FAFB;
+
+  border: 1px solid rgba(255,255,255,.20);
+  border-bottom-right-radius: 8px;
+
+  font-weight: 800;
+  letter-spacing: .1px;
+
+  box-shadow:
+    0 8px 22px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+/* AI – bubble leggermente più soft */
+.ai-msg-ai .ai-msg-bubble{
+  background: rgba(255,255,255,.07);
+  color: #E5E7EB;
+
+  border: 1px solid rgba(255,255,255,.12);
+  border-bottom-left-radius: 8px;
+
+  font-weight: 800;
+  letter-spacing: .1px;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,.28);
+}
+
+/* FIX: quando minimized sparisce anche input */
+#ai-chat-box.minimized #ai-chat-form{
+  display: none !important;
+}
+#ai-chat-box.hidden{
+  display: none !important;
+}
+
 
   </style>
 </head>
