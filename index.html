@@ -1514,121 +1514,140 @@
       });
     })();
 
-    // ================= ORB DRAG (PC + iPhone) =================
-    // ✅ no scroll su iPhone mentre trascini
-    // ✅ spostabile su PC
-    // ✅ al rilascio torna SEMPRE alla posizione definita (bottom-right)
-    (function(){
-      const widget = document.getElementById('ai-chat-widget');
-      const btn = document.getElementById('ai-chat-button');
-      if(!widget || !btn) return;
+<script>
+/* ================= ORB DRAG (PC + iPhone) =================
+   ✅ Tap su iPhone apre la chat
+   ✅ Drag su iPhone NON scrolla la pagina dietro
+   ✅ Drag su PC funziona
+   ✅ Se trascini e molli: l'orb torna SEMPRE alla posizione definita (bottom-right)
+*/
+(function(){
+  const widget = document.getElementById('ai-chat-widget');
+  const btn = document.getElementById('ai-chat-button');
+  if(!widget || !btn) return;
 
-      // flag usato per non aprire chat mentre stai trascinando
+  // flag per evitare che il click apra chat mentre stai trascinando
+  window.__orbDragging = false;
+
+  let isDragging = false;
+  let moved = false;
+  let offsetX = 0, offsetY = 0;
+
+  // posizione "definita" (default) = basso-destra sopra bottom-nav
+  function resetToDefault(){
+    widget.style.left = 'auto';
+    widget.style.top = 'auto';
+    widget.style.right = '16px';
+    widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
+  }
+
+  // sempre in posizione definita all'avvio
+  resetToDefault();
+
+  function pointFromEvent(e){
+    if (e.touches && e.touches[0]) return e.touches[0];
+    return e;
+  }
+
+  function startDrag(e){
+    // solo click sinistro su mouse
+    if (e.button !== undefined && e.button !== 0) return;
+
+    const p = pointFromEvent(e);
+    const rect = widget.getBoundingClientRect();
+
+    offsetX = p.clientX - rect.left;
+    offsetY = p.clientY - rect.top;
+
+    isDragging = true;
+    moved = false;
+
+    // ✅ IMPORTANTISSIMO: NON bloccare ancora il tap
+    // il tap deve aprire la chat su iPhone
+    window.__orbDragging = false;
+
+    // stop animazione float mentre tocchi (più stabile)
+    const img = widget.querySelector('img');
+    if (img) img.style.animation = 'none';
+  }
+
+  function onMove(e){
+    if(!isDragging) return;
+
+    // ✅ appena muovi davvero -> allora è drag:
+    // blocca lo scroll iPhone + blocca il click
+    if (!moved) {
+      moved = true;
+      window.__orbDragging = true;
+    }
+
+    if (e.cancelable) e.preventDefault();
+
+    const p = pointFromEvent(e);
+
+    const w = widget.offsetWidth;
+    const h = widget.offsetHeight;
+
+    let x = p.clientX - offsetX;
+    let y = p.clientY - offsetY;
+
+    // clamp dentro lo schermo
+    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
+
+    widget.style.left = x + 'px';
+    widget.style.top = y + 'px';
+    widget.style.right = 'auto';
+    widget.style.bottom = 'auto';
+  }
+
+  function endDrag(){
+    if(!isDragging) return;
+    isDragging = false;
+
+    // riattiva animazione
+    const img = widget.querySelector('img');
+    if (img) img.style.animation = '';
+
+    // ✅ se non hai trascinato (tap):
+    // NON resettare e NON bloccare -> il tap aprirà la chat
+    if (!moved){
       window.__orbDragging = false;
+      return;
+    }
 
-      let isDragging = false;
-      let moved = false;
-      let offsetX = 0, offsetY = 0;
+    // ✅ se hai trascinato: torna sempre al default
+    resetToDefault();
 
-      // posizione "definita" (default)
-      function resetToDefault(){
-        widget.style.left = 'auto';
-        widget.style.top = 'auto';
-        widget.style.right = '16px';
-        widget.style.bottom = 'calc(78px + env(safe-area-inset-bottom, 0px))';
-      }
+    // sblocca click subito dopo
+    setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 60);
+  }
 
-      // inizializza sempre in posizione definita
-      resetToDefault();
+  // Mouse (PC)
+  btn.addEventListener('mousedown', startDrag);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', endDrag);
 
-      function pointFromEvent(e){
-        if (e.touches && e.touches[0]) return e.touches[0];
-        return e;
-      }
+  // Touch (iPhone) - passive:false per poter preventDefault su move
+  btn.addEventListener('touchstart', startDrag, { passive:false });
+  document.addEventListener('touchmove', onMove, { passive:false });
+  document.addEventListener('touchend', endDrag, { passive:true });
+  document.addEventListener('touchcancel', endDrag, { passive:true });
 
-      function startDrag(e){
-        // solo click sinistro
-        if (e.button !== undefined && e.button !== 0) return;
+  // evita che il click apra la chat se stavi trascinando
+  btn.addEventListener('click', (e)=>{
+    if(window.__orbDragging){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
 
-        // IMPORTANTISSIMO: blocca lo scroll su iPhone
-        if (e.cancelable) e.preventDefault();
+  // se ruoti / resize: torna al default
+  window.addEventListener('orientationchange', ()=> setTimeout(resetToDefault, 120));
+  window.addEventListener('resize', ()=> setTimeout(resetToDefault, 60));
+})();
+</script>
 
-        const p = pointFromEvent(e);
-        const rect = widget.getBoundingClientRect();
-        offsetX = p.clientX - rect.left;
-        offsetY = p.clientY - rect.top;
-
-        isDragging = true;
-        moved = false;
-        window.__orbDragging = true;
-
-        // ferma animazione float durante drag
-        const img = widget.querySelector('img');
-        if (img) img.style.animation = 'none';
-      }
-
-      function onMove(e){
-        if(!isDragging) return;
-
-        // blocca scroll su iPhone mentre trascini
-        if (e.cancelable) e.preventDefault();
-
-        const p = pointFromEvent(e);
-        moved = true;
-
-        const w = widget.offsetWidth;
-        const h = widget.offsetHeight;
-
-        let x = p.clientX - offsetX;
-        let y = p.clientY - offsetY;
-
-        x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
-        y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
-
-        widget.style.left = x + 'px';
-        widget.style.top = y + 'px';
-        widget.style.right = 'auto';
-        widget.style.bottom = 'auto';
-      }
-
-      function endDrag(){
-        if(!isDragging) return;
-        isDragging = false;
-
-        // riattiva animazione float
-        const img = widget.querySelector('img');
-        if (img) img.style.animation = '';
-
-        // ✅ torna sempre alla posizione definita
-        resetToDefault();
-
-        // dopo pochissimo, permetti i click
-        setTimeout(()=>{ window.__orbDragging = false; moved = false; }, 120);
-      }
-
-      // Mouse (PC)
-      btn.addEventListener('mousedown', startDrag);
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', endDrag);
-
-      // Touch (iPhone) - PASSIVE FALSE per poter preventDefault
-      btn.addEventListener('touchstart', startDrag, { passive:false });
-      document.addEventListener('touchmove', onMove, { passive:false });
-      document.addEventListener('touchend', endDrag, { passive:true });
-      document.addEventListener('touchcancel', endDrag, { passive:true });
-
-      // evita “tap” che apre chat se hai trascinato
-      btn.addEventListener('click', (e)=>{
-        if(window.__orbDragging){
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }, true);
-
-      // se ruoti iPhone, rimetti in posizione definita
-      window.addEventListener('orientationchange', ()=> setTimeout(resetToDefault, 120));
-      window.addEventListener('resize', ()=> setTimeout(resetToDefault, 60));
-    })();
   </script>
 
   <!-- FIRESTORE RULES (Firebase Console -> Firestore Rules)
