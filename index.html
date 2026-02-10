@@ -884,7 +884,7 @@
     });
 
     // ===== Food totals =====
-    function updateFoodTotals(){
+    function updateFoodTotals(doSave=false){
       const monthlyBudget = 500;
       let monthlyTotal = 0;
 
@@ -908,27 +908,22 @@
         remEl.classList.toggle('pos', remaining >= 0);
         remEl.classList.toggle('neg', remaining < 0);
       }
+
+      // sync: aggiorna la riga "Spesa alimentare" nella sezione Spese (se esiste)
+      document.querySelectorAll("#spese-items .entry-item").forEach(row=>{
+        const label  = row.querySelector(".item-label-input");
+        const amount = row.querySelector(".item-amount-input");
+        if (label && amount && label.value.trim().toLowerCase() === "spesa alimentare"){
+          amount.value = monthlyTotal.toFixed(2);
+        }
+      });
+
+      updateBudgetTotals();
+      if (doSave) saveMonthData();
     }
-
-      // ⬇️ INCOLLA QUESTO BLOCCO QUI
-  document.querySelectorAll("#spese-items .entry-item").forEach(row=>{
-    const label  = row.querySelector(".item-label-input");
-    const amount = row.querySelector(".item-amount-input");
-
-    if (
-      label &&
-      amount &&
-      label.value.trim().toLowerCase() === "spesa alimentare"
-    ){
-      amount.value = monthlyTotal.toFixed(2);
-    }
-  });
-
-  updateBudgetTotals();
-}
 
     // ===== Pet totals (sync -> Spese "Animali") =====
-    function updatePetTotals(){
+    function updatePetTotals(doSave=false){
       let month = 0;
 
       for (let w = 1; w <= 4; w++){
@@ -954,6 +949,7 @@
       });
 
       updateBudgetTotals();
+      if (doSave) saveMonthData();
     }
 
     // ===== Pie =====
@@ -1214,15 +1210,13 @@
 
       if (t.classList.contains("week1-shopping") || t.classList.contains("week2-shopping") ||
           t.classList.contains("week3-shopping") || t.classList.contains("week4-shopping")){
-        updateFoodTotals();
-        saveMonthData();
+        updateFoodTotals(true);
         return;
       }
 
       if (t.classList.contains("pet-w1") || t.classList.contains("pet-w2") ||
           t.classList.contains("pet-w3") || t.classList.contains("pet-w4")){
-        updatePetTotals();   // aggiorna anche la riga "Animali"
-        saveMonthData();
+        updatePetTotals(true);   // aggiorna anche la riga "Animali"
         return;
       }
 
