@@ -910,6 +910,23 @@
       }
     }
 
+      // ⬇️ INCOLLA QUESTO BLOCCO QUI
+  document.querySelectorAll("#spese-items .entry-item").forEach(row=>{
+    const label  = row.querySelector(".item-label-input");
+    const amount = row.querySelector(".item-amount-input");
+
+    if (
+      label &&
+      amount &&
+      label.value.trim().toLowerCase() === "spesa alimentare"
+    ){
+      amount.value = monthlyTotal.toFixed(2);
+    }
+  });
+
+  updateBudgetTotals();
+}
+
     // ===== Pet totals (sync -> Spese "Animali") =====
     function updatePetTotals(){
       let month = 0;
