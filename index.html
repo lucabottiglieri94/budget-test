@@ -655,6 +655,61 @@
             <div class="sum"><div class="label">Rimasto</div><div class="value pos" id="total-food-remaining">€ 500,00</div></div>
           </div>
         </section>
+        <!-- 🐱🐰 SPESE ANIMALI (4 settimane) -->
+<section class="card">
+  <h2>🐱🐰 Spese Animali <span class="muted">4 settimane</span></h2>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+    <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
+      <div style="font-weight:950; margin-bottom:10px;">Settimana 1</div>
+      <div class="week-grid">
+        <input type="number" class="item-amount-input pet-w1" placeholder="€">
+        <input type="number" class="item-amount-input pet-w1" placeholder="€">
+        <input type="number" class="item-amount-input pet-w1" placeholder="€">
+        <input type="number" class="item-amount-input pet-w1" placeholder="€">
+      </div>
+      <div class="total-row"><span>Totale</span><span id="pet-total-w1">€ 0,00</span></div>
+    </div>
+
+    <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
+      <div style="font-weight:950; margin-bottom:10px;">Settimana 2</div>
+      <div class="week-grid">
+        <input type="number" class="item-amount-input pet-w2" placeholder="€">
+        <input type="number" class="item-amount-input pet-w2" placeholder="€">
+        <input type="number" class="item-amount-input pet-w2" placeholder="€">
+        <input type="number" class="item-amount-input pet-w2" placeholder="€">
+      </div>
+      <div class="total-row"><span>Totale</span><span id="pet-total-w2">€ 0,00</span></div>
+    </div>
+
+    <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
+      <div style="font-weight:950; margin-bottom:10px;">Settimana 3</div>
+      <div class="week-grid">
+        <input type="number" class="item-amount-input pet-w3" placeholder="€">
+        <input type="number" class="item-amount-input pet-w3" placeholder="€">
+        <input type="number" class="item-amount-input pet-w3" placeholder="€">
+        <input type="number" class="item-amount-input pet-w3" placeholder="€">
+      </div>
+      <div class="total-row"><span>Totale</span><span id="pet-total-w3">€ 0,00</span></div>
+    </div>
+
+    <div class="card" style="background: rgba(255,255,255,.04); box-shadow:none;">
+      <div style="font-weight:950; margin-bottom:10px;">Settimana 4</div>
+      <div class="week-grid">
+        <input type="number" class="item-amount-input pet-w4" placeholder="€">
+        <input type="number" class="item-amount-input pet-w4" placeholder="€">
+        <input type="number" class="item-amount-input pet-w4" placeholder="€">
+        <input type="number" class="item-amount-input pet-w4" placeholder="€">
+      </div>
+      <div class="total-row"><span>Totale</span><span id="pet-total-w4">€ 0,00</span></div>
+    </div>
+  </div>
+
+  <div class="summary" style="margin-top:14px;">
+    <div class="sum"><div class="label">Speso</div><div class="value" id="pet-total-month">€ 0,00</div></div>
+  </div>
+</section>
+
       </main>
     </div>
 
@@ -830,6 +885,25 @@
         remEl.classList.toggle('neg', remaining < 0);
       }
     }
+// ===== Pet totals =====
+function updatePetTotals(){
+  let month = 0;
+
+  for (let w = 1; w <= 4; w++){
+    let t = 0;
+    document
+      .querySelectorAll(`.pet-w${w}`)
+      .forEach(i => t += parseAmount(i.value));
+
+    const el = document.getElementById(`pet-total-w${w}`);
+    if (el) el.textContent = formatCurrency(t);
+
+    month += t;
+  }
+
+  const monthEl = document.getElementById("pet-total-month");
+  if (monthEl) monthEl.textContent = formatCurrency(month);
+}
 
     // ===== Pie =====
     let pieChart = null;
@@ -1063,22 +1137,43 @@
     window.removeEntry = removeEntry;
 
     // autosave: entrate/spese + food
-    document.addEventListener("input", (e)=>{
-      const t = e.target;
-      if (!t) return;
+document.addEventListener("input", (e)=>{
+  const t = e.target;
+  if (!t) return;
 
-      if (t.classList.contains("week1-shopping") || t.classList.contains("week2-shopping") ||
-          t.classList.contains("week3-shopping") || t.classList.contains("week4-shopping")){
-        updateFoodTotals();
-        saveMonthData();
-        return;
-      }
+  // alimentari
+  if (
+    t.classList.contains("week1-shopping") ||
+    t.classList.contains("week2-shopping") ||
+    t.classList.contains("week3-shopping") ||
+    t.classList.contains("week4-shopping")
+  ){
+    updateFoodTotals();
+    saveMonthData();
+    return;
+  }
 
-      if (t.classList.contains("item-label-input") || t.classList.contains("item-amount-input")){
-        updateBudgetTotals();
-        saveMonthData();
-      }
-    });
+  // 🐱🐰 animali → INCOLLA QUI
+  if (
+    t.classList.contains("pet-w1") ||
+    t.classList.contains("pet-w2") ||
+    t.classList.contains("pet-w3") ||
+    t.classList.contains("pet-w4")
+  ){
+    updatePetTotals();
+    saveMonthData();
+    return;
+  }
+
+  // entrate / spese normali
+  if (
+    t.classList.contains("item-label-input") ||
+    t.classList.contains("item-amount-input")
+  ){
+    updateBudgetTotals();
+    saveMonthData();
+  }
+});
 
     // ===== Login/Logout (popup + redirect fallback) =====
     async function doLogin(){
