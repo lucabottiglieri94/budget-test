@@ -903,6 +903,22 @@ function updatePetTotals(){
 
   const monthEl = document.getElementById("pet-total-month");
   if (monthEl) monthEl.textContent = formatCurrency(month);
+
+  // 🔁 aggiorna la spesa "Animali"
+  document.querySelectorAll("#spese-items .entry-item").forEach(row=>{
+    const label = row.querySelector(".item-label-input");
+    const amount = row.querySelector(".item-amount-input");
+
+    if (
+      label &&
+      amount &&
+      label.value.trim().toLowerCase() === "animali"
+    ){
+      amount.value = month.toFixed(2);
+    }
+  });
+
+  updateBudgetTotals();
 }
 
     // ===== Pie =====
