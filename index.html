@@ -376,6 +376,26 @@
       text-align: center;
     }
 
+    /* Savings Breakdown */
+    .savings-breakdown{
+      margin-top:16px; 
+      padding-top:12px; 
+      border-top:1px solid rgba(255,255,255,.10);
+    }
+    .savings-breakdown-title{
+      font-size:11px; 
+      font-weight:900; 
+      color:rgba(229,231,235,.65); 
+      margin-bottom:8px;
+    }
+    .savings-breakdown-grid{
+      display:grid; 
+      grid-template-columns:1fr 1fr; 
+      gap:8px; 
+      font-size:12px; 
+      font-weight:800;
+    }
+
     /* ===== AI ORB + CHAT ===== */
     #ai-chat-widget{
       position: fixed;
@@ -580,7 +600,7 @@
         <div class="topbar">
           <div class="topbar-left">
             <div class="topbar-title">💰 Budget Mensile</div>
-            <div class="topbar-sub">Gestione entrate/spese • sincronizzato</div>
+            <div class="topbar-sub">Gestione entrate/spese • sincronizzato • ottimizzato</div>
           </div>
           <div class="topbar-right">
             <select id="month-selector" class="select"></select>
@@ -627,6 +647,15 @@
             <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-weight:900;color:rgba(229,231,235,.78);font-size:12px;">
               <span>Risparmiato: <b id="saved-amount">€0,00</b></span>
               <span>Mancano: <b id="remaining-amount">€250,00</b></span>
+            </div>
+            
+            <!-- 🆕 BREAKDOWN RISPARMI -->
+            <div class="savings-breakdown">
+              <div class="savings-breakdown-title">💡 BREAKDOWN RISPARMI</div>
+              <div class="savings-breakdown-grid">
+                <div>🛒 Cibo: <span id="food-savings-detail" class="pos">€0,00</span></div>
+                <div>🐾 Animali: <span id="pet-savings-detail" class="pos">€0,00</span></div>
+              </div>
             </div>
           </section>
         </div>
@@ -869,6 +898,9 @@
     let unsubscribe = null;
     let isSaving = false;
 
+    // 🔥 DEBOUNCING: Salva dopo 800ms dall'ultima modifica
+    let saveTimeout = null;
+
     const loginScreen = document.getElementById("login-screen");
     const loginScreenBtn = document.getElementById("login-screen-btn");
     const appEl = document.getElementById("app");
@@ -1079,12 +1111,52 @@
       updateSavingsGoal();
     }
 
+    // 🔥🔥🔥 NUOVA FUNZIONE CON CALCOLO CORRETTO DEL RISPARMIO
     function updateSavingsGoal(){
       const goalAmount = parseAmount(savingsGoalInput.value) || 250;
-      const totalIncome = parseFloat((document.getElementById('summary-entrate')?.textContent || "€ 0,00").replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
-      const totalExpense = parseFloat((document.getElementById('total-spese')?.textContent || "€ 0,00").replace('€','').replace('.', '').replace(',', '.').trim()) || 0;
+      
+      // ENTRATE
+      const totalIncome = parseFloat((document.getElementById('summary-entrate')?.textContent || "€ 0,00")
+        .replace('€','').replace(/\./g, '').replace(',', '.').trim()) || 0;
+      
+      // SPESE MANUALI (escludendo food e pet auto-generati)
+      let manualExpenses = 0;
+      document.querySelectorAll('#spese-items .item-amount-input').forEach(input => {
+        // Escludi le voci auto-generate
+        if (!input.classList.contains('food-auto-amount') && 
+            !input.classList.contains('pet-auto-amount')) {
+          manualExpenses += parseAmount(input.value);
+        }
+      });
 
-      const savedAmount = totalIncome - totalExpense;
+      // CALCOLA QUANTO HAI SPESO DAVVERO per cibo e animali
+      const foodBudget = parseAmount(foodBudgetInput.value) || 500;
+      const petBudget = parseAmount(petBudgetInput.value) || 200;
+      
+      let actualFoodSpent = 0;
+      for (let week=1; week<=4; week++){
+        document.querySelectorAll(`.week${week}-shopping`).forEach(i => 
+          actualFoodSpent += parseAmount(i.value)
+        );
+      }
+      
+      let actualPetSpent = 0;
+      for (let week=1; week<=4; week++){
+        document.querySelectorAll(`.pet-week${week}-shopping`).forEach(i => 
+          actualPetSpent += parseAmount(i.value)
+        );
+      }
+
+      // 🎯 CALCOLO CORRETTO DEL RISPARMIO
+      // Risparmio = Entrate - (Spese Manuali + Spesa Food Reale + Spesa Pet Reale)
+      const totalExpenses = manualExpenses + actualFoodSpent + actualPetSpent;
+      const savedAmount = totalIncome - totalExpenses;
+      
+      // 💰 CALCOLA I RISPARMI SPECIFICI
+      const foodSavings = foodBudget - actualFoodSpent;
+      const petSavings = petBudget - actualPetSpent;
+      
+      // Aggiorna UI principale
       let percentage = (savedAmount / goalAmount) * 100;
       percentage = Math.max(0, Math.min(100, percentage));
 
@@ -1092,6 +1164,27 @@
       document.getElementById('progress-percentage').textContent = percentage.toFixed(0) + "%";
       document.getElementById('saved-amount').textContent = "€" + savedAmount.toFixed(2).replace('.', ',');
       document.getElementById('remaining-amount').textContent = "€" + Math.max(0, goalAmount - savedAmount).toFixed(2).replace('.', ',');
+      
+      // 🆕 AGGIORNA IL BREAKDOWN DEI RISPARMI
+      const foodSavingsEl = document.getElementById('food-savings-detail');
+      const petSavingsEl = document.getElementById('pet-savings-detail');
+      
+      if (foodSavingsEl) {
+        foodSavingsEl.textContent = "€" + foodSavings.toFixed(2).replace('.', ',');
+        foodSavingsEl.classList.toggle('pos', foodSavings >= 0);
+        foodSavingsEl.classList.toggle('neg', foodSavings < 0);
+      }
+      
+      if (petSavingsEl) {
+        petSavingsEl.textContent = "€" + petSavings.toFixed(2).replace('.', ',');
+        petSavingsEl.classList.toggle('pos', petSavings >= 0);
+        petSavingsEl.classList.toggle('neg', petSavings < 0);
+      }
+      
+      // 🆕 OPZIONALE: Log per debug
+      console.log(`💚 Risparmiato su cibo: €${foodSavings.toFixed(2)}`);
+      console.log(`🐾 Risparmiato su animali: €${petSavings.toFixed(2)}`);
+      console.log(`💰 Risparmio totale: €${savedAmount.toFixed(2)}`);
     }
 
     // ===== Data (include food + pets + settings) =====
@@ -1136,6 +1229,7 @@
       return data;
     }
 
+    // 🔥🔥🔥 DEBOUNCED SAVE - Salva solo dopo 800ms dall'ultima modifica
     async function saveMonthData(){
       const fb = window.firebaseAuth;
       if (!fb || !currentUser) return;
@@ -1155,6 +1249,15 @@
       }finally{
         setTimeout(()=>{ isSaving = false; }, 200);
       }
+    }
+
+    // 🔥 WRAPPER CON DEBOUNCING
+    function debouncedSave() {
+      clearTimeout(saveTimeout);
+      setSyncStatus("In attesa…", "rgba(156,163,175,1)");
+      saveTimeout = setTimeout(() => {
+        saveMonthData();
+      }, 800); // Aspetta 800ms dall'ultima modifica
     }
 
     function resetUIEmpty(){
@@ -1274,12 +1377,12 @@
       `;
       container.appendChild(div);
       updateBudgetTotals();
-      saveMonthData();
+      debouncedSave(); // 🔥 USA IL DEBOUNCED SAVE
     }
     function removeEntry(btn){
       const row = btn.closest(".entry-item");
       if (row){
-        // Check if it's an auto-generated expense (prevent deletion by warning)
+        // Check if it's an auto-generated expense
         const labelInput = row.querySelector('.item-label-input');
         if (labelInput) {
           const labelLower = labelInput.value.trim().toLowerCase();
@@ -1294,13 +1397,13 @@
         updateBudgetTotals();
         updateFoodTotals();
         updatePetTotals();
-        saveMonthData();
+        debouncedSave(); // 🔥 USA IL DEBOUNCED SAVE
       }
     }
     window.addEntryItem = addEntryItem;
     window.removeEntry = removeEntry;
 
-    // autosave: entrate/spese + food + pets + settings
+    // 🔥 AUTOSAVE CON DEBOUNCING - evita troppi salvataggi
     document.addEventListener("input", (e)=>{
       const t = e.target;
       if (!t) return;
@@ -1309,7 +1412,7 @@
       if (t.classList.contains("week1-shopping") || t.classList.contains("week2-shopping") ||
           t.classList.contains("week3-shopping") || t.classList.contains("week4-shopping")){
         updateFoodTotals();
-        saveMonthData();
+        debouncedSave(); // 🔥 DEBOUNCED
         return;
       }
 
@@ -1317,28 +1420,28 @@
       if (t.classList.contains("pet-week1-shopping") || t.classList.contains("pet-week2-shopping") ||
           t.classList.contains("pet-week3-shopping") || t.classList.contains("pet-week4-shopping")){
         updatePetTotals();
-        saveMonthData();
+        debouncedSave(); // 🔥 DEBOUNCED
         return;
       }
 
       // Savings goal
       if (t.id === 'savings-goal-input') {
         updateSavingsGoal();
-        saveMonthData();
+        debouncedSave(); // 🔥 DEBOUNCED
         return;
       }
 
       // Food settings
       if (t.id === 'food-budget-input' || t.id === 'food-weekly-input') {
         updateFoodTotals();
-        saveMonthData();
+        debouncedSave(); // 🔥 DEBOUNCED
         return;
       }
 
       // Pet settings
       if (t.id === 'pet-budget-input' || t.id === 'pet-weekly-input') {
         updatePetTotals();
-        saveMonthData();
+        debouncedSave(); // 🔥 DEBOUNCED
         return;
       }
 
@@ -1350,7 +1453,7 @@
           return;
         }
         updateBudgetTotals();
-        saveMonthData();
+        debouncedSave(); // 🔥 DEBOUNCED
       }
     });
 
@@ -1699,5 +1802,16 @@
       });
     })();
   </script>
+
+  <!-- FIRESTORE RULES (Firebase Console -> Firestore Rules)
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /users/{userId}/budgets/{monthId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+  -->
 </body>
 </html>
